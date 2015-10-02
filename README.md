@@ -172,7 +172,7 @@ For instance, to checkout *t-1.0.0-alpha1* you can enter the following command:
 
 After choosing the right branch or tag to work on, follow the insructions on **DEPENDENCIES** section. Make sure you have all the third-party library dependencies listed in this section before trying to build TWS.
 
-The `build/cmake` folder contains a CMake project for building TerraMA².
+The `build/cmake` folder contains a CMake project for building TWS.
 
 Until now its build has been tested on:
 - Linux Ubuntu 14.04
@@ -190,7 +190,7 @@ Follow the build steps below according to your platform.
 
 `/home/user/mydevel/tws/codebase`
 
-1.3. Create a folder out of the TerraMA² source tree to generate the build system, for example:
+1.3. Create a folder out of the TWS source tree to generate the build system, for example:
 ```
 $ cd /home/user/mydevel/tws
 $ mkdir build-release
