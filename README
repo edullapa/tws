@@ -1,0 +1,49 @@
+  TerraLib GeoWeb Services (TWS)
+  ==============================
+
+TODO
+
+Instructions
+------------
+
+The documents below are in the root directory of TWS codebase and they explain the details of the codebase:
+
+- BRANCHES-AND-TAGS.: Notes on how to switch to the right branch to work on or the right tag to get the source code.
+
+- BUILD-INSTRUCTIONS: Notes on how to compile and install TWS for each platform.
+
+- CHANGELOG.........: List of changes in TWS source code.
+
+- LICENSE...........: Licence statement in plain txt format.
+
+- README............: This file. It contains instructions about how to build and how is organized TWS plataform source code.
+
+
+Directories
+-----------
+
+build....: Contains the CMake scripts with commands, macros and functions used to build the environment for compiling libraries and executables in different platforms using the CMake tool.
+
+examples.: Some examples on how to use TWS API and GUI.
+
+licenses.: Copyright notices of third-party libraries used by TWS.
+
+resources: Fonts, images, sql, and xml files among other resources of general use.
+
+share....: XML Schema (.xsd), JSON, translations files and OGC specifications that is shared and installed with TWS.
+
+src......: Contains the source code of TWS and the source code of automatic tests.
+
+
+Reporting Bugs
+--------------
+
+Any problem should be reported to esensing-team@dpi.inpe.br.
+
+
+For more information on TWS, please, visit its main web page at: http://github.com/e-sensing/tws.
+
+
+  October 2015, e-Sensing Team <esensing-team@dpi.inpe.br>
+
+
