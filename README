@@ -1,8 +1,15 @@
   TerraLib GeoWeb Services (TWS)
   ==============================
 
-TerraLib Geoweb Services (TWS) is a free and open source..
-TODO
+TerraLib GeoWeb Services (TWS) is a free and open source platform for the development of web services that must handle Earth Observation data.
+
+TWS is part of the TerraLib family of geotechnologies:
+http://www.dpi.inpe.br/terralib5.
+
+The following service is under development/investigation:
+- Web Time Series Service (WTSS): a lightweight web service for handling time series data from remote sensing imagery.
+- Web Coverage Service 2.0 (WCS): a web coverage service for data exchange with SciDB.
+- Spatio-Temporal Web Map Service (WMS): a web map service for visualizing remote sensing imagery data as dynamic maps (space + time) stored as 3D arrays in SciDB.
 
 Instructions
 ------------
@@ -15,6 +22,8 @@ The documents below are in the root directory of TWS codebase and they explain t
 
 - CHANGELOG.........: List of changes in TWS source code.
 
+- DEPENDENCIES......: The list of third-party library you must install before building TWS.
+
 - LICENSE...........: Licence statement in plain txt format.
 
 - README............: This file. It contains instructions about how to build and how is organized TWS plataform source code.
@@ -25,7 +34,9 @@ Directories
 
 build....: Contains the CMake scripts with commands, macros and functions used to build the environment for compiling libraries and executables in different platforms using the CMake tool.
 
-examples.: Some examples on how to use TWS API and GUI.
+examples.: Some examples on how to use TWS.
+
+install..: Bash scripts for helping building and installing TWS.
 
 licenses.: Copyright notices of third-party libraries used by TWS.
 
