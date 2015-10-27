@@ -3,12 +3,12 @@
 **TerraLib GeoWeb Services (TWS)** is a free and open source platform for the development of web services that must handle Earth Observation data. TWS is part of the [TerraLib family of geotechnologies](http://www.dpi.inpe.br/terralib5).
 
 The following service is under development/investigation:
-- **Web Time Series Service (WTSS):** a lighteight web service for handling time series data from remote sensing imagery.
-- **Web Coverage Service 2.0 (WCS):** **TODO**.
-- **Spatio-Temporal Web Map Service (WMS):** a web map service for visualizing remote sensing imagery data as dynamic maps (space + time).
+- **Web Time Series Service (WTSS):** a lightweight web service for handling time series data from remote sensing imagery.
+- **Web Coverage Service 2.0 (WCS):** a web coverage service for data exchange with SciDB.
+- **Spatio-Temporal Web Map Service (WMS):** a web map service for visualizing remote sensing imagery data as dynamic maps (space + time) stored as 3D arrays in SciDB.
 
 **NOTE:**
-* **Until we reach version X.Y.Z this codebase will be instable and not fully operational.**
+* **Until we reach version 1.0.0 this codebase will be instable and not fully operational.**
 * **TWS is under active development. We are preparing this site to host it!**
 * **If you have any question, please, send us an e-mail at: esensing-team@dpi.inpe.br.**
 
@@ -50,12 +50,15 @@ In the root directory of TWS codebase (the source code tree) there are some text
 The file named **[DEPENDENCIES](https://github.com/e-sensing/tws/blob/master/DEPENDENCIES)** in the root of TWS source tree contains the official list of third-party libraries and tools that you must install before building TWS from source.
 
 If you want to build yourself TWS then you need to install some third-party libraries. Below we show the list of third-party libraries dependencies and its versions:
-- **Qt (Optional):** Make sure you have an installed Qt version 5.2.1 or later. Linux users may use any package manager to perform an easy installation. Mac OS X can use package managers such as Homebrew (http://brew.sh) or MacPorts (http://www.macports.org) in order to have an easy installation. If you prefer to install from source, download it from: http://qt-project.org/downloads.
-
 - **Boost (Mandatory):** TWS is built on top of Boost libraries. You will need to have them installed in order to build TWS. Make sure to have at least version 1.54.0 installed. If you prefer to install from source, download it from: http://www.boost.org.
 
 - **TerraLib (Mandatory):** TWS is built on top of TerraLib, a free and open source library for building GIS enabled applications. Make sure to have at least TerraLib version 5.1.0. You can download it from: http://www.dpi.inpe.br/terralib5.
- 
+
+**Note:**
+- When using TWS on a machine with a installed version of SciDB you probably already have Boost libraries installed.
+- If you have installed TerraLib you already have Boost and you don't need to install it again.
+
+
 ### Bash script for building all dependencies on Linux Ubuntu 14.04
 
 We have prepared a special bash script for building and installing the dependencies on Linux Ubuntu 14.04. This script can be found in TWS source tree under *install* folder. Follow the steps below:
