@@ -17,7 +17,7 @@
  */
 
 /*!
-  \file tws/core/HttpServerBuilder.cpp
+  \file tws/core/http_server_builder.cpp
 
   \brief A singleton for registering available HTTP server implementations..
 
@@ -25,9 +25,9 @@
  */
 
 // TWS
-#include "Exception.hpp"
-#include "HttpServer.hpp"
-#include "HttpServerBuilder.hpp"
+#include "exception.hpp"
+#include "http_server.hpp"
+#include "http_server_builder.hpp"
 
 // STL
 #include <cassert>

@@ -26,26 +26,24 @@
 #          Roger Victor
 #
 
-include_directories(${Boost_INCLUDE_DIR})
-
 file(GLOB TWS_SRC_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/core/*.cpp)
 file(GLOB TWS_HDR_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/core/*.hpp)
 
 source_group("Source Files"  FILES ${TWS_SRC_FILES})
 source_group("Header Files"  FILES ${TWS_HDR_FILES})
 
-add_library(core ${TWS_HDR_FILES} ${TWS_SRC_FILES})
+add_library(tws_mod_core SHARED ${TWS_HDR_FILES} ${TWS_SRC_FILES})
 
-target_link_libraries(tws   ${Boost_SYSTEM_LIBRARY}
-                                  ${Boost_DATE_TIME_LIBRARY}
-                                  ${Boost_CHRONO_LIBRARY}
-                                  ${Boost_TIMER_LIBRARY}
-                                  ${Boost_FILESYSTEM_LIBRARY}
-                                  ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                                  ${Boost_THREAD_LIBRARY})
+target_link_libraries(tws_mod_core   ${Boost_SYSTEM_LIBRARY}
+                                     ${Boost_DATE_TIME_LIBRARY}
+                                     ${Boost_CHRONO_LIBRARY}
+                                     ${Boost_TIMER_LIBRARY}
+                                     ${Boost_FILESYSTEM_LIBRARY}
+                                     ${Boost_PROGRAM_OPTIONS_LIBRARY}
+                                     ${Boost_THREAD_LIBRARY})
 
-#install(TARGETS modis2scidb
-#        EXPORT scietl-targets
-#        RUNTIME DESTINATION ${TWS_DESTINATION_RUNTIME} COMPONENT runtime
-#        LIBRARY DESTINATION ${TWS_DESTINATION_LIBRARY} COMPONENT runtime
-#        ARCHIVE DESTINATION ${TWS_DESTINATION_ARCHIVE} COMPONENT runtime)
+install(TARGETS tws_mod_core
+        EXPORT tws-targets
+        RUNTIME DESTINATION ${TWS_DESTINATION_RUNTIME} COMPONENT runtime
+        LIBRARY DESTINATION ${TWS_DESTINATION_LIBRARY} COMPONENT runtime
+        ARCHIVE DESTINATION ${TWS_DESTINATION_ARCHIVE} COMPONENT runtime)

@@ -17,7 +17,7 @@
  */
 
 /*!
-  \file tws/core/Exception.hpp
+  \file tws/core/exception.hpp
 
   \brief Specific exception types for Core Runtime module.
 
@@ -28,7 +28,7 @@
 #define __TWS_CORE_EXCEPTION_HPP__
 
 // TWS
-#include "../Exception.hpp"
+#include "../exception.hpp"
 
 namespace tws
 {

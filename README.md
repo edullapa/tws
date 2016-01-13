@@ -74,27 +74,27 @@ $ TWS_DEPENDENCIES_DIR="/home/user/mylibs" ./install-3rdparty-linux-ubuntu-14.04
 
 **Note:* Don't choose as target location, a system folder such as /usr or /usr/local. Try some user specifiic folder.
 
-### Bash script for building all dependencies on Mac OS X Yosemite
+### Bash script for building all dependencies on Mac OS X El Capitan
 
-We have prepared a special bash script for building and installing the dependencies on Mac OS X Yosemite. This script can be found in TWS source tree under *install* folder. Follow the steps below:
+We have prepared a special bash script for building and installing the dependencies on Mac OS X El Capitan. This script can be found in TWS source tree under *install* folder. Follow the steps below:
 
-- Download the third-party libraries package used by the development team: [tws-3rdparty-macosx-yosemite.tar.gz](http://www.dpi.inpe.br/esensing-devel/tws-3rdparty-macosx-yosemite.tar.gz).
+- Download the third-party libraries package used by the development team: [tws-3rdparty-macosx-el-capitan.tar.gz](http://www.dpi.inpe.br/esensing-devel/tws-3rdparty-macosx-el-capitan.tar.gz).
 
-- Copy the script [install-3rdparty-macosx-yosemite.sh](https://github.com/e-sensing/tws/tree/master/install/install-3rdparty-macosx-yosemite.sh) to the same folder you have downloaded the *tws-3rdparty-macosx-yosemite.tar.gz* package.
+- Copy the script [install-3rdparty-macosx-el-capitan.sh](https://github.com/e-sensing/tws/tree/master/install/install-3rdparty-macosx-el-capitan.sh) to the same folder you have downloaded the *tws-3rdparty-macosx-el-capitan.tar.gz* package.
 
 - Open the shell command line.
 
-- Make sure your Qt and CMake environment can be found in your PATH:
+- Make sure your CMake environment can be found in your PATH:
 ```
-$ export PATH=$PATH:/Users/user/Qt5.4.1/5.4/clang_64/bin:/Applications/CMake.app/Contents/bin
-```
-
-- In the shell command line, call the script *install-3rdparty-macosx-yosemite.sh* setting the target to install all the stuffs from these third-party libraries and tools:
-```
-$ TWS_DEPENDENCIES_DIR="/Users/user/mylibs" ./install-3rdparty-macosx-yosemite.sh
+$ export PATH=$PATH:/Applications/CMake.app/Contents/bin
 ```
 
-**Note:** Don't choose as target location, a system folder such as */usr* or */usr/local*. Try some user specifiic folder.
+- In the shell command line, call the script *install-3rdparty-macosx-el-capitan.sh* setting the target to install all the stuffs from these third-party libraries and tools:
+```
+$ TWS_DEPENDENCIES_DIR="/Users/user/mylibs" ./install-3rdparty-macosx-el-capitan.sh
+```
+
+**Note:** Don't choose as target location, a system folder such as */usr* or */usr/local*. Try some user specific folder.
 
 ### Prepared dependencies for Microsot Windows
 
@@ -149,7 +149,7 @@ In order to switch to branch *b-1.0.0-alpha* you can use the following command:
 
 ## Tags
 
-Also there are tags which usually are originated from a release branch. For instance, tag *t-1.0.0-alpha1* will be originated from branch *1-4.0.0-alpha*.
+Also there are tags which usually are originated from a release branch. For instance, tag *t-1.0.0-alpha1* will be originated from branch *b-1.0.0-alpha*.
 
 To check all tags available, use:
 
@@ -159,7 +159,7 @@ To check all tags available, use:
   t-1.0.0-alpha2
   t-1.0.0-beta1
   t-1.0.0-rc1
-  t-4.0.0
+  t-1.0.0
   ...
 ```
 
@@ -179,7 +179,7 @@ The `build/cmake` folder contains a CMake project for building TWS.
 
 Until now its build has been tested on:
 - Linux Ubuntu 14.04
-- Mac OS X Yosemite
+- Mac OS X El Capitan
 
 You should use at least CMake version 2.8.12 for building TWS. Older versions than this may not work properly.
 
@@ -237,16 +237,12 @@ Notes:
 ```
   -DCMAKE_CXX_FLAGS:STRING="-lpthread"
 ```
-* For building with Qt5 you can provide the Qt5_DIR variable as:
-```
-  -DQt5_DIR:PATH="/usr/local/lib/cmake/Qt5"
-```
 * For generating a debug version set CMAKE_BUILD_TYPE as:
 ```
   -DCMAKE_BUILD_TYPE:STRING="Debug"
 ```
 
-### Building on Mac OS X Yosemite
+### Building on Mac OS X El Capitan
 
 1.1 Open a Command Prompt (Shell).
 
@@ -265,10 +261,10 @@ $ cd build-release
 
 1.4. For Mac OS X systems you must choose the build configuration:
 ```
-$ cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE:STRING="Release" -DCMAKE_INSTALL_PREFIX:PATH="/Users/user/myinstall/tws" -DCMAKE_PREFIX_PATH:PATH="/Users/user/mylibs;/Users/user/mylibs/terralib5/lib/cmake;/Users/user/Qt5.4.1/5.4/clang_64/lib/cmake" ../codebase/build/cmake
+$ cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE:STRING="Release" -DCMAKE_INSTALL_PREFIX:PATH="/Users/user/myinstall/tws" -DCMAKE_PREFIX_PATH:PATH="/Users/user/mylibs;/Users/user/mylibs/terralib5/lib/cmake" ../codebase/build/cmake
 ```
 
-**Note:** Please, in the cmake call above, take special attention to the key *CMAKE_PREFIX_PATH* and Qt location.
+**Note:** Please, in the cmake call above, take special attention to the key *CMAKE_PREFIX_PATH* and TerraLib location.
 
 1.5. Building (with 4 process in parallel):
 ```
@@ -285,11 +281,6 @@ $ make uninstall
 ```
 
 Notes:
-
-* You have to specify valid paths for *CMAKE_PREFIX_PATH*. If you have a Qt version installed as a framework in your home directory, you have to tell CMake where to locate its CMake support. For instance, if you have Qt version 5.4.1 installed, you have to add to *CMAKE_PREFIX_PATH* the following directory:
-```
-/Users/user/Qt5.4.1/5.4/clang_64/lib/cmake
-```
 
 * You have also to tell where the TerraLib CMake support is located. Add to CMAKE_PREFIX_PATH where TerraLib is installed, for example:
 ```

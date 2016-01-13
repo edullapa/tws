@@ -17,15 +17,15 @@
  */
 
 /*!
-  \file tws/core/HttpRequest.hpp
+  \file tws/core/http_request.hpp
 
   \brief Base class that models an HTTP request.
 
   \author Gilberto Ribeiro de Queiroz
  */
 
-#ifndef __TWS_CORE_HTTPREQUEST_HPP__
-#define __TWS_CORE_HTTPREQUEST_HPP__
+#ifndef __TWS_CORE_HTTP_REQUEST_HPP__
+#define __TWS_CORE_HTTP_REQUEST_HPP__
 
 // TWS
 #include "Config.hpp"
@@ -74,4 +74,4 @@ namespace tws
   }   // end namespace core
 }     // end namespace tws
 
-#endif  // __TWS_CORE_HTTPREQUEST_HPP__
+#endif  // __TWS_CORE_HTTP_REQUEST_HPP__

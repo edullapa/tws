@@ -17,46 +17,17 @@
  */
 
 /*!
-  \file tws/core/HttpResponse.hpp
+  \file tws/core/config.hpp
 
-  \brief Base class that models an HTTP response.
+  \brief Configuration file for Core Runtime module.
 
   \author Gilberto Ribeiro de Queiroz
  */
 
-#ifndef __TWS_CORE_HTTPRESPONSE_HPP__
-#define __TWS_CORE_HTTPRESPONSE_HPP__
+#ifndef __TWS_CORE_CONFIG_HPP__
+#define __TWS_CORE_CONFIG_HPP__
 
 // TWS
-#include "config.hpp"
+#include "../config.hpp"
 
-// Boost
-#include <boost/noncopyable.hpp>
-
-namespace tws
-{
-  namespace core
-  {
-
-    //! Base class that models an HTTP response.
-    class http_response : public boost::noncopyable
-    {
-      public:
-
-        //! Constructor.
-        http_response() { }
-
-        //! Virtual destructor.
-        virtual ~http_response() { }
-
-        //! Add a header to the response.
-        virtual void add_header(const char* key, const char* value) = 0;
-
-        //! Set the content in the response.
-        virtual void set_content(const char* value, const std::size_t size) = 0;
-    };
-
-  }   // end namespace core
-}     // end namespace tws
-
-#endif  // __TWS_CORE_HTTPRESPONSE_HPP__
+#endif  // __TWS_CORE_CONFIG_HPP__

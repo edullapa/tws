@@ -25,10 +25,11 @@
  */
 
 // TWS
+#include "utils.hpp"
+#include "../build_config.hpp"
+//#include "../plugin.hpp"
 #include "http_server_builder.hpp"
 #include "service_operations_manager.hpp"
-#include "utils.hpp"
-#include "../plugin.hpp"
 
 // Boost
 #include <boost/filesystem.hpp>
@@ -40,17 +41,17 @@ tws::core::init_terralib_web_services()
 
   http_server_builder::instance();
 
-  tws::plugin::init_plugin_support();
+  //tws::plugin::init_plugin_support();
 
-  tws::plugin::load_all(true);
+  //tws::plugin::load_all(true);
 }
 
 void
 tws::core::shutdown_terralib_web_services()
 {
-  tws::plugin::unload_all();
+  //tws::plugin::unload_all();
 
-  tws::plugin::shutdown_plugin_support();
+  //tws::plugin::shutdown_plugin_support();
 }
 
 std::string
