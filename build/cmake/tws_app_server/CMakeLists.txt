@@ -18,29 +18,28 @@
 #  along with TWS. See LICENSE. If not, write to
 #  e-sensing team at <esensning-team@dpi.inpe.br>.
 #
-#  Description: Main CMake script for TWS build system.
 #
-#  Author: Gilberto Ribeiro de Queiroz
+#  CMake scripts for TerraLib GeoWeb Services
+#
+#  Description: Script for generating the Web Server.
+#
+#  Author: Gilberto Ribeiro de Queiroz <gribeiro@dpi.inpe.br>
 #
 
-file(GLOB TWS_SRC_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/core/*.cpp)
-file(GLOB TWS_HDR_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/core/*.hpp)
+file(GLOB TWS_SRC_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/app_server/*.cpp)
+file(GLOB TWS_HDR_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/app_server/*.hpp)
 
-source_group("Source Files"  FILES ${TWS_SRC_FILES})
-source_group("Header Files"  FILES ${TWS_HDR_FILES})
+add_executable(tws_app_server ${TWS_SRC_FILES} ${TWS_HDR_FILES})
 
-add_library(tws_mod_core SHARED ${TWS_HDR_FILES} ${TWS_SRC_FILES})
-
-target_link_libraries(tws_mod_core   ${Boost_SYSTEM_LIBRARY}
-                                     ${Boost_DATE_TIME_LIBRARY}
-                                     ${Boost_CHRONO_LIBRARY}
-                                     ${Boost_TIMER_LIBRARY}
+target_link_libraries(tws_app_server tws_mod_core
                                      ${Boost_FILESYSTEM_LIBRARY}
-                                     ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                                     ${Boost_THREAD_LIBRARY})
+                                     ${Boost_SYSTEM_LIBRARY})
 
-install(TARGETS tws_mod_core
+install(TARGETS tws_app_server
         EXPORT tws-targets
         RUNTIME DESTINATION ${TWS_DESTINATION_RUNTIME} COMPONENT runtime
         LIBRARY DESTINATION ${TWS_DESTINATION_LIBRARY} COMPONENT runtime
         ARCHIVE DESTINATION ${TWS_DESTINATION_ARCHIVE} COMPONENT runtime)
+
+export(TARGETS tws_app_server APPEND FILE ${CMAKE_BINARY_DIR}/tws-exports.cmake)
+

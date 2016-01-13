@@ -21,7 +21,6 @@
 #  Description: Main CMake script for TWS build system.
 #
 #  Author: Gilberto Ribeiro de Queiroz
-#          Eduardo Llapa Rodriguez
 #          Matheus Cavassan Zaglia
 #          Roger Victor
 #
@@ -107,6 +106,22 @@ if(APPLE)
   add_definitions(-ftemplate-depth-1024)
 endif()
 
+# For each CMake version we need to check some policies
+# Note: automatically link executables with qtmain.lib on Windows when it has Qt dependency.
+if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}" VERSION_GREATER  2.8.9)
+  cmake_policy(SET CMP0020 NEW)
+endif()
+
+if(${CMAKE_MAJOR_VERSION} GREATER 2)
+  cmake_policy(SET CMP0026 OLD)
+  cmake_policy(SET CMP0042 NEW)
+  cmake_policy(SET CMP0043 NEW)
+endif()
+
+if(${CMAKE_VERSION} VERSION_GREATER "3.1.2")
+  cmake_policy(SET CMP0053 OLD)
+endif()
+
 # Build will generate files into a single folder
 if((CMAKE_GENERATOR STREQUAL Xcode) OR MSVC)
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
@@ -129,6 +144,7 @@ endif()
 # Turn on multi process compilation on Windows
 if(MSVC)
   add_definitions(/MP)
+  set(CMAKE_DEBUG_POSTFIX "d")
 endif()
 
 # Enable CTest
@@ -155,6 +171,31 @@ if(NOT Boost_FOUND)
   message(FATAL_ERROR "TWS: could not find required Boost libraries!")
 endif()
 
+#find_package(SciDB REQUIRED)
+
+#find_package(terralib REQUIRED)
+
+find_package(RapidJSON REQUIRED)
+
+#find_package(CppNetLib)
+
+#find_package(OpenSSL)
+
+#find_package(Doxygen)
+
+#find_package(GTest)
+
+#find_package(GMock)
+
+#
+# some variables needed in config file
+#
+
+#if(CPPNETLIB_FOUND)
+#  set(TWS_CPPNETLIB_ENABLED ON)
+#endif()
+
+
 #
 # add include targets
 #
@@ -168,28 +209,29 @@ include_directories(${Boost_INCLUDE_DIR})
 
 option(TWS_MOD_CORE_ENABLED "Build TWS CORE library?" ON)
 
+CMAKE_DEPENDENT_OPTION(TWS_MOD_MONGOOSE_ENABLED "Build Mongoose Web Server support?" ON "TWS_MOD_CORE_ENABLED" OFF)
+
+CMAKE_DEPENDENT_OPTION(TWS_APP_SERVER_ENABLED "Build Application Web Server?" ON "TWS_MOD_CORE_ENABLED" OFF)
+
 
 #
 # process TWS configuration files
 #
 
-#configure_file(${CMAKE_SOURCE_DIR}/terrama2-config-pkg.cmake.in
-#               ${CMAKE_BINARY_DIR}/pkg/terrama2-config.cmake @ONLY)
+#configure_file(${CMAKE_SOURCE_DIR}/tws-config-pkg.cmake.in
+#               ${CMAKE_BINARY_DIR}/pkg/tws-config.cmake @ONLY)
 
-#configure_file(${CMAKE_SOURCE_DIR}/terrama2-config-version.cmake.in
-#               ${CMAKE_BINARY_DIR}/terrama2-config-version.cmake @ONLY)
+#configure_file(${CMAKE_SOURCE_DIR}/tws-config-version.cmake.in
+#               ${CMAKE_BINARY_DIR}/tws-config-version.cmake @ONLY)
 
-#configure_file(${CMAKE_SOURCE_DIR}/terrama2-config.cmake.in
-#               ${CMAKE_BINARY_DIR}/terrama2-config.cmake @ONLY)
+#configure_file(${CMAKE_SOURCE_DIR}/tws-config.cmake.in
+#               ${CMAKE_BINARY_DIR}/tws-config.cmake @ONLY)
 
 configure_file(${TWS_ABSOLUTE_ROOT_DIR}/src/tws/build_config.hpp.in
                ${CMAKE_BINARY_DIR}/tws_build_config.hpp @ONLY)
 
 configure_file(${TWS_ABSOLUTE_ROOT_DIR}/src/tws/config.hpp.in
                ${CMAKE_BINARY_DIR}/tws_config.hpp @ONLY)
-
-#configure_file(${TWS_ABSOLUTE_ROOT_DIR}/src/terrama2/Defines.hpp.in
-#               ${CMAKE_BINARY_DIR}/terrama2_defines.hpp @ONLY)
 
 configure_file(${TWS_ABSOLUTE_ROOT_DIR}/src/tws/version.hpp.in
                ${CMAKE_BINARY_DIR}/tws_version.hpp @ONLY)
@@ -205,35 +247,45 @@ if(TWS_MOD_CORE_ENABLED)
   add_subdirectory(tws_mod_core)
 endif()
 
+if(TWS_MOD_MONGOOSE_ENABLED)
+  add_subdirectory(tws_mod_mongoose)
+endif()
+
+if(TWS_APP_SERVER_ENABLED)
+  add_subdirectory(tws_app_server)
+endif()
+
+
 
 #
 # install and targets export
 #
 
-#file(GLOB TWS_HDR_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/terrama2/*.hpp)
+file(GLOB TWS_HDR_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/*.hpp)
 
-#install(FILES ${CMAKE_BINARY_DIR}/terrama2_config.hpp
-#              ${CMAKE_BINARY_DIR}/terrama2_version.hpp
-#              ${TWS_HDR_FILES}
-#        DESTINATION ${TWS_DESTINATION_HEADERS}/terrama2 COMPONENT devel)
+install(FILES ${CMAKE_BINARY_DIR}/tws_config.hpp
+              ${CMAKE_BINARY_DIR}/tws_build_config.hpp
+              ${CMAKE_BINARY_DIR}/tws_version.hpp
+              ${TWS_HDR_FILES}
+        DESTINATION ${TWS_DESTINATION_HEADERS}/tws COMPONENT devel)
 
-#install(FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/terrama2.hpp
+#install(FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws.hpp
 #        DESTINATION ${TWS_DESTINATION_HEADERS} COMPONENT devel)
 
-#install(FILES ${TWS_BINARY_DIR}/pkg/terrama2-config.cmake
-#              ${TWS_BINARY_DIR}/terrama2-config-version.cmake
-#        DESTINATION ${TWS_DESTINATION_LIBRARY}/cmake/terrama2-${TWS_VERSION_STRING} COMPONENT devel)
+#install(FILES ${TWS_BINARY_DIR}/pkg/tws-config.cmake
+#              ${TWS_BINARY_DIR}/tws-config-version.cmake
+#        DESTINATION ${TWS_DESTINATION_LIBRARY}/cmake/tws-${TWS_VERSION_STRING} COMPONENT devel)
 
-#install(EXPORT terrama2-targets
-#        DESTINATION ${TWS_DESTINATION_LIBRARY}/cmake/terrama2-${TWS_VERSION_STRING}
-#        FILE terrama2-exports.cmake
-#        COMPONENT devel)
+install(EXPORT tws-targets
+        DESTINATION ${TWS_DESTINATION_LIBRARY}/cmake/tws-${TWS_VERSION_STRING}
+        FILE tws-exports.cmake
+        COMPONENT devel)
 
-#install(DIRECTORY ${TWS_ABSOLUTE_ROOT_DIR}/share/terrama2/config
-#        DESTINATION ${TWS_DESTINATION_SHARE}/terrama2 COMPONENT runtime)
+#install(DIRECTORY ${TWS_ABSOLUTE_ROOT_DIR}/share/tws/config
+#        DESTINATION ${TWS_DESTINATION_SHARE}/tws COMPONENT runtime)
 
-#install(DIRECTORY ${TWS_ABSOLUTE_ROOT_DIR}/share/terrama2/icons
-#        DESTINATION ${TWS_DESTINATION_SHARE}/terrama2 COMPONENT runtime)
+#install(DIRECTORY ${TWS_ABSOLUTE_ROOT_DIR}/share/tws/icons
+#        DESTINATION ${TWS_DESTINATION_SHARE}/tws COMPONENT runtime)
 
 
 #
@@ -258,11 +310,11 @@ endif()
 
 set(CPACK_SOURCE_INSTALLED_DIRECTORIES "${TWS_ABSOLUTE_ROOT_DIR};/")
 
-#configure_file(${TWS_SOURCE_DIR}/terrama2-cpack-options.cmake.in
-#               ${TWS_BINARY_DIR}/terrama2CPackOptions.cmake
+#configure_file(${TWS_SOURCE_DIR}/tws-cpack-options.cmake.in
+#               ${TWS_BINARY_DIR}/twsCPackOptions.cmake
 #               @ONLY)
 
-#set(CPACK_PROJECT_CONFIG_FILE ${TWS_BINARY_DIR}/terrama2CPackOptions.cmake)
+#set(CPACK_PROJECT_CONFIG_FILE ${TWS_BINARY_DIR}/twsCPackOptions.cmake)
 
 include(CPack)
 

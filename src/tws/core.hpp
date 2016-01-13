@@ -17,24 +17,24 @@
  */
 
 /*!
-  \file tws/tws_build_config.hpp
+  \file tws/core.hpp
 
-  \brief Configuration flags for TerraLib Web Services.
+  \brief General header include files for the Common Runtime module.
 
   \author Gilberto Ribeiro de Queiroz
  */
 
-#ifndef __TWS_TWS_BUILD_CONFIG_HPP__
-#define __TWS_TWS_BUILD_CONFIG_HPP__
+#ifndef __TWS_CORE_HPP__
+#define __TWS_CORE_HPP__
 
-//! The environment variable that users can set to tell the real install location of TWS.
-#define TWS_DIR_VAR_NAME "@TWS_DIR_VAR_NAME@"
+// TWS
+#include "core/config.hpp"
+#include "core/exception.hpp"
+#include "core/http_request.hpp"
+#include "core/http_response.hpp"
+#include "core/http_server.hpp"
+#include "core/http_server_builder.hpp"
+#include "core/service_operations_manager.hpp"
+#include "core/utils.hpp"
 
-//! Path to the codebase of TWS.
-#define TWS_CODEBASE_PATH "@TWS_ABSOLUTE_ROOT_DIR@"
-
-//! Install prefix path of TWS.
-#define TWS_INSTALL_PREFIX_PATH "@CMAKE_INSTALL_PREFIX@"
-
-#endif  // __TWS_TWS_CONFIG_HPP__
-
+#endif  // __TWS_CORE_HPP__

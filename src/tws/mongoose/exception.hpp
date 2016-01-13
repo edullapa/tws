@@ -17,24 +17,29 @@
  */
 
 /*!
-  \file tws/tws_build_config.hpp
+  \file tws/mongoose/exception.hpp
 
-  \brief Configuration flags for TerraLib Web Services.
+  \brief Specific exception types for Mongoose module.
 
   \author Gilberto Ribeiro de Queiroz
  */
 
-#ifndef __TWS_TWS_BUILD_CONFIG_HPP__
-#define __TWS_TWS_BUILD_CONFIG_HPP__
+#ifndef __TWS_MONGOOSE_EXCEPTION_HPP__
+#define __TWS_MONGOOSE_EXCEPTION_HPP__
 
-//! The environment variable that users can set to tell the real install location of TWS.
-#define TWS_DIR_VAR_NAME "@TWS_DIR_VAR_NAME@"
+// TWS
+#include "../exception.hpp"
 
-//! Path to the codebase of TWS.
-#define TWS_CODEBASE_PATH "@TWS_ABSOLUTE_ROOT_DIR@"
+namespace tws
+{
+  //! The namespace for the Mongoose module of TerraLib Web Services.
+  namespace mongoose
+  {
 
-//! Install prefix path of TWS.
-#define TWS_INSTALL_PREFIX_PATH "@CMAKE_INSTALL_PREFIX@"
+    //! The base type for exceptions from the Mongoose module.
+    struct exception: virtual tws::exception { };
 
-#endif  // __TWS_TWS_CONFIG_HPP__
+  }  // end namespace mongoose
+}    // end namespace tws
 
+#endif  // __TWS_MONGOOSE_EXCEPTION_HPP__
