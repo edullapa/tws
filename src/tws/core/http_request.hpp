@@ -28,7 +28,7 @@
 #define __TWS_CORE_HTTP_REQUEST_HPP__
 
 // TWS
-#include "Config.hpp"
+#include "config.hpp"
 
 // Boost
 #include <boost/noncopyable.hpp>
