@@ -28,8 +28,8 @@
 #define __TWS_CORE_UTILS_HPP__
 
 // TWS
-#include "Config.hpp"
-#include "Exception.hpp"
+#include "config.hpp"
+#include "exception.hpp"
 
 // STL
 #include <string>
