@@ -19,31 +19,37 @@
 #  e-sensing team at <esensning-team@dpi.inpe.br>.
 #
 #
-#  CMake scripts for TerraLib GeoWeb Services
+#  CMake scripts for TerraLib Web Services
 #
-#  Description: Script for generating the Web Server.
+#  Description: Script for generating the build of Web Map Service support.
 #
-#  Author: Gilberto Ribeiro de Queiroz <gribeiro@dpi.inpe.br>
+#  Author: Roger Victor
 #
 
+include_directories(${RAPIDJSON_INCLUDE_DIR})
 include_directories(${terralib_INCLUDE_DIRS})
 
-file(GLOB TWS_SRC_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/app_server/*.cpp)
-file(GLOB TWS_HDR_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/app_server/*.hpp)
+file(GLOB TWS_SRC_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/wms/*.cpp)
+file(GLOB TWS_HDR_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/wms/*.hpp)
 
-add_executable(tws_app_server ${TWS_SRC_FILES} ${TWS_HDR_FILES})
+add_library(tws_mod_wms SHARED ${TWS_SRC_FILES} ${TWS_HDR_FILES})
 
-target_link_libraries(tws_app_server tws_mod_core
-                                     terralib_mod_plugin
-                                     terralib_mod_common
-                                     ${Boost_FILESYSTEM_LIBRARY}
-                                     ${Boost_SYSTEM_LIBRARY})
+target_link_libraries(tws_mod_wms tws_mod_core
+                                  terralib_mod_plugin
+                                  ${Boost_FILESYSTEM_LIBRARY}
+                                  ${Boost_SYSTEM_LIBRARY})
 
-install(TARGETS tws_app_server
+set_target_properties(tws_mod_wms
+                      PROPERTIES VERSION ${TWS_VERSION_MAJOR}.${TWS_VERSION_MINOR}
+                                 SOVERSION ${TWS_VERSION_MAJOR}.${TWS_VERSION_MINOR})
+
+install(TARGETS tws_mod_wms
         EXPORT tws-targets
         RUNTIME DESTINATION ${TWS_DESTINATION_RUNTIME} COMPONENT runtime
         LIBRARY DESTINATION ${TWS_DESTINATION_LIBRARY} COMPONENT runtime
         ARCHIVE DESTINATION ${TWS_DESTINATION_ARCHIVE} COMPONENT runtime)
 
-export(TARGETS tws_app_server APPEND FILE ${CMAKE_BINARY_DIR}/tws-exports.cmake)
+install(FILES ${TWS_HDR_FILES}
+        DESTINATION ${TWS_DESTINATION_HEADERS}/tws/wms COMPONENT devel)
 
+export(TARGETS tws_mod_wms APPEND FILE ${CMAKE_BINARY_DIR}/tws-exports.cmake)

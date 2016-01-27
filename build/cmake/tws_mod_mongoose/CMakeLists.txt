@@ -27,10 +27,8 @@
 #
 
 include_directories(${TWS_ABSOLUTE_ROOT_DIR}/third-party/mongoose)
-
-if(TWS_RAPIDJSON_ENABLED)
-  include_directories(${RAPIDJSON_INCLUDE_DIR})
-endif()
+include_directories(${RAPIDJSON_INCLUDE_DIR})
+include_directories(${terralib_INCLUDE_DIRS})
 
 add_definitions(-DMONGOOSE_NO_FILESYSTEM)
 
@@ -47,6 +45,7 @@ add_library(tws_mod_mongoose SHARED ${TWS_SRC_FILES} ${TWS_HDR_FILES}
                                     ${TWS_SRC_MONGOOSE_FILES} ${TWS_HDR_MONGOOSE_FILES})
 
 target_link_libraries(tws_mod_mongoose tws_mod_core
+                                       terralib_mod_plugin
                                        ${Boost_FILESYSTEM_LIBRARY}
                                        ${Boost_SYSTEM_LIBRARY})
 

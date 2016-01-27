@@ -25,21 +25,14 @@
  */
 
 // TWS
-#include "../core/http_server.hpp"
-#include "../core/http_server_builder.hpp"
-#include "config.hpp"
-#include "server.hpp"
+#include "../core/service_operations_manager.hpp"
+#include "wms.hpp"
 
 // TerraLib
 #include <terralib/plugin/Plugin.h>
 
 // STL
 #include <memory>
-
-std::unique_ptr<tws::core::http_server> build_mongoose()
-{
-  return std::unique_ptr<tws::core::http_server>(new tws::mongoose::server);
-}
 
 class Plugin : public te::plugin::Plugin
 {
@@ -59,7 +52,9 @@ class Plugin : public te::plugin::Plugin
       if(m_initialized)
         return;
       
-      tws::core::http_server_builder::instance().insert("mongoose", build_mongoose);
+      tws::wms::register_operations();
+      
+      tws::wms::initialize_operations();
       
       m_initialized = true;
     }
@@ -69,7 +64,7 @@ class Plugin : public te::plugin::Plugin
       if(!m_initialized)
         return;
       
-      tws::core::http_server_builder::instance().remove("mongoose");
+      //tws::core::http_server_builder::instance().remove("mongoose");
       
       m_initialized = false;
     }

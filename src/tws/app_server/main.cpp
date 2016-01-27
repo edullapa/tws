@@ -29,6 +29,11 @@
 #include "../core/http_server_builder.hpp"
 #include "../core/utils.hpp"
 
+// TerraLib
+#include <terralib/common/TerraLib.h>
+#include <terralib/plugin/PluginManager.h>
+#include <terralib/plugin/Utils.h>
+
 // STL
 #include <cstdlib>
 #include <iostream>
@@ -42,18 +47,44 @@
 //  #error "No Web Server Support Built: check if mongoose or cppnetlib modules were built!"
 //#endif
 
+void LoadModules()
+{
+  std::string plugins_path = tws::core::find_in_app_path("share/tws/plugins");
+  
+  te::plugin::PluginInfo* info = te::plugin::GetInstalledPlugin(plugins_path + "/tws.http_server.mongoose.teplg");
+  te::plugin::PluginManager::getInstance().add(info);
+  
+  info = te::plugin::GetInstalledPlugin(plugins_path + "/tws.wms.teplg");
+  te::plugin::PluginManager::getInstance().add(info);
+  
+  te::plugin::PluginManager::getInstance().loadAll();
+}
+
+void UnloadModules()
+{
+  te::plugin::PluginManager::getInstance().unloadAll();
+}
+
 int main(int argc, char *argv[])
 {
   std::cout << "\nStarting TerraLib GeoWeb Services...\n" << std::endl;
+  
+  TerraLib::getInstance().initialize();
+  
+  
 
   try
   {
     tws::core::init_terralib_web_services();
+    
+    LoadModules();
 
     //std::unique_ptr<tws::core::http_server> server = tws::core::http_server_builder::instance().build(TWS_DEFAULT_WEB_SERVER);
     std::unique_ptr<tws::core::http_server> server = tws::core::http_server_builder::instance().build("mongoose");
 
     server->start();
+    
+    UnloadModules();
   }
   catch(const boost::exception& e)
   {
@@ -76,6 +107,9 @@ int main(int argc, char *argv[])
 
     return EXIT_FAILURE;
   }
+  
+  
+  TerraLib::getInstance().finalize();
 
   std::cout << "\nFinished TerraLib GeoWeb Services!\n" << std::endl;
 
