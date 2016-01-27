@@ -17,24 +17,42 @@
  */
 
 /*!
-  \file tws/tws_build_config.hpp
+  \file tws/mongoose/http_response.cpp
 
-  \brief Configuration flags for TerraLib Web Services.
+  \brief HTTP response implementaton for Moongose.
 
   \author Gilberto Ribeiro de Queiroz
  */
 
-#ifndef __TWS_TWS_BUILD_CONFIG_HPP__
-#define __TWS_TWS_BUILD_CONFIG_HPP__
+// TWS
+#include "http_response.hpp"
 
-//! The environment variable that users can set to tell the real install location of TWS.
-#define TWS_DIR_VAR_NAME "@TWS_DIR_VAR_NAME@"
+// STL
+#include <cassert>
 
-//! Path to the codebase of TWS.
-#define TWS_CODEBASE_PATH "@TWS_ABSOLUTE_ROOT_DIR@"
+// Mongoose
+#include "mongoose.h"
 
-//! Install prefix path of TWS.
-#define TWS_INSTALL_PREFIX_PATH "@CMAKE_INSTALL_PREFIX@"
+tws::mongoose::http_response::http_response(mg_connection* conn)
+  : conn_(conn)
+{
+  assert(conn_);
+}
 
-#endif  // __TWS_TWS_CONFIG_HPP__
+tws::mongoose::http_response::~http_response()
+{
+}
 
+void
+tws::mongoose::http_response::add_header(const char* key,
+                                         const char* value)
+{
+  mg_send_header(conn_, key, value);
+}
+
+void
+tws::mongoose::http_response::set_content(const char* value,
+                                          const std::size_t size)
+{
+  mg_send_data(conn_, value, size);
+}

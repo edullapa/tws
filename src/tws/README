@@ -1,0 +1,35 @@
+  TerraLib GeoWeb Services - Source Code
+  ======================================
+
+
+This folder contains the source code of TerraLib GeoWeb Services (TWS).
+
+The source codebase is organized as follow:
+
+- core..........: The source code of the core runtime library of TWS.
+
+- mongoose......: The source code of a web server written on top of Mongoose library.
+
+- plugin........: A library for handling plugins.
+
+- scidb.........: A library with utility classes and functions for dealing with SciDB.
+
+- wtss..........: The implementation of Web Time Series Data Service.
+
+- config.hpp....: A proxy file for the real config file.
+
+- config.hpp.in.: The template config file with the set of support macros.
+
+- core.hpp......: A include header file for the core runtime module.
+
+- exeption.hpp..: The base exception types of TWS.
+
+- version.hpp...: A proxy file for the real versioning system file.
+
+- version.hpp.in: A file with macros for versioning system purpose.
+
+
+For more information on TWS, please, visit its main web page at: http://github.com/e-sensing/tws.
+
+
+  October 2015, e-Sensing Team <esensing-team@dpi.inpe.br>

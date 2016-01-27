@@ -17,24 +17,17 @@
  */
 
 /*!
-  \file tws/tws_build_config.hpp
+  \file tws/mongoose/config.hpp
 
-  \brief Configuration flags for TerraLib Web Services.
+  \brief Configuration file for Mongoose support in TWS.
 
   \author Gilberto Ribeiro de Queiroz
  */
 
-#ifndef __TWS_TWS_BUILD_CONFIG_HPP__
-#define __TWS_TWS_BUILD_CONFIG_HPP__
+#ifndef __TWS_MONGOOSE_CONFIG_HPP__
+#define __TWS_MONGOOSE_CONFIG_HPP__
 
-//! The environment variable that users can set to tell the real install location of TWS.
-#define TWS_DIR_VAR_NAME "@TWS_DIR_VAR_NAME@"
+// TWS
+#include "../config.hpp"
 
-//! Path to the codebase of TWS.
-#define TWS_CODEBASE_PATH "@TWS_ABSOLUTE_ROOT_DIR@"
-
-//! Install prefix path of TWS.
-#define TWS_INSTALL_PREFIX_PATH "@CMAKE_INSTALL_PREFIX@"
-
-#endif  // __TWS_TWS_CONFIG_HPP__
-
+#endif  // __TWS_MONGOOSE_CONFIG_HPP__

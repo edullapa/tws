@@ -1,0 +1,50 @@
+  TerraLib GeoWeb Services - Acknowledgment
+  =========================================
+
+TerraLib GeoWeb Services is built on top of other great free and open source libraries and resources as listed below.
+
+1. Boost
+--------
+
+The Boost C++ libraries is available at http://www.boost.org.
+
+A copy of the license model and copyright notes from version 1.54.0 can be found in BOOST.license document in this folder.
+
+
+2. SciDB C++ API
+----------------
+
+SciDB is available at http://scidb.org.
+
+A copy with its license model and copyright notes can be found in SCIDB.license document in this folder.
+
+
+3. Proj4
+--------
+
+TO BE DONE
+
+
+4. RapidJSON
+------------
+
+TO BE DONE
+
+
+5. Mongoose
+-----------
+
+TO BE DONE
+
+
+6. cpp-netlib
+-------------
+
+TO BE DONE
+
+
+For more information on TWS, please, visit its main web page at: http://github.com/e-sensing/tws.
+
+
+  October 2015, e-Sensing Team <esensing-team@dpi.inpe.br>
+
