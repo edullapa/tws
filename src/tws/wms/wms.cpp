@@ -16,7 +16,6 @@
   with TerraLib Web Services. See COPYING. If not, see <http://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-
 /*!
   \file tws/wtss/wtss.cpp
 
