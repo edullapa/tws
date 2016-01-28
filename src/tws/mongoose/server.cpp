@@ -43,10 +43,9 @@
 // Mongoose
 #include "mongoose.h"
 
-#ifdef TWS_RAPIDJSON_ENABLED
+// RapidJSON
 #include <rapidjson/document.h>
 #include <rapidjson/filestream.h>
-#endif
 
 int tws_mongoose_event_handler(mg_connection *conn, enum mg_event ev);
 
@@ -169,7 +168,6 @@ tws_mongoose_http_config tws_mongoose_read_config_file()
 {
   tws_mongoose_http_config result;
 
-#ifdef TWS_RAPIDJSON_ENABLED
   std::string input_file = tws::core::find_in_app_path("share/tws/config/mongoose_web_server.json");
 
   if(input_file.empty())
@@ -276,15 +274,11 @@ tws_mongoose_http_config tws_mongoose_read_config_file()
 
   fclose(pfile);
 
-#else
+  //result.log_file = "tws.log";
+  //result.document_root = "/opt/www";
+  //result.listening_port = 6543;
+  //result.max_threads = 100;
+  //result.max_connections = 1000;
 
-  result.log_file = "tws.log";
-  result.document_root = "/opt/www";
-  result.listening_port = 6543;
-  result.max_threads = 100;
-  result.max_connections = 1000;
-
-#endif // TWS_RAPIDJSON_ENABLED
-  
   return result;
 }

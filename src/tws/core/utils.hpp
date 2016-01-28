@@ -37,6 +37,9 @@
 // Boost
 #include <boost/tokenizer.hpp>
 
+// RapidJSON
+#include <rapidjson/document.h>
+
 namespace tws
 {
   namespace core
@@ -116,8 +119,86 @@ namespace tws
       If the path is not found it returns an empty string.
      */
     std::string find_in_app_path(const std::string& p);
+    
+    //! Copy the JSON string array to a range beginning at result.
+    template<class OutputIterator> void
+    copy_string_array(const rapidjson::Value& jvalues, OutputIterator result);
+    
+    //! Copy a string sequence to a JSON array.
+    template<class InputIterator> void
+    copy_string_array(InputIterator first,
+                      InputIterator last,
+                      rapidjson::Value& jvalues,
+                      rapidjson::Document::AllocatorType& allocator);
+    
+    //! Copy a numeric sequence to a JSON array
+    template<class InputIterator> void
+    copy_numeric_array(InputIterator first,
+                       InputIterator last,
+                       rapidjson::Value& jvalues,
+                       rapidjson::Document::AllocatorType& allocator);
 
   }   // end namespace core
 }     // end namespace tws
+
+template<class OutputIterator> inline void
+tws::core::copy_string_array(const rapidjson::Value& jvalues,
+                             OutputIterator result)
+{
+  if(!jvalues.IsArray())
+    throw conversion_error() << tws::error_description("copy_string_array: can only copy arrays of strings.");
+  
+  if(jvalues.Empty())
+    return;
+  
+  const rapidjson::SizeType nelements = jvalues.Size();
+  
+  for(rapidjson::SizeType i = 0; i != nelements; ++i)
+  {
+    const rapidjson::Value& jelement = jvalues[i];
+    
+    if(!jelement.IsString())
+      throw conversion_error() << tws::error_description("copy_string_array: only string elements are allowed in array.");
+    
+    if(jelement.IsNull())
+      continue;
+    
+    *result++ = jelement.GetString();
+  }
+}
+
+template<class InputIterator> inline void
+tws::core::copy_string_array(InputIterator first,
+                             InputIterator last,
+                             rapidjson::Value& jvalues,
+                             rapidjson::Document::AllocatorType& allocator)
+{
+  if(!jvalues.IsArray())
+    throw tws::conversion_error() << tws::error_description("copy_string_array: can only copy arrays of string data.");
+  
+  while(first != last)
+  {
+    jvalues.PushBack(first->c_str(), allocator);
+    
+    ++first;
+  }
+}
+
+template<class InputIterator> inline void
+tws::core::copy_numeric_array(InputIterator first,
+                              InputIterator last,
+                              rapidjson::Value& jvalues,
+                              rapidjson::Document::AllocatorType& allocator)
+{
+  if(!jvalues.IsArray())
+    throw conversion_error() << tws::error_description("copy_numeric_array: can only copy arrays of numeric data.");
+  
+  while(first != last)
+  {
+    jvalues.PushBack(*first, allocator);
+    
+    ++first;
+  }
+}
 
 #endif  // __TWS_CORE_UTILS_HPP__

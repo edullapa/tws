@@ -1,0 +1,7 @@
+{
+  "listening_port": 7654,
+  "max_threads": 10,
+  "max_connections": 8,
+  "log_file": "tws.log",
+  "document_root": "/opt/www"
+}
