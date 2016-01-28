@@ -35,6 +35,7 @@
 // STL
 #include <algorithm>
 #include <memory>
+#include <iostream>
 
 // Boost
 #include <boost/algorithm/string/classification.hpp>
@@ -80,6 +81,26 @@ void
 tws::wcs::describe_coverage_functor::operator()(const tws::core::http_request& request,
                                                 tws::core::http_response& response)
 {
+// output result
+  rapidjson::Document::AllocatorType allocator;
+
+  rapidjson::Document doc;
+
+  doc.SetObject();
+
+  rapidjson::Value jarrays(rapidjson::kArrayType);
+
+  rapidjson::StringBuffer str_buff;
+
+  rapidjson::Writer<rapidjson::StringBuffer> writer(str_buff);
+
+  doc.Accept(writer);
+
+  const char* p_str_buff = str_buff.GetString();
+
+  response.add_header("Content-Type", "application/json");
+  response.add_header("Access-Control-Allow-Origin", "*");
+  response.set_content(p_str_buff, str_buff.Size());
 }
 
 void tws::wcs::get_coverage_functor::operator()(const tws::core::http_request& request,
