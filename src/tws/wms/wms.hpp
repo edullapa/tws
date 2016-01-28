@@ -42,7 +42,7 @@ namespace tws
   namespace wms
   {
 
-    //! List the name of coverages managed by the server.
+    //! List the metadata, describing the layers avaliable for vizualization.
     /*! http://chronos.dpi.inpe.br:6543/wms/GetCapabilities */
     struct get_capabilities_functor
     {
@@ -50,7 +50,7 @@ namespace tws
                       tws::core::http_response& response);
     };
 
-    //! List the metadata about a given coverage.
+    //! Request the server to render a map giving a list of layers.
     /*! http://chronos.dpi.inpe.br:6543/wms/GetMap?layers=mod09q1 */
     struct get_map_functor
     {
@@ -58,7 +58,7 @@ namespace tws
                       tws::core::http_response& response);
     };
 
-    //! Retrieve the time series for a given coverage.
+    //! Retrieve information about an element of a particular layer.
     /*! http://chronos.dpi.inpe.br:6543/wms/GetFeatureInfo?layers=mod09q1 */
     struct get_feature_info_functor
     {
