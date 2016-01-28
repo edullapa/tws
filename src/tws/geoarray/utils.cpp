@@ -45,7 +45,7 @@
 void
 tws::geoarray::load_metadata(std::map<std::string, metadata_t>& arrays)
 {
-  std::string input_file = tws::core::find_in_app_path("share/tws/config/arrays_metadata.json");
+  std::string input_file = tws::core::find_in_app_path("share/tws/config/geo_arrays.json");
 
   if(input_file.empty())
     throw  tws::file_exists_error() << tws::error_description("could not locate array metadata file: 'share/tws/config/arrays_metadata.json'.");

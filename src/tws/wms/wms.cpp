@@ -31,6 +31,7 @@
 #include "../core/http_response.hpp"
 #include "../core/service_operations_manager.hpp"
 #include "../core/utils.hpp"
+#include "../geoarray/metadata_manager.hpp"
 
 // STL
 #include <algorithm>
@@ -59,23 +60,30 @@ void
 tws::wms::get_capabilities_functor::operator()(const tws::core::http_request& request,
                                                tws::core::http_response& response)
 {
+// retrieve the list of registered geo-arrays
+  std::vector<std::string> arrays = tws::geoarray::metadata_manager::instance().list_arrays();
+  
 // output result
   rapidjson::Document::AllocatorType allocator;
-
+  
   rapidjson::Document doc;
-
+  
   doc.SetObject();
-
+  
   rapidjson::Value jarrays(rapidjson::kArrayType);
-
+  
+  tws::core::copy_string_array(arrays.begin(), arrays.end(), jarrays, allocator);
+  
+  doc.AddMember("geoarrays", jarrays, allocator);
+  
   rapidjson::StringBuffer str_buff;
-
+  
   rapidjson::Writer<rapidjson::StringBuffer> writer(str_buff);
-
+  
   doc.Accept(writer);
-
+  
   const char* p_str_buff = str_buff.GetString();
-
+  
   response.add_header("Content-Type", "application/json");
   response.add_header("Access-Control-Allow-Origin", "*");
   response.set_content(p_str_buff, str_buff.Size());
