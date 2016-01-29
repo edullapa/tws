@@ -115,7 +115,7 @@ void tws::wcs::register_operations()
 
   service.name = "wcs";
 
-// 1st WMS operation: GetCapabilities
+// 1st WCS operation: GetCapabilities
   {
     tws::core::service_operation s_op;
 
@@ -126,7 +126,7 @@ void tws::wcs::register_operations()
     service.operations.push_back(s_op);
   }
 
-// 2nd WMS operation: DescribeCoverage
+// 2nd WCS operation: DescribeCoverage
   {
     tws::core::service_operation s_op;
 
@@ -137,7 +137,7 @@ void tws::wcs::register_operations()
     service.operations.push_back(s_op);
   }
 
-// 3rd WMS operation: GetCoverage
+// 3rd WCS operation: GetCoverage
   {
     tws::core::service_operation s_op;
 
