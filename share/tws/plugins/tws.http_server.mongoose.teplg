@@ -8,7 +8,7 @@
             engine="C++">
   <Name>tws.http_server.mongoose</Name>
   <DisplayName>Mongoose Web Application Server</DisplayName>
-  <Description>Test</Description>
+  <Description>A simple web server built on top of Mongoose library</Description>
   <TerraLibVersion>1.0.0</TerraLibVersion>
   <License xlink:href="http://www.gnu.org/licenses/lgpl-3.0-standalone.html">GNU Lesser General Public License v 3.0</License>
   <Category>Web Services</Category>

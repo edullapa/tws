@@ -211,9 +211,11 @@ option(TWS_MOD_CORE_ENABLED "Build TWS CORE library?" ON)
 
 CMAKE_DEPENDENT_OPTION(TWS_MOD_MONGOOSE_ENABLED "Build Mongoose Web Server support?" ON "TWS_MOD_CORE_ENABLED" OFF)
 
-CMAKE_DEPENDENT_OPTION(TWS_MOD_WMS_ENABLED "Build Application Web Map Service?" ON "TWS_MOD_CORE_ENABLED" OFF)
+CMAKE_DEPENDENT_OPTION(TWS_MOD_GEOARRAY_ENABLED "Build Geo-Array metadata support?" ON "TWS_MOD_CORE_ENABLED" OFF)
 
-CMAKE_DEPENDENT_OPTION(TWS_MOD_WCS_ENABLED "Build Application Web Coverage Service?" ON "TWS_MOD_CORE_ENABLED" OFF)
+CMAKE_DEPENDENT_OPTION(TWS_MOD_WMS_ENABLED "Build Application Web Map Service?" ON "TWS_MOD_GEOARRAY_ENABLED" OFF)
+
+CMAKE_DEPENDENT_OPTION(TWS_MOD_WCS_ENABLED "Build Application Web Coverage Service?" ON "TWS_MOD_GEOARRAY_ENABLED" OFF)
 
 CMAKE_DEPENDENT_OPTION(TWS_APP_SERVER_ENABLED "Build Application Web Server?" ON "TWS_MOD_CORE_ENABLED" OFF)
 
@@ -250,6 +252,11 @@ configure_file(${TWS_ABSOLUTE_ROOT_DIR}/src/tws/version.hpp.in
 if(TWS_MOD_CORE_ENABLED)
   add_subdirectory(tws_mod_core)
 endif()
+
+if(TWS_MOD_GEOARRAY_ENABLED)
+  add_subdirectory(tws_mod_geoarray)
+endif()
+
 
 if(TWS_MOD_WMS_ENABLED)
   add_subdirectory(tws_mod_wms)
