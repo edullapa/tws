@@ -17,9 +17,9 @@
  */
 
 /*!
-  \file tws/wtss/wtss.cpp
+  \file tws/wms/wms.cpp
 
-  \brief Web Time Series Data Service.
+  \brief Web Map Service.
 
   \author Roger Victor
  */

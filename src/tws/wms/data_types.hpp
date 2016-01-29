@@ -17,7 +17,7 @@
  */
 
 /*!
-  \file tws/geoarray/data_types.hpp
+  \file tws/wms/data_types.hpp
 
   \brief A class for describing the WMS metadata.
 
@@ -37,6 +37,44 @@ namespace tws
 {
   namespace wms
   {
+    //! A keyword related to the metadata.
+    struct keyword_t
+    {
+      std::string keyword;
+    };
+    
+    //! ...
+    struct online_resource_t
+    {
+      std::string xlink_type;
+      std::string xlink_href;
+    };
+    
+    //! ...
+    struct get_t
+    {
+      online_resource_t online_resource;
+    };
+    
+    //! ...
+    struct post_t
+    {
+      online_resource_t online_resource;
+    };
+    
+    //! ...
+    struct http_t
+    {
+      get_t get;
+      post_t post;
+    };
+    
+    //! The DCP type of the request.
+    struct dcp_type_t
+    {
+      http_t http;
+    };
+    
     //! The spatial resolution of array cells.
     struct spatial_resolution_t
     {

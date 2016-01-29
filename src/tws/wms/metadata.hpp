@@ -17,7 +17,7 @@
  */
 
 /*!
-  \file tws/metadata/metadata.hpp
+  \file tws/wms/metadata.hpp
 
   \brief A class for describing the WMS metadata.
 
@@ -38,26 +38,59 @@ namespace tws
 {
   namespace wms
   {
-    //! Base metadata of an array attribute.
-    struct attribute_t
+    //! Base metadata of a layer.
+    struct layer_metadata_t
     {
-      std::string name;
-      std::string description;
-      numeric_range_t valid_range;
-      double scale_factor;
-      double missing_value;
-      int datatype;
+      std::string title;
+      std::string crs;
+    };
+    
+    //! Base metadata of a exception.
+    struct exception_metadata_t
+    {
+      std::string format;
     };
 
-    //! Base metadata of an array.
-    struct metadata_t
+    //! Base metadata of a request.
+    struct request_metadata_t
+    {
+      std::string format;
+      dcp_type_t dcp_type;
+    };
+    
+    //! Base metadata of a capability.
+    struct capability_metadata_t
+    {
+      std::vector<request_metadata_t> request;
+      exception_metadata_t exception;
+      std::vector<layer_metadata_t> layer;
+    };
+    
+    //! Base metadata of the service contact information.
+    struct contact_metadata_t
+    {
+      std::string contact_person;
+      std::string contact_organization;
+      std::string contact_position;
+      std::string contact_address;
+      std::string contact_voice_telephone;
+      std::string contact_electronic_mail_address;
+    };
+    
+    //! Base metadata of the service information.
+    struct service_metadata_t
     {
       std::string name;
-      std::string description;
-      std::string detail;
-      std::vector<attribute_t> attributes;
-      std::vector<dimension_t> dimensions;
-      geo_extent_t geo_extent;
+      std::string title;
+      std::string abstract;
+      std::vector<keyword_t> keyword_list;
+      online_resource_t online_resource;
+      contact_metadata_t contact_information;
+      std::string fees;
+      std::string access_constraints;
+      std::string layer_limit;
+      std::string max_width;
+      std::string max_height;
     };
 
   }  // end namespace wms
