@@ -17,11 +17,11 @@
  */
 
 /*!
-  \file tws/mongoose/plugin.cpp
+  \file tws/wcs/plugin.cpp
 
-  \brief Add a plugin interface for dynamic loading of the Mongoose module.
+  \brief Plugin interface for dynamic loading of WCS as Mongoose module.
 
-  \author Gilberto Ribeiro de Queiroz
+  \author Raphael Willian da Costa
  */
 
 // TWS

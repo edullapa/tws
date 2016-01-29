@@ -18,9 +18,9 @@
 
 
 /*!
-  \file tws/wtss/wtss.cpp
+  \file tws/wcs/wcs.cpp
 
-  \brief Web Time Series Data Service.
+  \brief Web Coverage Service implementation.
 
   \author Raphael Willian da Costa
  */
