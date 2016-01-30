@@ -17,7 +17,7 @@
  */
 
 /*!
-  \file tws/mongoose/plugin.cpp
+  \file tws/wms/plugin.cpp
 
   \brief Add a plugin interface for dynamic loading of the Mongoose module.
 
