@@ -21,7 +21,7 @@
 #
 #  CMake scripts for TerraLib Web Services
 #
-#  Description: Script for generating the build of Web Map Service support.
+#  Description: Script for generating the build of Web Time Series Data Service support.
 #
 #  Author: Matheus Cavassan Zaglia
 #

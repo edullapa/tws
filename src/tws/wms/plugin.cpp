@@ -19,7 +19,7 @@
 /*!
   \file tws/wms/plugin.cpp
 
-  \brief Add a plugin interface for dynamic loading of the Mongoose module.
+  \brief Add a plugin interface for dynamic loading of the Web Map Service module.
 
   \author Gilberto Ribeiro de Queiroz
  */

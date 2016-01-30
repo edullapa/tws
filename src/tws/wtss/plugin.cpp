@@ -19,7 +19,7 @@
 /*!
   \file tws/wtss/plugin.cpp
 
-  \brief Add a plugin interface for dynamic loading of the Mongoose module.
+  \brief Add a plugin interface for dynamic loading of the Web Time Series Data Service module.
 
   \author Gilberto Ribeiro de Queiroz
  */
