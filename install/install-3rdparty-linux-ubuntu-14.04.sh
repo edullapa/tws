@@ -81,7 +81,7 @@ valid $? "Error: could not enter 3rd-party libraries dir (tws-3rdparty-linux-ubu
 # Check installation dir
 #
 if [ "$TWS_DIR" == "" ]; then
-  TWS_DIR = "/opt/tws"
+  TWS_DIR="/opt/tws"
 fi
 
 export PATH="$PATH:$TWS_DIR/bin"
