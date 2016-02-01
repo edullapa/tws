@@ -215,6 +215,8 @@ CMAKE_DEPENDENT_OPTION(TWS_MOD_GEOARRAY_ENABLED "Build Geo-Array metadata suppor
 
 CMAKE_DEPENDENT_OPTION(TWS_MOD_WMS_ENABLED "Build Application Web Map Service?" ON "TWS_MOD_GEOARRAY_ENABLED" OFF)
 
+CMAKE_DEPENDENT_OPTION(TWS_MOD_WCS_ENABLED "Build Application Web Coverage Service?" ON "TWS_MOD_GEOARRAY_ENABLED" OFF)
+
 CMAKE_DEPENDENT_OPTION(TWS_APP_SERVER_ENABLED "Build Application Web Server?" ON "TWS_MOD_CORE_ENABLED" OFF)
 
 
@@ -258,6 +260,10 @@ endif()
 
 if(TWS_MOD_WMS_ENABLED)
   add_subdirectory(tws_mod_wms)
+endif()
+
+if(TWS_MOD_WCS_ENABLED)
+  add_subdirectory(tws_mod_wcs)
 endif()
 
 if(TWS_MOD_MONGOOSE_ENABLED)

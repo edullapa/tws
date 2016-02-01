@@ -16,16 +16,17 @@
   with TerraLib Web Services. See COPYING. If not, see <http://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
+
 /*!
-  \file tws/wms/wms.hpp
+  \file tws/wcs/wcs.hpp
 
-  \brief Web Map Service.
+  \brief Web Coverage Service.
 
-  \author Roger Victor
+  \author Raphael Willian da Costa
  */
 
-#ifndef __TWS_WMS_WMS_HPP__
-#define __TWS_WMS_WMS_HPP__
+#ifndef __TWS_WCS_WCS_HPP__
+#define __TWS_WCS_WCS_HPP__
 
 // TWS
 //#include "config.hpp"
@@ -38,28 +39,28 @@ namespace tws
     class http_response;
   }
 
-  namespace wms
+  namespace wcs
   {
 
-    //! List the metadata, describing the layers avaliable for vizualization.
-    /*! http://chronos.dpi.inpe.br:6543/wms/GetCapabilities */
+    //! List the name of coverages managed by the server.
+    /*! http://chronos.dpi.inpe.br:6543/wcs/GetCapabilities */
     struct get_capabilities_functor
     {
       void operator()(const tws::core::http_request& request,
                       tws::core::http_response& response);
     };
 
-    //! Request the server to render a map giving a list of layers.
-    /*! http://chronos.dpi.inpe.br:6543/wms/GetMap?layers=mod09q1 */
-    struct get_map_functor
+    //! List the metadata about a given coverage.
+    /*! http://chronos.dpi.inpe.br:6543/wcs/DescribeCoverage?coverageID=mod09q1 */
+    struct describe_coverage_functor
     {
       void operator()(const tws::core::http_request& request,
                       tws::core::http_response& response);
     };
 
-    //! Retrieve information about an element of a particular layer.
-    /*! http://chronos.dpi.inpe.br:6543/wms/GetFeatureInfo?layers=mod09q1 */
-    struct get_feature_info_functor
+    //! Retrieve the time series for a given coverage.
+    /*! http://chronos.dpi.inpe.br:6543/wcs/GetCoverage?coverageID=mod09q1 */
+    struct get_coverage_functor
     {
       void operator()(const tws::core::http_request& request,
                       tws::core::http_response& response);
@@ -71,7 +72,7 @@ namespace tws
     //! Initialize all service operations.
     void initialize_operations();
 
-  }   // end namespace wms
+  }   // end namespace wcs
 }     // end namespace tws
 
-#endif  // __TWS_WMS_WMS_HPP__
+#endif  // __TWS_WCS_WCS_HPP__

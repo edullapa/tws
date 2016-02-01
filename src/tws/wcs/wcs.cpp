@@ -16,25 +16,26 @@
   with TerraLib Web Services. See COPYING. If not, see <http://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
+
 /*!
-  \file tws/wms/wms.cpp
+  \file tws/wcs/wcs.cpp
 
-  \brief Web Map Service.
+  \brief Web Coverage Service implementation.
 
-  \author Roger Victor
+  \author Raphael Willian da Costa
  */
 
 // TWS
-#include "wms.hpp"
+#include "wcs.hpp"
 #include "../core/http_request.hpp"
 #include "../core/http_response.hpp"
 #include "../core/service_operations_manager.hpp"
 #include "../core/utils.hpp"
-#include "../geoarray/metadata_manager.hpp"
 
 // STL
 #include <algorithm>
 #include <memory>
+#include <iostream>
 
 // Boost
 #include <boost/algorithm/string/classification.hpp>
@@ -50,94 +51,99 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
-// TerraLib
-//#include <terralib/geometry/Envelope.h>
-//#include <terralib/raster/Grid.h>
-//#include <terralib/srs/Converter.h>
 
-void
-tws::wms::get_capabilities_functor::operator()(const tws::core::http_request& request,
-                                               tws::core::http_response& response)
+void tws::wcs::get_capabilities_functor::operator()(const tws::core::http_request& request,
+                                                    tws::core::http_response& response)
 {
-// retrieve the list of registered geo-arrays
-  std::vector<std::string> arrays = tws::geoarray::metadata_manager::instance().list_arrays();
-  
 // output result
   rapidjson::Document::AllocatorType allocator;
-  
+
   rapidjson::Document doc;
-  
+
   doc.SetObject();
-  
+
   rapidjson::Value jarrays(rapidjson::kArrayType);
-  
-  tws::core::copy_string_array(arrays.begin(), arrays.end(), jarrays, allocator);
-  
-  doc.AddMember("geoarrays", jarrays, allocator);
-  
+
   rapidjson::StringBuffer str_buff;
-  
+
   rapidjson::Writer<rapidjson::StringBuffer> writer(str_buff);
-  
+
   doc.Accept(writer);
-  
+
   const char* p_str_buff = str_buff.GetString();
-  
+
   response.add_header("Content-Type", "application/json");
   response.add_header("Access-Control-Allow-Origin", "*");
   response.set_content(p_str_buff, str_buff.Size());
 }
 
 void
-tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
-                                      tws::core::http_response& response)
+tws::wcs::describe_coverage_functor::operator()(const tws::core::http_request& request,
+                                                tws::core::http_response& response)
+{
+// output result
+  rapidjson::Document::AllocatorType allocator;
+
+  rapidjson::Document doc;
+
+  doc.SetObject();
+
+  rapidjson::Value jarrays(rapidjson::kArrayType);
+
+  rapidjson::StringBuffer str_buff;
+
+  rapidjson::Writer<rapidjson::StringBuffer> writer(str_buff);
+
+  doc.Accept(writer);
+
+  const char* p_str_buff = str_buff.GetString();
+
+  response.add_header("Content-Type", "application/json");
+  response.add_header("Access-Control-Allow-Origin", "*");
+  response.set_content(p_str_buff, str_buff.Size());
+}
+
+void tws::wcs::get_coverage_functor::operator()(const tws::core::http_request& request,
+                                                tws::core::http_response& response)
 {
 
 }
 
-void
-tws::wms::get_feature_info_functor::operator()(const tws::core::http_request& request,
-                                           tws::core::http_response& response)
-{
-
-}
-
-void
-tws::wms::register_operations()
+void tws::wcs::register_operations()
 {
   tws::core::service_metadata service;
 
-  service.name = "wms";
+  service.name = "wcs";
 
-// 1st WMS operation: GetCapabilities
+// 1st WCS operation: GetCapabilities
   {
     tws::core::service_operation s_op;
 
     s_op.name = "GetCapabilities";
-    s_op.description = "List the metadata, describing the layers avaliable for vizualization.";
+    s_op.description = ".......";
     s_op.handler = get_capabilities_functor();
 
     service.operations.push_back(s_op);
   }
 
-// 2nd WMS operation: GetMap
+// 2nd WCS operation: DescribeCoverage
   {
     tws::core::service_operation s_op;
 
-    s_op.name = "GetMap";
-    s_op.description = "Request the server to render a map giving a list of layers.";
-    s_op.handler = get_map_functor();
+    s_op.name = "DescribeCoverage";
+    s_op.description = "...";
+    s_op.handler = describe_coverage_functor();
 
     service.operations.push_back(s_op);
   }
 
-// 3rd WMS operation: GetFeatureInfo
+// 3rd WCS operation: GetCoverage
   {
     tws::core::service_operation s_op;
 
-    s_op.name = "GetFeatureInfo";
-    s_op.description = "Retrieve information about an element of a particular layer.";
-    s_op.handler = get_feature_info_functor();
+    s_op.name = "GetCoverage";
+    s_op.description = "....";
+    s_op.handler = get_coverage_functor();
 
     service.operations.push_back(s_op);
   }
@@ -145,8 +151,7 @@ tws::wms::register_operations()
   tws::core::service_operations_manager::instance().insert(service);
 }
 
-void
-tws::wms::initialize_operations()
+void tws::wcs::initialize_operations()
 {
 
 }
