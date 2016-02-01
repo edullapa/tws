@@ -17,16 +17,16 @@
  */
 
 /*!
-  \file tws/wms/plugin.cpp
+  \file tws/wtss/plugin.cpp
 
-  \brief Add a plugin interface for dynamic loading of the Web Map Service module.
+  \brief Add a plugin interface for dynamic loading of the Web Time Series Data Service module.
 
   \author Gilberto Ribeiro de Queiroz
  */
 
 // TWS
 #include "../core/service_operations_manager.hpp"
-#include "wms.hpp"
+#include "wtss.hpp"
 
 // TerraLib
 #include <terralib/plugin/Plugin.h>
@@ -52,9 +52,9 @@ class Plugin : public te::plugin::Plugin
       if(m_initialized)
         return;
       
-      tws::wms::register_operations();
+      tws::wtss::register_operations();
       
-      tws::wms::initialize_operations();
+      tws::wtss::initialize_operations();
       
       m_initialized = true;
     }
