@@ -7,9 +7,9 @@
             release="2013-01-01"
             engine="C++">
   <Name>tws.wms</Name>
-  <DisplayName>Web Map Service</DisplayName>
-  <Description>Test</Description>
-  <TerraLibVersion>1.0.0</TerraLibVersion>
+  <DisplayName>OGC Web Map Service</DisplayName>
+  <Description>A web map service for time series data from remote sensing imagery</Description>
+  <TerraLibVersion>5.1.0</TerraLibVersion>
   <License xlink:href="http://www.gnu.org/licenses/lgpl-3.0-standalone.html">GNU Lesser General Public License v 3.0</License>
   <Category>Web Services</Category>
   <Site xlink:href="http://www.dpi.inpe.br/terralib5/wiki/doku.php?id=wiki:designimplementation:dataaccess:pgis"></Site>
