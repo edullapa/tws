@@ -56,6 +56,9 @@ void LoadModules()
   
   info = te::plugin::GetInstalledPlugin(plugins_path + "/tws.wms.teplg");
   te::plugin::PluginManager::getInstance().add(info);
+
+  info = te::plugin::GetInstalledPlugin(plugins_path + "/tws.wcs.teplg");
+  te::plugin::PluginManager::getInstance().add(info);
   
   te::plugin::PluginManager::getInstance().loadAll();
 }
