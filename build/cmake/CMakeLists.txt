@@ -266,6 +266,10 @@ if(TWS_MOD_WCS_ENABLED)
   add_subdirectory(tws_mod_wcs)
 endif()
 
+if(TWS_MOD_WTSS_ENABLED)
+  add_subdirectory(tws_mod_wtss)
+endif()
+
 if(TWS_MOD_MONGOOSE_ENABLED)
   add_subdirectory(tws_mod_mongoose)
 endif()
