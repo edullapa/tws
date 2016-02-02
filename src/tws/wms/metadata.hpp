@@ -31,6 +31,7 @@
 #include "data_types.hpp"
 
 // STL
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -41,8 +42,10 @@ namespace tws
     //! Base metadata of a layer.
     struct layer_metadata_t
     {
+      std::string name;
       std::string title;
       std::string crs;
+      std::vector<std::shared_ptr<layer_metadata_t> > layers;
     };
     
     //! Base metadata of a exception.
@@ -88,9 +91,9 @@ namespace tws
       contact_metadata_t contact_information;
       std::string fees;
       std::string access_constraints;
-      std::string layer_limit;
-      std::string max_width;
-      std::string max_height;
+      uint32_t layer_limit;
+      uint32_t max_width;
+      uint32_t max_height;
     };
 
   }  // end namespace wms
