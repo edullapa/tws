@@ -3,4 +3,3 @@
 *.user
 build/cmake/.idea/
 *.*~
-install/
