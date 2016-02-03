@@ -110,7 +110,7 @@ if [ ! -f "$TWS_DIR/include/rapidjson/rapidjson.h" ]; then
   cd rapidjson
   valid $? "Error: could not enter rapidjson!"
 
-  mv include/rapidjson $TWS_DIR/include/
+  mv rapidjson/include $TWS_DIR/include/
 
   cd ..
 fi

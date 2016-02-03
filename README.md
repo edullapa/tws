@@ -69,7 +69,7 @@ We have prepared a special bash script for building and installing the dependenc
 
 - Open the shell command line and call the script *install-3rdparty-linux-ubuntu-14.04.sh* setting the target to install all the stuffs from these third-party libraries and tools:
 ```
-$ TWS_DEPENDENCIES_DIR="/home/user/mylibs" ./install-3rdparty-linux-ubuntu-14.04.sh
+$ TWS_DIR="/home/user/mylibs" ./install-3rdparty-linux-ubuntu-14.04.sh
 ```
 
 **Note:* Don't choose as target location, a system folder such as /usr or /usr/local. Try some user specifiic folder.

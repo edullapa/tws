@@ -59,7 +59,11 @@ void LoadModules()
 
   info = te::plugin::GetInstalledPlugin(plugins_path + "/tws.wcs.teplg");
   te::plugin::PluginManager::getInstance().add(info);
-  
+
+  info = te::plugin::GetInstalledPlugin(plugins_path + "/tws.wtss.teplg");
+  te::plugin::PluginManager::getInstance().add(info);
+
+
   te::plugin::PluginManager::getInstance().loadAll();
 }
 
@@ -86,7 +90,7 @@ int main(int argc, char *argv[])
     std::unique_ptr<tws::core::http_server> server = tws::core::http_server_builder::instance().build("mongoose");
 
     server->start();
-    
+
     UnloadModules();
   }
   catch(const boost::exception& e)
