@@ -44,8 +44,28 @@ namespace tws
     {
       std::string name;
       std::string title;
+      std::string abstract;
+      std::vector<keyword_t> keyword_list;
       std::string crs;
+      ex_geographic_bounding_box_t ex_geographic_bounding_box;
+      bounding_box_t bounding_box;
+      dimension_t dimension;
+      attribution_t attribution;
+      authority_url_t authority_url;
+      identifier_t identifier;
+      metadata_url_t metadata_url;
+      data_url_t data_url;
+      feature_list_url_t feature_list_url;
+      style_t style;
+      double min_scale_denominator;
+      double max_scale_denominator;
       std::vector<std::shared_ptr<layer_metadata_t> > layers;
+      bool queryable;
+      uint32_t cascaded;
+      bool opaque;
+      bool noSubsets;
+      uint32_t fixed_width;
+      uint32_t fixed_height;
     };
     
     //! Base metadata of a exception.
