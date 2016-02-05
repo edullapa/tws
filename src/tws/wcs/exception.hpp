@@ -45,7 +45,7 @@ namespace tws
     struct invalid_parameter_value: virtual exception { };
 
 
-  }  // end namespace geoarray
+  }  // end namespace wcs
 }    // end namespace tws
 
 #endif  // __TWS_WCS_EXCEPTION_HPP__
