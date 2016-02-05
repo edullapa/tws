@@ -53,39 +53,69 @@
 
 #include <terralib/xml/Writer.h>
 #include <terralib/xml/AbstractWriterFactory.h>
+#include <terralib/xml/ReaderFactory.h>
 
 
 void tws::wcs::get_capabilities_functor::operator()(const tws::core::http_request& request,
                                                     tws::core::http_response& response)
 {
 
-//  std::shared_ptr<te::xml::AbstractWriter> writer(te::xml::AbstractWriterFactory::make());
+  // TODO: generate in memory and retrieve instead saving in file
+  std::shared_ptr<te::xml::AbstractWriter> writer(te::xml::AbstractWriterFactory::make());
+  writer->setURI("capabilities.xml");
+  writer->setRootNamespaceURI("http://www.opengis.net/wcs/2.0");
+  writer->writeStartDocument("UTF", "no");
+  writer->writeStartElement("wcs:Capabilities");
+  writer->writeEndElement("wcs:Capabilities");
+  writer->writeToFile();
 
-//  writer->setRootNamespaceURI("http://www.opengis.net/wcs/2.0");
-//  writer->writeStartDocument("UTF", "no");
-//  writer->writeElement("Capabilities", 0);
+//  std::shared_ptr<te::xml::Reader> xml_reader(te::xml::ReaderFactory::make());
+//  xml_reader->read("capabilities.xml");
+  std::string output;
 
+//  while(xml_reader->next())
+  {
+//    output.append(xml_reader->getElementLocalName());
+//    std::cout << "Element Name: " << reader->getElementLocalName() << " -> ";
+//    std::cout << "Node Type: "; NodeTypePrinter(reader->getNodeType());
 
-// output result
-  rapidjson::Document::AllocatorType allocator;
+//    if(reader->getNodeType() == te::xml::START_ELEMENT && reader->hasAttrs())
+//    {
+//      std::cout << "  Attributes" << std::endl;
+//      for(std::size_t i = 0; i < reader->getNumberOfAttrs(); ++i)
+//        std::cout << "  * [" << reader->getAttrLocalName(i) << " = " << reader->getAttr(i) << "]" << std::endl;
+//    }
 
-  rapidjson::Document doc;
+//    if(reader->getNodeType() == te::xml::VALUE)
+//      std::cout << "  * Element value: " << reader->getElementValue() << std::endl;
+  }
 
-  doc.SetObject();
-
-  rapidjson::Value jarrays(rapidjson::kArrayType);
-
-  rapidjson::StringBuffer str_buff;
-
-  rapidjson::Writer<rapidjson::StringBuffer> writer(str_buff);
-
-  doc.Accept(writer);
-
-  const char* p_str_buff = str_buff.GetString();
-
-  response.add_header("Content-Type", "application/json");
+  response.add_header("Content-Type", "application/xml");
   response.add_header("Access-Control-Allow-Origin", "*");
-  response.set_content(p_str_buff, str_buff.Size());
+  std::string message = "{\"status\": 1}";
+  response.set_content(output.c_str(), output.size());
+//  response.set_content(message.c_str(), message.size());
+
+//// output result
+//  rapidjson::Document::AllocatorType allocator;
+
+//  rapidjson::Document doc;
+
+//  doc.SetObject();
+
+//  rapidjson::Value jarrays(rapidjson::kArrayType);
+
+//  rapidjson::StringBuffer str_buff;
+
+//  rapidjson::Writer<rapidjson::StringBuffer> writer(str_buff);
+
+//  doc.Accept(writer);
+
+//  const char* p_str_buff = str_buff.GetString();
+
+//  response.add_header("Content-Type", "application/json");
+//  response.add_header("Access-Control-Allow-Origin", "*");
+//  response.set_content(p_str_buff, str_buff.Size());
 }
 
 void
