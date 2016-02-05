@@ -51,10 +51,21 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
+#include <terralib/xml/Writer.h>
+#include <terralib/xml/AbstractWriterFactory.h>
+
 
 void tws::wcs::get_capabilities_functor::operator()(const tws::core::http_request& request,
                                                     tws::core::http_response& response)
 {
+
+//  std::shared_ptr<te::xml::AbstractWriter> writer(te::xml::AbstractWriterFactory::make());
+
+//  writer->setRootNamespaceURI("http://www.opengis.net/wcs/2.0");
+//  writer->writeStartDocument("UTF", "no");
+//  writer->writeElement("Capabilities", 0);
+
+
 // output result
   rapidjson::Document::AllocatorType allocator;
 
