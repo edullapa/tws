@@ -31,6 +31,7 @@
 #include "../core/http_response.hpp"
 #include "../core/service_operations_manager.hpp"
 #include "../core/utils.hpp"
+#include "../geoarray/metadata_manager.hpp"
 
 // STL
 #include <algorithm>
@@ -57,9 +58,118 @@ void tws::wcs::get_capabilities_functor::operator()(const tws::core::http_reques
 // create Capabilities document
   rapidxml::xml_document<> doc;
 
-  rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_element, "Capabilities");
+  rapidxml::xml_node<> *root = doc.allocate_node(rapidxml::node_element, "Capabilities");
 
-  doc.append_node(node);
+  rapidxml::xml_attribute<>* attr = doc.allocate_attribute("version", "2.0.1");
+  root->append_attribute(attr);
+
+  {
+    // Service Identification node (service metadata)
+    rapidxml::xml_node<>* serviceIdentificationNode = doc.allocate_node(rapidxml::node_element, "ServiceIdentification");
+
+    {
+      // Temp code. This metadata should be get from json file
+      rapidxml::xml_node<>* node = doc.allocate_node(rapidxml::node_element, "Title", "Web Coverage Service");
+
+      serviceIdentificationNode->append_node(node);
+
+      node = doc.allocate_node(rapidxml::node_element, "Abstract", "This server implements WCS 2.0 especification");
+
+      serviceIdentificationNode->append_node(node);
+
+      node = doc.allocate_node(rapidxml::node_element, "ServiceType", "WCS");
+
+      serviceIdentificationNode->append_node(node);
+
+      node = doc.allocate_node(rapidxml::node_element, "ServiceTypeVersion", "2.0.1");
+
+      serviceIdentificationNode->append_node(node);
+
+      node = doc.allocate_node(rapidxml::node_element, "Profile");
+
+      serviceIdentificationNode->append_node(node);
+    }
+
+    // Service Provider node (service metadata)
+    rapidxml::xml_node<>* serviceProviderNode = doc.allocate_node(rapidxml::node_element, "ServiceProvider");
+
+    {
+      // Temp code. This metadata should be get from json file
+      rapidxml::xml_node<>* node = doc.allocate_node(rapidxml::node_element, "ProviderName", "National Institute for Spatial Research");
+
+      serviceProviderNode->append_node(node);
+
+      node = doc.allocate_node(rapidxml::node_element, "ProviderSite");
+
+      rapidxml::xml_attribute<>* attr = doc.allocate_attribute("href", "http://inpe.br");
+      node->append_attribute(attr);
+
+      serviceProviderNode->append_node(node);
+
+      // ServiceContact node
+      rapidxml::xml_node<>* serviceContactNode = doc.allocate_node(rapidxml::node_element, "ServiceContact");
+
+      node->append_node(serviceContactNode);
+    }
+
+    // Service Provider node (service metadata)
+    rapidxml::xml_node<>* operationsMetadataNode = doc.allocate_node(rapidxml::node_element, "OperationsMetadata");
+
+    {
+      // getcapabilities
+      rapidxml::xml_node<>* node = doc.allocate_node(rapidxml::node_element, "Operation");
+
+      rapidxml::xml_attribute<>* attr = doc.allocate_attribute("name", "GetCapabilities");
+      node->append_attribute(attr);
+
+      operationsMetadataNode->append_node(node);
+
+      // describe coverage
+      node = doc.allocate_node(rapidxml::node_element, "Operation");
+
+      attr = doc.allocate_attribute("name", "DescribeCoverage");
+      node->append_attribute(attr);
+
+      operationsMetadataNode->append_node(node);
+
+      // getcoverage
+      node = doc.allocate_node(rapidxml::node_element, "Operation");
+
+      attr = doc.allocate_attribute("name", "GetCoverage");
+      node->append_attribute(attr);
+
+      operationsMetadataNode->append_node(node);
+    }
+
+
+    // wcs:ServiceMetadata node
+    rapidxml::xml_node<>* serviceMetadataNode = doc.allocate_node(rapidxml::node_element, "ServiceMetadata");
+    serviceMetadataNode->append_node(doc.allocate_node(rapidxml::node_element, "formatSupported", "application/xml"));
+    serviceMetadataNode->append_node(doc.allocate_node(rapidxml::node_element, "formatSupported", "image/tiff"));
+    serviceMetadataNode->append_node(doc.allocate_node(rapidxml::node_element, "formatSupported", "image/hdf"));
+
+    rapidxml::xml_node<>* contentsaNode = doc.allocate_node(rapidxml::node_element, "Contents");
+
+    // retrieve the list of registered geo-arrays
+    std::vector<std::string> arrays = tws::geoarray::metadata_manager::instance().list_arrays();
+    for(auto array: arrays)
+    {
+      rapidxml::xml_node<>* summary = doc.allocate_node(rapidxml::node_element, "CoverageSummary");
+      summary->append_node(doc.allocate_node(rapidxml::node_element, "CoverageId", array.c_str()));
+      // todo: set it from file
+      summary->append_node(doc.allocate_node(rapidxml::node_element, "CoverageSubType", "GridCoverage"));
+
+      contentsaNode->append_node(summary);
+    }
+
+    root->append_node(serviceIdentificationNode);
+    root->append_node(serviceProviderNode);
+    root->append_node(operationsMetadataNode);
+    root->append_node(serviceMetadataNode);
+    root->append_node(contentsaNode);
+  }
+
+  doc.append_node(root);
   
 // output result
   std::string str_buff;
