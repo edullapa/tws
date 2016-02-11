@@ -26,6 +26,7 @@
 
 // TWS
 #include "wms.hpp"
+#include "data_types.hpp"
 #include "../core/http_request.hpp"
 #include "../core/http_response.hpp"
 #include "../core/service_operations_manager.hpp"
@@ -45,15 +46,9 @@
 // SciDB
 //#include <SciDBAPI.h>
 
-// RapidJSON
-#include <rapidjson/document.h>
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/writer.h>
-
-// TerraLib
-//#include <terralib/geometry/Envelope.h>
-//#include <terralib/raster/Grid.h>
-//#include <terralib/srs/Converter.h>
+// RapidXml
+#include <rapidxml/rapidxml.hpp>
+#include <rapidxml/rapidxml_print.hpp>
 
 void
 tws::wms::get_capabilities_functor::operator()(const tws::core::http_request& request,
