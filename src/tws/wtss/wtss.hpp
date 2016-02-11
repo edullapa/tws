@@ -32,7 +32,7 @@
 #define __TWS_WTSS_WTSS_HPP__
 
 // TWS
-#include "config.hpp"
+//#include "config.hpp"
 
 namespace tws
 {

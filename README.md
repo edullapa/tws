@@ -50,18 +50,22 @@ In the root directory of TWS codebase (the source code tree) there are some text
 The file named **[DEPENDENCIES](https://github.com/e-sensing/tws/blob/master/DEPENDENCIES)** in the root of TWS source tree contains the official list of third-party libraries and tools that you must install before building TWS from source.
 
 If you want to build yourself TWS then you need to install some third-party libraries. Below we show the list of third-party libraries dependencies and its versions:
-- **Boost (Mandatory):** TWS is built on top of Boost libraries. You will need to have them installed in order to build TWS. Make sure to have at least version 1.54.0 installed. If you prefer to install from source, download it from: http://www.boost.org.
 
 - **TerraLib (Mandatory):** TWS is built on top of TerraLib, a free and open source library for building GIS enabled applications. Make sure to have at least TerraLib version 5.1.0. You can download it from: http://www.dpi.inpe.br/terralib5.
+
+- **Boost (Mandatory):** TWS is built on top of Boost libraries. You will need to have them installed in order to build TWS. Make sure to have at least version 1.54.0 installed. If you prefer to install from source, download it from: http://www.boost.org.
+
+- ** RapidJSON (Mandatory):** Some of TWS web services implementation is built on top of RapidJSON library. You will need to have it installed in order to build TWS. You can download it from: https://github.com/miloyip/rapidjson.
+
+- ** RapidXML (Optional):** OGC Web Services are XML based. So, some of TWS web services implementation is built on top of RapidXML library. You will need to have it installed in order to build these services. You can download it from: http://rapidxml.sourceforge.net.
 
 **Note:**
 - When using TWS on a machine with a installed version of SciDB you probably already have Boost libraries installed.
 - If you have installed TerraLib you already have Boost and you don't need to install it again.
 
+### Bash script for building all dependencies on Linux Ubuntu 14.04 LTS
 
-### Bash script for building all dependencies on Linux Ubuntu 14.04
-
-We have prepared a special bash script for building and installing the dependencies on Linux Ubuntu 14.04. This script can be found in TWS source tree under *install* folder. Follow the steps below:
+We have prepared a special bash script for building and installing the dependencies on Linux Ubuntu 14.04 LTS. This script can be found in TWS source tree under *install* folder. Follow the steps below:
 
 - Download the third-party libraries package used by the development team: [tws-3rdparty-linux-ubuntu-14.04.tar.gz](http://www.dpi.inpe.br/esensing-devel/tws-3rdparty-linux-ubuntu-14.04.tar.gz).
 
@@ -72,7 +76,7 @@ We have prepared a special bash script for building and installing the dependenc
 $ TWS_DIR="/home/user/mylibs" ./install-3rdparty-linux-ubuntu-14.04.sh
 ```
 
-**Note:* Don't choose as target location, a system folder such as /usr or /usr/local. Try some user specifiic folder.
+*Note:* *Don't* choose as target location, a system folder such as */usr* or */usr/local*. Try some user specific folder.
 
 ### Bash script for building all dependencies on Mac OS X El Capitan
 
@@ -94,12 +98,7 @@ $ export PATH=$PATH:/Applications/CMake.app/Contents/bin
 $ TWS_DEPENDENCIES_DIR="/Users/user/mylibs" ./install-3rdparty-macosx-el-capitan.sh
 ```
 
-**Note:** Don't choose as target location, a system folder such as */usr* or */usr/local*. Try some user specific folder.
-
-### Prepared dependencies for Microsot Windows
-
-**THIS SECTION IS UNDER DEVELOPMENT**
-
+*Note:* *Don't* choose as target location, a system folder such as */usr* or */usr/local*. Try some user specific folder.
 
 ## Cloning TWS Repository
 
