@@ -55,9 +55,9 @@ If you want to build yourself TWS then you need to install some third-party libr
 
 - **Boost (Mandatory):** TWS is built on top of Boost libraries. You will need to have them installed in order to build TWS. Make sure to have at least version 1.54.0 installed. If you prefer to install from source, download it from: http://www.boost.org.
 
-- ** RapidJSON (Mandatory):** Some of TWS web services implementation is built on top of RapidJSON library. You will need to have it installed in order to build TWS. You can download it from: https://github.com/miloyip/rapidjson.
+- **RapidJSON (Mandatory):** Some of TWS web services implementation is built on top of RapidJSON library. You will need to have it installed in order to build TWS. You can download it from: https://github.com/miloyip/rapidjson.
 
-- ** RapidXML (Optional):** OGC Web Services are XML based. So, some of TWS web services implementation is built on top of RapidXML library. You will need to have it installed in order to build these services. You can download it from: http://rapidxml.sourceforge.net.
+- **RapidXML (Optional):** OGC Web Services are XML based. So, some of TWS web services implementation is built on top of RapidXML library. You will need to have it installed in order to build these services. You can download it from: http://rapidxml.sourceforge.net.
 
 **Note:**
 - When using TWS on a machine with a installed version of SciDB you probably already have Boost libraries installed.
