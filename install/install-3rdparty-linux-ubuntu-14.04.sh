@@ -84,9 +84,6 @@ if [ "$TWS_DIR" == "" ]; then
   TWS_DIR="/opt/tws"
 fi
 
-export PATH="$PATH:$TWS_DIR/bin"
-export LD_LIBRARY_PATH="$PATH:$TWS_DIR/lib"
-
 echo "installing 3rd-party libraries to '$TWS_DIR' ..."
 echo ""
 sleep 1s
@@ -111,6 +108,34 @@ if [ ! -f "$TWS_DIR/include/rapidjson/rapidjson.h" ]; then
   valid $? "Error: could not enter rapidjson!"
 
   mv rapidjson/include $TWS_DIR/include/
+
+  cd ..
+fi
+
+
+#
+# RapidXml
+#
+if [ ! -f "$TWS_DIR/include/rapidxml/rapidxml.hpp" ]; then
+  echo "installing RapidXml..."
+  echo ""
+  sleep 1s
+
+  if [ ! -d "$TWS_DIR" ]; then
+    mkdir $TWS_DIR
+  fi
+
+  if [ ! -d "$TWS_DIR/include/rapidxml" ]; then
+    mkdir -p $TWS_DIR/include/rapidxml
+  fi
+
+  unzip rapidxml-1.13.zip
+  valid $? "Error: could not uncompress rapidxml-1.13.zip!"
+
+  cd rapidxml-1.13
+  valid $? "Error: could not enter rapidxml!"
+
+  mv *.hpp $TWS_DIR/include/rapidxml/
 
   cd ..
 fi
