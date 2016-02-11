@@ -25,7 +25,7 @@
 #
 #  Author: Raphael Willian da Costa
 
-include_directories(${RAPIDJSON_INCLUDE_DIR})
+include_directories(${RAPIDXML_INCLUDE_DIR})
 include_directories(${terralib_INCLUDE_DIRS})
 
 file(GLOB TWS_SRC_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/wcs/*.cpp)

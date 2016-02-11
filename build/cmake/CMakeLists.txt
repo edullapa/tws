@@ -177,6 +177,8 @@ find_package(terralib REQUIRED)
 
 find_package(RapidJSON REQUIRED)
 
+find_package(RapidXml)
+
 #find_package(CppNetLib)
 
 #find_package(OpenSSL)
@@ -211,13 +213,13 @@ option(TWS_MOD_CORE_ENABLED "Build TWS CORE library?" ON)
 
 CMAKE_DEPENDENT_OPTION(TWS_MOD_MONGOOSE_ENABLED "Build Mongoose Web Server support?" ON "TWS_MOD_MONGOOSE_ENABLED" OFF)
 
-CMAKE_DEPENDENT_OPTION(TWS_MOD_GEOARRAY_ENABLED "Build Geo-Array metadata support?" ON "TWS_MOD_GEOARRAY_ENABLED" OFF)
+CMAKE_DEPENDENT_OPTION(TWS_MOD_GEOARRAY_ENABLED "Build Geo-Array metadata support?" ON "TWS_MOD_CORE_ENABLED" OFF)
 
-CMAKE_DEPENDENT_OPTION(TWS_MOD_WMS_ENABLED "Build Application Web Map Service?" ON "TWS_MOD_WMS_ENABLED" OFF)
+CMAKE_DEPENDENT_OPTION(TWS_MOD_WMS_ENABLED "Build Application Web Map Service?" ON "TWS_MOD_GEOARRAY_ENABLED;RAPIDXML_FOUND" OFF)
 
-CMAKE_DEPENDENT_OPTION(TWS_MOD_WTSS_ENABLED "Build Application Web Time Series Data Service?" ON "TWS_MOD_WTSS_ENABLED" OFF)
+CMAKE_DEPENDENT_OPTION(TWS_MOD_WTSS_ENABLED "Build Application Web Time Series Data Service?" ON "TWS_MOD_GEOARRAY_ENABLED" OFF)
 
-CMAKE_DEPENDENT_OPTION(TWS_MOD_WCS_ENABLED "Build Application Web Coverage Service?" ON "TWS_MOD_WCS_ENABLED" OFF)
+CMAKE_DEPENDENT_OPTION(TWS_MOD_WCS_ENABLED "Build Application Web Coverage Service?" ON "TWS_MOD_GEOARRAY_ENABLED;RAPIDXML_FOUND" OFF)
 
 CMAKE_DEPENDENT_OPTION(TWS_APP_SERVER_ENABLED "Build Application Web Server?" ON "TWS_MOD_CORE_ENABLED" OFF)
 
@@ -259,7 +261,6 @@ if(TWS_MOD_GEOARRAY_ENABLED)
   add_subdirectory(tws_mod_geoarray)
 endif()
 
-
 if(TWS_MOD_WMS_ENABLED)
   add_subdirectory(tws_mod_wms)
 endif()
@@ -279,7 +280,6 @@ endif()
 if(TWS_APP_SERVER_ENABLED)
   add_subdirectory(tws_app_server)
 endif()
-
 
 
 #

@@ -34,6 +34,7 @@
 
 // STL
 #include <algorithm>
+#include <iterator>
 #include <memory>
 #include <iostream>
 
@@ -46,61 +47,56 @@
 // SciDB
 //#include <SciDBAPI.h>
 
-// RapidJSON
-#include <rapidjson/document.h>
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/writer.h>
-
+// RapidXml
+#include <rapidxml/rapidxml_print.hpp>
+#include <rapidxml/rapidxml.hpp>
 
 void tws::wcs::get_capabilities_functor::operator()(const tws::core::http_request& request,
                                                     tws::core::http_response& response)
 {
+// create Capabilities document
+  rapidxml::xml_document<> doc;
+
+  rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_element, "Capabilities");
+
+  doc.append_node(node);
+  
 // output result
-  rapidjson::Document::AllocatorType allocator;
+  std::string str_buff;
 
-  rapidjson::Document doc;
+  rapidxml::print(std::back_inserter(str_buff), doc, 0);
 
-  doc.SetObject();
+  const char* p_str_buff = str_buff.c_str();
 
-  rapidjson::Value jarrays(rapidjson::kArrayType);
-
-  rapidjson::StringBuffer str_buff;
-
-  rapidjson::Writer<rapidjson::StringBuffer> writer(str_buff);
-
-  doc.Accept(writer);
-
-  const char* p_str_buff = str_buff.GetString();
-
-  response.add_header("Content-Type", "application/json");
+  response.add_header("Content-Type", "application/xml");
   response.add_header("Access-Control-Allow-Origin", "*");
-  response.set_content(p_str_buff, str_buff.Size());
+  response.set_content(p_str_buff, str_buff.size());
 }
 
 void
 tws::wcs::describe_coverage_functor::operator()(const tws::core::http_request& request,
                                                 tws::core::http_response& response)
 {
-// output result
-  rapidjson::Document::AllocatorType allocator;
-
-  rapidjson::Document doc;
-
-  doc.SetObject();
-
-  rapidjson::Value jarrays(rapidjson::kArrayType);
-
-  rapidjson::StringBuffer str_buff;
-
-  rapidjson::Writer<rapidjson::StringBuffer> writer(str_buff);
-
-  doc.Accept(writer);
-
-  const char* p_str_buff = str_buff.GetString();
-
-  response.add_header("Content-Type", "application/json");
-  response.add_header("Access-Control-Allow-Origin", "*");
-  response.set_content(p_str_buff, str_buff.Size());
+//// output result
+//  rapidjson::Document::AllocatorType allocator;
+//
+//  rapidjson::Document doc;
+//
+//  doc.SetObject();
+//
+//  rapidjson::Value jarrays(rapidjson::kArrayType);
+//
+//  rapidjson::StringBuffer str_buff;
+//
+//  rapidjson::Writer<rapidjson::StringBuffer> writer(str_buff);
+//
+//  doc.Accept(writer);
+//
+//  const char* p_str_buff = str_buff.GetString();
+//
+//  response.add_header("Content-Type", "application/json");
+//  response.add_header("Access-Control-Allow-Origin", "*");
+//  response.set_content(p_str_buff, str_buff.Size());
 }
 
 void tws::wcs::get_coverage_functor::operator()(const tws::core::http_request& request,

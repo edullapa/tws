@@ -18,7 +18,7 @@
 #
 #  CMake scripts for TerraLib Web Services
 #
-#  Author: Gilberto Ribeiro de Queiroz <gribeiro@dpi.inpe.br>
+#  Author: Gilberto Ribeiro de Queiroz
 #
 #  Description: Find SciDB include directory and C++ client library.
 #
