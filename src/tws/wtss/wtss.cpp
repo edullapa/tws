@@ -33,15 +33,7 @@
 #include "../core/http_response.hpp"
 #include "../core/service_operations_manager.hpp"
 #include "../core/utils.hpp"
-//#include "../metadata/array_metadata_manager.hpp"
-//#include "../metadata/utils.hpp"
-#include "../rapidjson/utils.hpp"
-#include "../scidb/connection.hpp"
-#include "../scidb/connection_pool.hpp"
-#include "../scidb/utils.hpp"
-#include "coverage_manager.hpp"
-#include "timeline_manager.hpp"
-#include "utils.hpp"
+#include "../geoarray/metadata_manager.hpp"
 #include "wtss.hpp"
 
 // STL
@@ -55,7 +47,7 @@
 #include <boost/lexical_cast.hpp>
 
 // SciDB
-#include <SciDBAPI.h>
+//#include <SciDBAPI.h>
 
 // RapidJSON
 #include <rapidjson/document.h>
@@ -71,8 +63,8 @@ void
 tws::wtss::list_coverages_functor::operator()(const tws::core::http_request& request,
                                               tws::core::http_response& response)
 {
-// retrieve the list of registered coverages
-  std::vector<std::string> coverages = tws::wtss::coverage_manager::instance().coverages();
+// retrieve the list of registered geo-arrays
+  std::vector<std::string> arrays = tws::geoarray::metadata_manager::instance().list_arrays();
 
 // output result
   rapidjson::Document::AllocatorType allocator;
@@ -83,7 +75,7 @@ tws::wtss::list_coverages_functor::operator()(const tws::core::http_request& req
 
   rapidjson::Value jarrays(rapidjson::kArrayType);
 
-  tws::json::copy_string_array(coverages.begin(), coverages.end(), jarrays, allocator);
+  tws::core::copy_string_array(arrays.begin(), arrays.end(), jarrays, allocator);
 
   doc.AddMember("coverages", jarrays, allocator);
 
@@ -503,44 +495,44 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 void
 tws::wtss::register_operations()
 {
-//  tws::core::service_metadata service;
-//
-//  service.name = "wtss";
-//
-//// 1st WTSS operation: list available coverages
-//  {
-//    tws::core::service_operation s_op;
-//
-//    s_op.name = "list_coverages";
-//    s_op.description = "List all coverages from remote sensing data products available in the server";
-//    s_op.handler = list_coverages_functor();
-//
-//    service.operations.push_back(s_op);
-//  }
-//
-//// 2nd WTSS operation: get metadata about a specific coverage
-//  {
-//    tws::core::service_operation s_op;
-//
-//    s_op.name = "describe_coverage";
-//    s_op.description = "Retrieve the metadata of a specific coverage";
-//    s_op.handler = describe_coverage_functor();
-//
-//    service.operations.push_back(s_op);
-//  }
-//
-//// 3rd WTSS operation: time_series retrieval operation
-//  {
-//    tws::core::service_operation s_op;
-//
-//    s_op.name = "time_series";
-//    s_op.description = "Retrieve the time series for a given location in a particular coverage";
-//    s_op.handler = time_series_functor();
-//
-//    service.operations.push_back(s_op);
-//  }
-//
-//  tws::core::service_operations_manager::instance().insert(service);
+  tws::core::service_metadata service;
+
+  service.name = "wtss";
+
+// 1st WTSS operation: list available coverages
+  {
+    tws::core::service_operation s_op;
+
+    s_op.name = "list_coverages";
+    s_op.description = "List all coverages from remote sensing data products available in the server";
+    s_op.handler = list_coverages_functor();
+
+    service.operations.push_back(s_op);
+  }
+
+// 2nd WTSS operation: get metadata about a specific coverage
+  {
+    tws::core::service_operation s_op;
+
+    s_op.name = "describe_coverage";
+    s_op.description = "Retrieve the metadata of a specific coverage";
+    s_op.handler = describe_coverage_functor();
+
+    service.operations.push_back(s_op);
+  }
+
+// 3rd WTSS operation: time_series retrieval operation
+  {
+    tws::core::service_operation s_op;
+
+    s_op.name = "time_series";
+    s_op.description = "Retrieve the time series for a given location in a particular coverage";
+    s_op.handler = time_series_functor();
+
+    service.operations.push_back(s_op);
+  }
+
+  tws::core::service_operations_manager::instance().insert(service);
 }
 
 void
