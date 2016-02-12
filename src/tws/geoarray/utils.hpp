@@ -32,7 +32,7 @@
 #define __TWS_METADATA_UTILS_HPP__
 
 // TWS
-#include "metadata.hpp"
+#include "data_types.hpp"
 
 // STL
 #include <map>
@@ -47,12 +47,12 @@ namespace tws
   namespace geoarray
   {
 
-    void load_metadata(std::map<std::string, metadata_t>& arrays);
+    void load_geoarrays(std::map<std::string, geoarray_t>& arrays);
     
-    void load_metadata(std::map<std::string, metadata_t>& arrays,
-                       const std::string& input_file);
+    void load_geoarrays(std::map<std::string, geoarray_t>& arrays,
+                        const std::string& input_file);
 
-    metadata_t read_array_metadata(const rapidjson::Value& jmetadata);
+    geoarray_t read_array_metadata(const rapidjson::Value& jmetadata);
 
     std::vector<attribute_t> read_array_attributes(const rapidjson::Value& jattributes);
 

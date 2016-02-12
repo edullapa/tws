@@ -25,45 +25,45 @@
  */
 
 // TWS
-#include "metadata_manager.hpp"
+#include "geoarray_manager.hpp"
+#include "data_types.hpp"
 #include "exception.hpp"
 #include "utils.hpp"
 
 // STL
+#include <iterator>
 #include <map>
+#include <utility>
 
 // Boost
-#include <boost/foreach.hpp>
 #include <boost/format.hpp>
 
-struct tws::geoarray::metadata_manager::impl
+struct tws::geoarray::geoarray_manager::impl
 {
-  std::map<std::string, metadata_t> arrays;
+  std::map<std::string, geoarray_t> arrays;
 };
 
 void
-tws::geoarray::metadata_manager::insert(const metadata_t& am)
+tws::geoarray::geoarray_manager::insert(const geoarray_t& a)
 {
-  std::map<std::string, metadata_t>::const_iterator it = pimpl_->arrays.find(am.name);
+  std::map<std::string, geoarray_t>::const_iterator it = pimpl_->arrays.find(a.name);
 
-  if(it != pimpl_->arrays.end())
+  if(it != std::end(pimpl_->arrays))
   {
-    boost::format err_msg("metadata for array '%1%' already registered.");
+    boost::format err_msg("geo-array '%1%' already registered.");
     
-    throw tws::item_already_exists_error() << tws::error_description((err_msg % am.name).str());
+    throw tws::item_already_exists_error() << tws::error_description((err_msg % a.name).str());
   }
 
-  pimpl_->arrays[am.name] = am;
+  pimpl_->arrays.insert(std::make_pair(a.name, a));
 }
 
 std::vector<std::string>
-tws::geoarray::metadata_manager::list_arrays() const
+tws::geoarray::geoarray_manager::list_arrays() const
 {
   std::vector<std::string> arrays;
 
-  typedef std::map<std::string, metadata_t> array_map_t;
-  
-  BOOST_FOREACH(const array_map_t::value_type& v, pimpl_->arrays)
+  for(const auto& v : pimpl_->arrays)
   {
     arrays.push_back(v.first);
   }
@@ -71,12 +71,12 @@ tws::geoarray::metadata_manager::list_arrays() const
   return arrays;
 }
 
-const tws::geoarray::metadata_t&
-tws::geoarray::metadata_manager::get(const std::string& array_name) const
+const tws::geoarray::geoarray_t&
+tws::geoarray::geoarray_manager::get(const std::string& array_name) const
 {
-  std::map<std::string, metadata_t>::const_iterator it = pimpl_->arrays.find(array_name);
+  std::map<std::string, geoarray_t>::const_iterator it = pimpl_->arrays.find(array_name);
 
-  if(it == pimpl_->arrays.end())
+  if(it == std::end(pimpl_->arrays))
   {
     boost::format err_msg("could not find metadata for array: %1%");
 
@@ -86,23 +86,23 @@ tws::geoarray::metadata_manager::get(const std::string& array_name) const
   return it->second;
 }
 
-tws::geoarray::metadata_manager&
-tws::geoarray::metadata_manager::instance()
+tws::geoarray::geoarray_manager&
+tws::geoarray::geoarray_manager::instance()
 {
-  static metadata_manager inst;
+  static geoarray_manager inst;
 
   return inst;
 }
 
-tws::geoarray::metadata_manager::metadata_manager()
+tws::geoarray::geoarray_manager::geoarray_manager()
   : pimpl_(nullptr)
 {
   pimpl_ = new impl;
   
-  load_metadata(pimpl_->arrays);
+  load_geoarrays(pimpl_->arrays);
 }
 
-tws::geoarray::metadata_manager::~metadata_manager()
+tws::geoarray::geoarray_manager::~geoarray_manager()
 {
   delete pimpl_;
 }

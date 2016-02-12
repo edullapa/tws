@@ -17,18 +17,18 @@
  */
 
 /*!
-  \file tws/metadata/array_metadata_manager.hpp
+  \file tws/geoarray/geoarray_manager.hpp
 
-  \brief A singleton for managing metadata about arrays.
+  \brief A singleton for managing the registered geo-arrays.
 
   \author Gilberto Ribeiro de Queiroz
  */
 
-#ifndef __TWS_GEOARRAY_METADATA_MANAGER_HPP__
-#define __TWS_GEOARRAY_METADATA_MANAGER_HPP__
+#ifndef __TWS_GEOARRAY_GEOARRAY_MANAGER_HPP__
+#define __TWS_GEOARRAY_GEOARRAY_MANAGER_HPP__
 
 // TWS
-#include "metadata.hpp"
+#include "config.hpp"
 
 // STL
 #include <vector>
@@ -40,25 +40,28 @@ namespace tws
 {
   namespace geoarray
   {
+  
+    //! Forward declaration
+    struct geoarray_t;
 
-    //! A singleton for managing metadata about arrays.
-    class metadata_manager : public boost::noncopyable
+    //! A singleton for managing geo-arrays.
+    class geoarray_manager : public boost::noncopyable
     {
       public:
 
-        void insert(const metadata_t& am);
+        void insert(const geoarray_t& a);
 
         std::vector<std::string> list_arrays() const;
 
-        const metadata_t& get(const std::string& array_name) const;
+        const geoarray_t& get(const std::string& array_name) const;
 
-        static metadata_manager& instance();
+        static geoarray_manager& instance();
 
       private:
 
-        metadata_manager();
+        geoarray_manager();
 
-        ~metadata_manager();
+        ~geoarray_manager();
 
       private:
 
@@ -70,4 +73,4 @@ namespace tws
   }  // end namespace geoarray
 }    // end namespace tws
 
-#endif  // __TWS_GEOARRAY_METADATA_MANAGER_HPP__
+#endif  // __TWS_GEOARRAY_GEOARRAY_MANAGER_HPP__

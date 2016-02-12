@@ -32,6 +32,7 @@
 
 // STL
 #include <string>
+#include <vector>
 
 namespace tws
 {
