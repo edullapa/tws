@@ -32,6 +32,7 @@
 
 // STL
 #include <vector>
+#include <string>
 
 // Boost
 #include <boost/noncopyable.hpp>

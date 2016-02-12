@@ -119,6 +119,13 @@ namespace tws
       If the path is not found it returns an empty string.
      */
     std::string find_in_app_path(const std::string& p);
+
+    /*!
+      \brief It tries to open a json file from path.
+
+      \exception tws::file_open_error It may throwed when the file is invalid or cannot be open.
+    */
+    rapidjson::Document *open_json_file(const std::string& path);
     
     //! Copy the JSON string array to a range beginning at result.
     template<class OutputIterator> void

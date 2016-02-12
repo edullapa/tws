@@ -34,6 +34,10 @@
 // Boost
 #include <boost/filesystem.hpp>
 
+// rapidJSON
+#include <rapidjson/document.h>
+#include <rapidjson/filestream.h>
+
 void
 tws::core::init_terralib_web_services()
 {
@@ -102,4 +106,55 @@ tws::core::find_in_app_path(const std::string& p)
     return eval_path.string();
 
   return "";
+}
+
+rapidjson::Document* tws::core::open_json_file(const std::string &path)
+{
+  if(!boost::filesystem::is_regular(path))
+  {
+    boost::format err_msg("input file '%1%' doesn't exist.");
+
+    throw tws::file_exists_error() << tws::error_description((err_msg % path).str());
+  }
+
+  FILE* pfile = fopen(path.c_str(), "r");
+
+  if(pfile == nullptr)
+  {
+    boost::format err_msg("error opening input file '%1%'.");
+
+    throw tws::file_open_error() << tws::error_description((err_msg % path).str());
+  }
+
+  try
+  {
+    rapidjson::FileStream istr(pfile);
+
+    rapidjson::Document* doc = new rapidjson::Document();
+
+    doc->ParseStream<0>(istr);
+
+    if(doc->HasParseError())
+    {
+      boost::format err_msg("error parsing input file '%1%': %2%.");
+
+      throw tws::parser_error() << tws::error_description((err_msg % path % doc->GetParseError()).str());
+    }
+
+    if(!doc->IsObject() || doc->IsNull())
+    {
+      boost::format err_msg("error parsing input file '%1%': unexpected file format.");
+
+      throw tws::parser_error() << tws::error_description((err_msg % path).str());
+    }
+
+    fclose(pfile);
+
+    return doc;
+  }
+  catch(...)
+  {
+    fclose(pfile);
+    throw;
+  }
 }

@@ -59,45 +59,11 @@ tws::geoarray::load_geoarrays(std::map<std::string, geoarray_t>& arrays,
 {
   arrays.clear();
 
-  if(!boost::filesystem::is_regular(input_file))
-  {
-    boost::format err_msg("input file '%1%' doesn't exist.");
-
-    throw tws::file_exists_error() << tws::error_description((err_msg % input_file).str());
-  }
-
-  FILE* pfile = fopen(input_file.c_str(), "r");
-
-  if(pfile == nullptr)
-  {
-    boost::format err_msg("error opening input file '%1%'.");
-
-    throw tws::file_open_error() << tws::error_description((err_msg % input_file).str());
-  }
-
   try
   {
-    rapidjson::FileStream istr(pfile);
+    rapidjson::Document* doc = tws::core::open_json_file(input_file);
 
-    rapidjson::Document doc;
-
-    doc.ParseStream<0>(istr);
-
-    if(doc.HasParseError())
-    {
-      boost::format err_msg("error parsing input file '%1%': %2%.");
-
-      throw tws::parser_error() << tws::error_description((err_msg % input_file % doc.GetParseError()).str());
-    }
-
-    if(!doc.IsObject() || doc.IsNull())
-    {
-      boost::format err_msg("error parsing input file '%1%': unexpected file format.");
-
-      throw tws::parser_error() << tws::error_description((err_msg % input_file).str());
-    }
-
-    const rapidjson::Value& jarrays = doc["arrays"];
+    const rapidjson::Value& jarrays = (*doc)["arrays"];
 
     if(!jarrays.IsArray())
     {
@@ -122,11 +88,9 @@ tws::geoarray::load_geoarrays(std::map<std::string, geoarray_t>& arrays,
   }
   catch(...)
   {
-    fclose(pfile);
     throw;
   }
   
-  fclose(pfile);
 }
 
 tws::geoarray::geoarray_t
