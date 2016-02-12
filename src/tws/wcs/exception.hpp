@@ -38,13 +38,6 @@ namespace tws
     //! The base type for the WCS exceptions.
     struct exception: virtual tws::exception { };
 
-    //! Type for handling missing parameter value in service request.
-    struct missing_parameter_value: virtual exception { };
-
-    //! Type for handling invalid parameter value in service request.
-    struct invalid_parameter_value: virtual exception { };
-
-
   }  // end namespace wcs
 }    // end namespace tws
 

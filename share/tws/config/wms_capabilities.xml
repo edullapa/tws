@@ -83,23 +83,21 @@
     <Format>BLANK</Format>
   </Exception>
   <Layer>
-    <Title>e-Sensing Maps</Title>
-    <CRS>CRS:84</CRS>
-    <AuthorityURL name="DIF_ID">
-      <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://gcmd.gsfc.nasa.gov/difguide/whatisadif.html" />
-    </AuthorityURL>
-    <Layer queryable="1">
+    <Name>All</Name>
+    <Layer>
       <Name>mod13q1</Name>
-      <Title>Vegetation Indices 16-Day L3 Global 250m</Title>
-      <CRS>EPSG:4326</CRS>
-      <EX_GeographicBoundingBox>
-        <westBoundLongitude>-180.0</westBoundLongitude>
-        <eastBoundLongitude>180.0</eastBoundLongitude>
-        <southBoundLatitude>-90.0</southBoundLatitude>
-        <northBoundLatitude>90.0</northBoundLatitude>
-      </EX_GeographicBoundingBox>
-      <BoundingBox CRS="CRS:84" minx="-180.0" miny="-90.0" maxx="180.0" maxy="90.0" resx="0.00208333333333" resy="0.00208333333333"/>
-      <BoundingBox CRS="EPSG:4326" minx="-180.0" miny="-90.0" maxx="180.0" maxy="90.0" resx="0.00208333333333" resy="0.00208333333333"/>
+      <Overviews>
+        <Overview>
+          <Dimensions>
+            <Dimension name="col_id" description="column" min_idx="0" max_idx="172799" pos="0" />
+            <Dimension name="row_id" description="row" min_idx="0" max_idx="86399" pos="1" />
+            <Dimension name="time_id" description="time" min_idx="0" max_idx="1024" pos="2" />
+          </Dimensions>
+          <Attributes>
+            <Attribute name="evi" description="250m 16 days EVI" datatype="16-bit signed integer" valid_range_min="-2000" valid_range_max="10000" scale_factor="0.0001" missing_value="-3000" />
+          </Attributes>
+        </Overview>
+      </Overviews>
     </Layer>
   </Layer>
 </Capability>

@@ -159,7 +159,7 @@ void tws::wcs::get_capabilities_functor::operator()(const tws::core::http_reques
 
       // retrieve the list of registered geo-arrays
       std::vector<std::string> arrays = tws::geoarray::geoarray_manager::instance().list_arrays();
-      for(auto array: arrays)
+      for(const auto& array: arrays)
       {
         rapidxml::xml_node<>* summary = doc.allocate_node(rapidxml::node_element, "CoverageSummary");
         summary->append_node(doc.allocate_node(rapidxml::node_element, "CoverageId", array.c_str()));
