@@ -43,19 +43,19 @@
 //#include <terralib/srs/SpatialReferenceSystemManager.h>
 
 void
-tws::geoarray::load_metadata(std::map<std::string, metadata_t>& arrays)
+tws::geoarray::load_geoarrays(std::map<std::string, geoarray_t>& arrays)
 {
   std::string input_file = tws::core::find_in_app_path("share/tws/config/geo_arrays.json");
 
   if(input_file.empty())
     throw  tws::file_exists_error() << tws::error_description("could not locate array metadata file: 'share/tws/config/arrays_metadata.json'.");
 
-  load_metadata(arrays, input_file);
+  load_geoarrays(arrays, input_file);
 }
 
 void
-tws::geoarray::load_metadata(std::map<std::string, metadata_t>& arrays,
-                             const std::string& input_file)
+tws::geoarray::load_geoarrays(std::map<std::string, geoarray_t>& arrays,
+                              const std::string& input_file)
 {
   arrays.clear();
 
@@ -81,9 +81,9 @@ tws::geoarray::load_metadata(std::map<std::string, metadata_t>& arrays,
       if(jarray.IsNull())
         continue;
 
-      metadata_t ameta = read_array_metadata(jarray);
+      geoarray_t g_array = read_array_metadata(jarray);
 
-      arrays[ameta.name] = ameta;
+      arrays.insert(std::make_pair(g_array.name, g_array));
     }
   }
   catch(...)
@@ -93,13 +93,13 @@ tws::geoarray::load_metadata(std::map<std::string, metadata_t>& arrays,
   
 }
 
-tws::geoarray::metadata_t
+tws::geoarray::geoarray_t
 tws::geoarray::read_array_metadata(const rapidjson::Value& jmetadata)
 {
   if(!jmetadata.IsObject())
     throw tws::parser_error() << tws::error_description("error parsing array metadata.");
 
-  metadata_t ameta;
+  geoarray_t ameta;
 
   const rapidjson::Value& jarray_name = jmetadata["name"];
 

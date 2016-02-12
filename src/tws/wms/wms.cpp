@@ -26,11 +26,12 @@
 
 // TWS
 #include "wms.hpp"
+#include "data_types.hpp"
 #include "../core/http_request.hpp"
 #include "../core/http_response.hpp"
 #include "../core/service_operations_manager.hpp"
 #include "../core/utils.hpp"
-#include "../geoarray/metadata_manager.hpp"
+#include "../geoarray/geoarray_manager.hpp"
 
 // STL
 #include <algorithm>
@@ -45,47 +46,48 @@
 // SciDB
 //#include <SciDBAPI.h>
 
-// RapidJSON
-#include <rapidjson/document.h>
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/writer.h>
-
-// TerraLib
-//#include <terralib/geometry/Envelope.h>
-//#include <terralib/raster/Grid.h>
-//#include <terralib/srs/Converter.h>
+// RapidXml
+#include <rapidxml/rapidxml.hpp>
+#include <rapidxml/rapidxml_print.hpp>
 
 void
 tws::wms::get_capabilities_functor::operator()(const tws::core::http_request& request,
                                                tws::core::http_response& response)
 {
-// retrieve the list of registered geo-arrays
-  std::vector<std::string> arrays = tws::geoarray::metadata_manager::instance().list_arrays();
+// mount WMS_Capabilities object
+  capabilities_t wms_capabilities;
+  
+// retrieve the list of served layers
+//  wms_capabilities.capability.layer.layers = layer_manager::instance().list_layers();
+//
+//  wms_capabilities.service = service_metadata_manager::instance().get();
+//
+//  wms_capabilities.version = "1.3.0";
   
 // output result
-  rapidjson::Document::AllocatorType allocator;
+//  rapidjson::Document::AllocatorType allocator;
+//  
+//  rapidjson::Document doc;
+//  
+//  doc.SetObject();
+//  
+//  rapidjson::Value jarrays(rapidjson::kArrayType);
+//  
+//  tws::core::copy_string_array(arrays.begin(), arrays.end(), jarrays, allocator);
+//  
+//  doc.AddMember("geoarrays", jarrays, allocator);
+//  
+//  rapidjson::StringBuffer str_buff;
+//  
+//  rapidjson::Writer<rapidjson::StringBuffer> writer(str_buff);
+//  
+//  doc.Accept(writer);
+//  
+//  const char* p_str_buff = str_buff.GetString();
   
-  rapidjson::Document doc;
-  
-  doc.SetObject();
-  
-  rapidjson::Value jarrays(rapidjson::kArrayType);
-  
-  tws::core::copy_string_array(arrays.begin(), arrays.end(), jarrays, allocator);
-  
-  doc.AddMember("geoarrays", jarrays, allocator);
-  
-  rapidjson::StringBuffer str_buff;
-  
-  rapidjson::Writer<rapidjson::StringBuffer> writer(str_buff);
-  
-  doc.Accept(writer);
-  
-  const char* p_str_buff = str_buff.GetString();
-  
-  response.add_header("Content-Type", "application/json");
+  response.add_header("Content-Type", "application/xml");
   response.add_header("Access-Control-Allow-Origin", "*");
-  response.set_content(p_str_buff, str_buff.Size());
+//  response.set_content(p_str_buff, str_buff.Size());
 }
 
 void

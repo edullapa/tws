@@ -55,9 +55,9 @@ If you want to build yourself TWS then you need to install some third-party libr
 
 - **Boost (Mandatory):** TWS is built on top of Boost libraries. You will need to have them installed in order to build TWS. Make sure to have at least version 1.54.0 installed. If you prefer to install from source, download it from: http://www.boost.org.
 
-- ** RapidJSON (Mandatory):** Some of TWS web services implementation is built on top of RapidJSON library. You will need to have it installed in order to build TWS. You can download it from: https://github.com/miloyip/rapidjson.
+- **RapidJSON (Mandatory):** Some of TWS web services implementation is built on top of RapidJSON library. You will need to have it installed in order to build TWS. You can download it from: https://github.com/miloyip/rapidjson.
 
-- ** RapidXML (Optional):** OGC Web Services are XML based. So, some of TWS web services implementation is built on top of RapidXML library. You will need to have it installed in order to build these services. You can download it from: http://rapidxml.sourceforge.net.
+- **RapidXML (Optional):** OGC Web Services are XML based. So, some of TWS web services implementation is built on top of RapidXML library. You will need to have it installed in order to build these services. You can download it from: http://rapidxml.sourceforge.net.
 
 **Note:**
 - When using TWS on a machine with a installed version of SciDB you probably already have Boost libraries installed.
@@ -76,7 +76,7 @@ We have prepared a special bash script for building and installing the dependenc
 $ TWS_DIR="/home/user/mylibs" ./install-3rdparty-linux-ubuntu-14.04.sh
 ```
 
-*Note:* *Don't* choose as target location, a system folder such as */usr* or */usr/local*. Try some user specific folder.
+**Note:** **Don't** choose as target location, a system folder such as **/usr** or **/usr/local**. Try some user specific folder.
 
 ### Bash script for building all dependencies on Mac OS X El Capitan
 
@@ -95,10 +95,10 @@ $ export PATH=$PATH:/Applications/CMake.app/Contents/bin
 
 - In the shell command line, call the script *install-3rdparty-macosx-el-capitan.sh* setting the target to install all the stuffs from these third-party libraries and tools:
 ```
-$ TWS_DEPENDENCIES_DIR="/Users/user/mylibs" ./install-3rdparty-macosx-el-capitan.sh
+$ TWS_DIR="/Users/user/mylibs" ./install-3rdparty-macosx-el-capitan.sh
 ```
 
-*Note:* *Don't* choose as target location, a system folder such as */usr* or */usr/local*. Try some user specific folder.
+**Note:** **Don't** choose as target location, a system folder such as **/usr** or **/usr/local**. Try some user specific folder.
 
 ## Cloning TWS Repository
 

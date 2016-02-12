@@ -17,54 +17,60 @@
  */
 
 /*!
-  \file tws/metadata/array_metadata.hpp
+  \file tws/geoarray/geoarray_manager.hpp
 
-  \brief A class for describing the geospatial metadata of a SciDB array.
+  \brief A singleton for managing the registered geo-arrays.
 
-  \author Gilberto Ribeiro de Queiroz <gribeiro@dpi.inpe.br>
-
-  \date 2014-2014
-
-  \copyright GNU General Public License version 3
+  \author Gilberto Ribeiro de Queiroz
  */
 
-#ifndef __TWS_GEOARRAY_METADATA_HPP__
-#define __TWS_GEOARRAY_METADATA_HPP__
+#ifndef __TWS_GEOARRAY_GEOARRAY_MANAGER_HPP__
+#define __TWS_GEOARRAY_GEOARRAY_MANAGER_HPP__
 
 // TWS
-#include "data_types.hpp"
+#include "config.hpp"
 
 // STL
-#include <string>
 #include <vector>
+
+// Boost
+#include <boost/noncopyable.hpp>
 
 namespace tws
 {
   namespace geoarray
   {
-    //! Base metadata of an array attribute.
-    struct attribute_t
-    {
-      std::string name;
-      std::string description;
-      numeric_range_t valid_range;
-      double scale_factor;
-      double missing_value;
-      int datatype;
-    };
+  
+    //! Forward declaration
+    struct geoarray_t;
 
-    //! Base metadata of an array.
-    struct metadata_t
+    //! A singleton for managing geo-arrays.
+    class geoarray_manager : public boost::noncopyable
     {
-      std::string name;
-      std::string description;
-      std::string detail;
-      std::vector<attribute_t> attributes;
-      std::vector<dimension_t> dimensions;
-      geo_extent_t geo_extent;
+      public:
+
+        void insert(const geoarray_t& a);
+
+        std::vector<std::string> list_arrays() const;
+
+        const geoarray_t& get(const std::string& array_name) const;
+
+        static geoarray_manager& instance();
+
+      private:
+
+        geoarray_manager();
+
+        ~geoarray_manager();
+
+      private:
+
+        struct impl;
+
+        impl* pimpl_;
     };
 
   }  // end namespace geoarray
 }    // end namespace tws
 
-#endif  // __TWS_GEOARRAY_METADATA_HPP__
+#endif  // __TWS_GEOARRAY_GEOARRAY_MANAGER_HPP__

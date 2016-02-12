@@ -1,0 +1,106 @@
+<?xml version='1.0' encoding="UTF-8"?>
+<WMS_Capabilities version="1.3.0"
+                  xmlns="http://www.opengis.net/wms"
+                  xmlns:xlink="http://www.w3.org/1999/xlink"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://www.opengis.net/wms http://schemas.opengis.net/wms/1.3.0/capabilities_1_3_0.xsd">
+<Service>
+  <Name>WMS</Name>
+  <Title>e-Sensing Server</Title>
+  <Abstract>Web Map Service maintained by e-Sensing team. Visualization of global Land Use and Land Cover maps.</Abstract>
+  <KeywordList>
+    <Keyword>Amazônia</Keyword>
+    <Keyword>floresta</Keyword>
+    <Keyword>cerrado</Keyword>
+  </KeywordList>
+  <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://localhost/" />
+  <ContactInformation>
+    <ContactPersonPrimary>
+      <ContactPerson>Gilberto Ribeiro</ContactPerson>
+      <ContactOrganization>INPE</ContactOrganization>
+    </ContactPersonPrimary>
+    <ContactPosition>Computer Scientist</ContactPosition>
+    <ContactAddress>
+      <AddressType>postal</AddressType>
+      <Address>Av. Astronautas</Address>
+      <City>São José dos Campos</City>
+      <StateOrProvince>SP</StateOrProvince>
+      <PostCode>12227-010</PostCode>
+      <Country>Brazil</Country>
+    </ContactAddress>
+    <ContactVoiceTelephone>3208 6803</ContactVoiceTelephone>
+    <ContactElectronicMailAddress>gribeiro</ContactElectronicMailAddress>
+  </ContactInformation>
+  <Fees>none</Fees>
+  <AccessConstraints>none</AccessConstraints>
+  <LayerLimit>1</LayerLimit>
+  <MaxWidth>2048</MaxWidth>
+  <MaxHeight>2048</MaxHeight>
+</Service>
+<Capability>
+  <Request>
+    <GetCapabilities>
+      <Format>text/xml</Format>
+      <DCPType>
+        <HTTP>
+          <Get>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://localhost/wms/GetCapabilities?" />
+          </Get>
+          <Post>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://localhost/wms/GetCapabilities?" />
+          </Post>
+        </HTTP>
+      </DCPType>
+    </GetCapabilities>
+    <GetMap>
+      <Format>image/png</Format>
+      <Format>image/gif</Format>
+      <Format>image/jpeg</Format>
+      <DCPType>
+        <HTTP>
+          <Get>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://localhost/wms/GetMap?" />
+          </Get>
+        </HTTP>
+      </DCPType>
+    </GetMap>
+    <GetFeatureInfo>
+      <Format>text/xml</Format>
+      <Format>text/plain</Format>
+      <Format>text/html</Format>
+      <DCPType>
+        <HTTP>
+          <Get>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://localhost/wms/GetFeatureInfo?" />
+          </Get>
+        </HTTP>
+      </DCPType>
+    </GetFeatureInfo>
+  </Request>
+  <Exception>
+    <Format>XML</Format>
+    <Format>INIMAGE</Format>
+    <Format>BLANK</Format>
+  </Exception>
+  <Layer>
+    <Title>e-Sensing Maps</Title>
+    <CRS>CRS:84</CRS>
+    <AuthorityURL name="DIF_ID">
+      <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://gcmd.gsfc.nasa.gov/difguide/whatisadif.html" />
+    </AuthorityURL>
+    <Layer queryable="1">
+      <Name>mod13q1</Name>
+      <Title>Vegetation Indices 16-Day L3 Global 250m</Title>
+      <CRS>EPSG:4326</CRS>
+      <EX_GeographicBoundingBox>
+        <westBoundLongitude>-180.0</westBoundLongitude>
+        <eastBoundLongitude>180.0</eastBoundLongitude>
+        <southBoundLatitude>-90.0</southBoundLatitude>
+        <northBoundLatitude>90.0</northBoundLatitude>
+      </EX_GeographicBoundingBox>
+      <BoundingBox CRS="CRS:84" minx="-180.0" miny="-90.0" maxx="180.0" maxy="90.0" resx="0.00208333333333" resy="0.00208333333333"/>
+      <BoundingBox CRS="EPSG:4326" minx="-180.0" miny="-90.0" maxx="180.0" maxy="90.0" resx="0.00208333333333" resy="0.00208333333333"/>
+    </Layer>
+  </Layer>
+</Capability>
+</WMS_Capabilities>

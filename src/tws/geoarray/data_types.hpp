@@ -32,6 +32,7 @@
 
 // STL
 #include <string>
+#include <vector>
 
 namespace tws
 {
@@ -197,6 +198,28 @@ namespace tws
     {
       spatial_extent_t spatial;
       temporal_extent_t temporal;
+    };
+    
+    //! Base metadata of an array attribute.
+    struct attribute_t
+    {
+      std::string name;
+      std::string description;
+      numeric_range_t valid_range;
+      double scale_factor;
+      double missing_value;
+      int datatype;
+    };
+
+    //! Base metadata of an array.
+    struct geoarray_t
+    {
+      std::string name;
+      std::string description;
+      std::string detail;
+      std::vector<attribute_t> attributes;
+      std::vector<dimension_t> dimensions;
+      geo_extent_t geo_extent;
     };
 
   }  // end namespace geoarray
