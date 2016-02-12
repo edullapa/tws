@@ -33,7 +33,7 @@
 #include "../core/http_response.hpp"
 #include "../core/service_operations_manager.hpp"
 #include "../core/utils.hpp"
-#include "../geoarray/metadata_manager.hpp"
+#include "../geoarray/geoarray_manager.hpp"
 #include "wtss.hpp"
 
 // STL
@@ -64,7 +64,7 @@ tws::wtss::list_coverages_functor::operator()(const tws::core::http_request& req
                                               tws::core::http_response& response)
 {
 // retrieve the list of registered geo-arrays
-  std::vector<std::string> arrays = tws::geoarray::metadata_manager::instance().list_arrays();
+  std::vector<std::string> arrays = tws::geoarray::geoarray_manager::instance().list_arrays();
 
 // output result
   rapidjson::Document::AllocatorType allocator;

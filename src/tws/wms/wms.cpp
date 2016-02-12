@@ -31,7 +31,7 @@
 #include "../core/http_response.hpp"
 #include "../core/service_operations_manager.hpp"
 #include "../core/utils.hpp"
-#include "../geoarray/metadata_manager.hpp"
+#include "../geoarray/geoarray_manager.hpp"
 
 // STL
 #include <algorithm>
@@ -54,8 +54,15 @@ void
 tws::wms::get_capabilities_functor::operator()(const tws::core::http_request& request,
                                                tws::core::http_response& response)
 {
+// mount WMS_Capabilities object
+  capabilities_t wms_capabilities;
+  
 // retrieve the list of served layers
-  //std::vector<layer_t> layers = layer_manager::instance().list_layers();
+//  wms_capabilities.capability.layer.layers = layer_manager::instance().list_layers();
+//
+//  wms_capabilities.service = service_metadata_manager::instance().get();
+//
+//  wms_capabilities.version = "1.3.0";
   
 // output result
 //  rapidjson::Document::AllocatorType allocator;

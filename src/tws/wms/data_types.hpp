@@ -29,6 +29,7 @@
 
 // TWS
 #include "config.hpp"
+#include "../geoarray/data_types.hpp"
 
 // STL
 #include <string>
@@ -291,12 +292,22 @@ namespace tws
     };
     
     //! Base datatype for WMS_Capabilities document.
-    struct capabilities
+    struct capabilities_t
     {
       service_t service;
       capability_t capability;
       std::string version;
       std::string update_sequence;
+    };
+    
+    //! An overview of a given geo-array.
+    struct overview_t
+    {
+      std::string geo_array_name;                          //!< the original array name.
+      std::string o_array_name;                            //!< the name of an array that materizalies the overview.
+      std::vector<tws::geoarray::attribute_t> attributes;  //!< the list of attributes in the overview array.
+      std::vector<tws::geoarray::dimension_t> dimensions;  //!< the dimension information of the overview array.
+      tws::geoarray::geo_extent_t geo_extent;              //!< spatial and temporal resolution and extent of the new array.
     };
 
   }  // end namespace wms

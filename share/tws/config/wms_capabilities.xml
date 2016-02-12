@@ -82,6 +82,25 @@
     <Format>INIMAGE</Format>
     <Format>BLANK</Format>
   </Exception>
-  <Layer/>
+  <Layer>
+    <Title>e-Sensing Maps</Title>
+    <CRS>CRS:84</CRS>
+    <AuthorityURL name="DIF_ID">
+      <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://gcmd.gsfc.nasa.gov/difguide/whatisadif.html" />
+    </AuthorityURL>
+    <Layer queryable="1">
+      <Name>mod13q1</Name>
+      <Title>Vegetation Indices 16-Day L3 Global 250m</Title>
+      <CRS>EPSG:4326</CRS>
+      <EX_GeographicBoundingBox>
+        <westBoundLongitude>-180.0</westBoundLongitude>
+        <eastBoundLongitude>180.0</eastBoundLongitude>
+        <southBoundLatitude>-90.0</southBoundLatitude>
+        <northBoundLatitude>90.0</northBoundLatitude>
+      </EX_GeographicBoundingBox>
+      <BoundingBox CRS="CRS:84" minx="-180.0" miny="-90.0" maxx="180.0" maxy="90.0" resx="0.00208333333333" resy="0.00208333333333"/>
+      <BoundingBox CRS="EPSG:4326" minx="-180.0" miny="-90.0" maxx="180.0" maxy="90.0" resx="0.00208333333333" resy="0.00208333333333"/>
+    </Layer>
+  </Layer>
 </Capability>
 </WMS_Capabilities>
