@@ -42,27 +42,7 @@ namespace tws
 {
   namespace geoarray
   {
-    //! Base metadata of an array attribute.
-    struct attribute_t
-    {
-      std::string name;
-      std::string description;
-      numeric_range_t valid_range;
-      double scale_factor;
-      double missing_value;
-      int datatype;
-    };
-
-    //! Base metadata of an array.
-    struct metadata_t
-    {
-      std::string name;
-      std::string description;
-      std::string detail;
-      std::vector<attribute_t> attributes;
-      std::vector<dimension_t> dimensions;
-      geo_extent_t geo_extent;
-    };
+    
 
   }  // end namespace geoarray
 }    // end namespace tws
