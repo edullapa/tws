@@ -31,7 +31,7 @@
 #include "../core/http_response.hpp"
 #include "../core/service_operations_manager.hpp"
 #include "../core/utils.hpp"
-#include "../geoarray/metadata_manager.hpp"
+#include "../geoarray/geoarray_manager.hpp"
 #include "wcs_manager.hpp"
 #include "data_types.hpp"
 
@@ -158,7 +158,7 @@ void tws::wcs::get_capabilities_functor::operator()(const tws::core::http_reques
       rapidxml::xml_node<>* contentsaNode = doc.allocate_node(rapidxml::node_element, "Contents");
 
       // retrieve the list of registered geo-arrays
-      std::vector<std::string> arrays = tws::geoarray::metadata_manager::instance().list_arrays();
+      std::vector<std::string> arrays = tws::geoarray::geoarray_manager::instance().list_arrays();
       for(auto array: arrays)
       {
         rapidxml::xml_node<>* summary = doc.allocate_node(rapidxml::node_element, "CoverageSummary");
