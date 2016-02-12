@@ -16,16 +16,32 @@ namespace tws
         //! Singleton method
         static wcs_manager& instance();
 
+        /*!
+          \brief It makes a capabilities operation object with wcs metadata
+          \return A tws::wcs::capabilities_t struct containing wcs configuration
+        */
         capabilities_t capabilities();
+
+        /*!
+          \brief It makes a provider object with wcs metadata
+          \return A tws::wcs::service_provider_t struct containing wcs configuration
+        */
         service_provider_t provider();
 
+        /*!
+          \brief It makes a indentification object with wcs metadata
+          \return A tws::wcs::service_identification_t struct containing wcs configuration
+        */
         service_identification_t identification();
 
       private:
+        //! Constructor
         wcs_manager();
+
+        //! Destructor
         ~wcs_manager();
 
-        struct impl;
+        struct impl; //!< Pimpl idiom
 
         impl* pimpl_;
     };
