@@ -75,6 +75,7 @@ namespace tws
     {
       service_identification_t identification;
       service_provider_t provider;
+      service_metadata_t metadata;
       contents_t contents;
     };
   }

@@ -151,9 +151,8 @@ void tws::wcs::get_capabilities_functor::operator()(const tws::core::http_reques
 
       // wcs:ServiceMetadata node
       rapidxml::xml_node<>* serviceMetadataNode = doc.allocate_node(rapidxml::node_element, "ServiceMetadata");
-      serviceMetadataNode->append_node(doc.allocate_node(rapidxml::node_element, "formatSupported", "application/xml"));
-      serviceMetadataNode->append_node(doc.allocate_node(rapidxml::node_element, "formatSupported", "image/tiff"));
-      serviceMetadataNode->append_node(doc.allocate_node(rapidxml::node_element, "formatSupported", "image/hdf"));
+      for(const auto& format: capabilities.metadata.formats_supported)
+        serviceMetadataNode->append_node(doc.allocate_node(rapidxml::node_element, "formatSupported", format.c_str()));
 
       rapidxml::xml_node<>* contentsaNode = doc.allocate_node(rapidxml::node_element, "Contents");
 

@@ -9,6 +9,7 @@ namespace tws
     struct capabilities_t;
     struct service_identification_t;
     struct service_provider_t;
+    struct service_metadata_t;
 
     class wcs_manager
     {
@@ -33,6 +34,12 @@ namespace tws
           \return A tws::wcs::service_identification_t struct containing wcs configuration
         */
         service_identification_t identification();
+
+        /*!
+          \brief It makes a service metadata object with wcs metadata
+          \return A tws::wcs::service_metadata_t struct containing wcs configuration
+        */
+        service_metadata_t metadata();
 
       private:
         //! Constructor

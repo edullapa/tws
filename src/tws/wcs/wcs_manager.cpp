@@ -50,6 +50,7 @@ tws::wcs::capabilities_t tws::wcs::wcs_manager::capabilities()
 
   capabilities.identification = identification();
   capabilities.provider = provider();
+  capabilities.metadata = metadata();
 
   return capabilities;
 }
@@ -139,6 +140,30 @@ tws::wcs::service_identification_t tws::wcs::wcs_manager::identification()
     identification.service_type = "WCS";
 
     return identification;
+  }
+  catch(...)
+  {
+    throw;
+  }
+}
+
+tws::wcs::service_metadata_t tws::wcs::wcs_manager::metadata()
+{
+  try
+  {
+    service_metadata_t metadata;
+    const rapidjson::Value& formats = (*pimpl_->json_file)["formats_supported"];
+    if (!formats.IsArray())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find formats supported in wcs config file");
+    }
+
+    for (unsigned int i = 0; i < formats.Size(); ++i)
+    {
+      metadata.formats_supported.push_back(formats[i].GetString());
+    }
+
+    return metadata;
   }
   catch(...)
   {
