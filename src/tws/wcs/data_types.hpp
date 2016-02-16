@@ -78,5 +78,47 @@ namespace tws
       service_metadata_t metadata;
       contents_t contents;
     };
+
+    struct envelope_t
+    {
+      std::string axis;
+      std::string min;
+      std::string max;
+      int dimension;
+    };
+
+    struct bounded_by_t
+    {
+      envelope_t envelope;
+    };
+
+    struct domain_set_t
+    {
+
+    };
+
+    struct attribute_t
+    {
+      std::string name;
+      // todo: complete it
+    };
+
+    struct data_record_t
+    {
+      std::vector<attribute_t> attributes;
+    };
+
+    struct coverage_description_t
+    {
+      std::string id;
+      bounded_by_t bounded_by;
+      domain_set_t domain_set;
+    };
+
+    //! Struct for handling describe coverage metadata in WCS xml response
+    struct describe_coverage_t
+    {
+      std::vector<coverage_description_t> coverages_description;
+    };
   }
 }

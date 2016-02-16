@@ -2,6 +2,8 @@
 #include "wcs_manager.hpp"
 #include "../core/utils.hpp"
 #include "data_types.hpp"
+#include "../geoarray/geoarray_manager.hpp"
+#include "../geoarray/data_types.hpp"
 
 // rapidjson
 #include <rapidjson/document.h>
@@ -169,4 +171,47 @@ tws::wcs::service_metadata_t tws::wcs::wcs_manager::metadata()
   {
     throw;
   }
+}
+
+tws::wcs::describe_coverage_t tws::wcs::wcs_manager::describe_coverage()
+{
+  describe_coverage_t describe;
+
+  std::vector<std::string> arrays = tws::geoarray::geoarray_manager::instance().list_arrays();
+  for(const auto& array: arrays)
+  {
+    auto geoarray = tws::geoarray::geoarray_manager::instance().get(array);
+
+    coverage_description_t description;
+    description.id = geoarray.name;
+
+    envelope_t envelope;
+
+    std::string min;
+    std::string max;
+    std::string axis;
+    int dimension_size = 0;
+
+    for(const auto& dimension: geoarray.dimensions)
+    {
+      axis.append(dimension.name + " ");
+      min.append(std::to_string(dimension.min_idx) + " ");
+      max.append(std::to_string(dimension.max_idx) + " ");
+      ++dimension_size;
+    }
+
+    // todo: remove last whitespace
+    envelope.axis = axis;
+    envelope.min = min;
+    envelope.max = max;
+    envelope.dimension = dimension_size;
+
+    bounded_by_t bounded;
+    bounded.envelope = envelope;
+    description.bounded_by = bounded;
+
+    describe.coverages_description.push_back(description);
+  }
+
+  return describe;
 }

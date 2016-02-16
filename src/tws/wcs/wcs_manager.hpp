@@ -10,6 +10,7 @@ namespace tws
     struct service_identification_t;
     struct service_provider_t;
     struct service_metadata_t;
+    struct describe_coverage_t;
 
     class wcs_manager
     {
@@ -40,6 +41,8 @@ namespace tws
           \return A tws::wcs::service_metadata_t struct containing wcs configuration
         */
         service_metadata_t metadata();
+
+        describe_coverage_t describe_coverage();
 
       private:
         //! Constructor
