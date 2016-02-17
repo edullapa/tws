@@ -42,6 +42,10 @@ namespace tws
         */
         service_metadata_t metadata();
 
+        /*!
+          \brief It makes a describe coverage operation object with wcs coverages metadata
+          \return A tws::wcs::describe_coverage_t struct containing wcs coverage(s) configuration
+        */
         describe_coverage_t describe_coverage();
 
       private:

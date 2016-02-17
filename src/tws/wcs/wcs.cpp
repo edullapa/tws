@@ -303,6 +303,46 @@ tws::wcs::describe_coverage_functor::operator()(const tws::core::http_request& r
 void tws::wcs::get_coverage_functor::operator()(const tws::core::http_request& request,
                                                 tws::core::http_response& response)
 {
+  const char* query_string = request.query_string();
+  // temp code
+  if (query_string == nullptr)
+  {
+    throw tws::missing_argument_error() << tws::error_description("Arguments missing. OGC services requires at least three arguments: \"service\", \"version\" e \"request\"");
+  }
+
+  tws::core::query_string_t arguments = tws::core::expand(query_string);
+
+  const auto& coverage_id = arguments.find("coverageID");
+  if (coverage_id == arguments.end())
+    throw tws::missing_argument_error() << tws::error_description("Missing \"coverageID\" argument");
+
+  ////  std::string str_q_aql("SELECT " + attrs + " FROM " + coverage.from_clause);
+  ////
+  ////  if(!coverage.where_clause.empty())
+  ////    str_q_aql += " WHERE " + coverage.where_clause;
+  ////
+  ////  boost::format q_aql(str_q_aql);
+  ////  q_aql.bind_arg(1, pixel_col);
+  ////  q_aql.bind_arg(2, pixel_row);
+  ////  q_aql.bind_arg(3, start_time_pos);
+  ////  q_aql.bind_arg(4, pixel_col);
+  ////  q_aql.bind_arg(5, pixel_row);
+  ////  q_aql.bind_arg(6, end_time_pos);
+  //
+  //// get a connection to retrieve the time series
+  //  std::unique_ptr<tws::scidb::connection> conn(tws::scidb::connection_pool::instance().get());
+  //
+  ////  boost::shared_ptr< ::scidb::QueryResult > qresult = conn->execute(q_aql.str(), false);
+  //
+  ////  if((qresult.get() == nullptr) || (qresult->array.get() == nullptr))
+  ////    throw tws::core::http_request_error() << tws::error_description("no query result returned after querying database.");
+  //
+  ////  const ::scidb::ArrayDesc& array_desc = qresult->array->getArrayDesc();
+  //
+  ////  const ::scidb::Attributes& array_attributes = array_desc.getAttributes(true);
+  //
+  ////  const std::size_t nattributes = array_attributes.size();
+  //  const std::size_t nattributes = queried_attributes.size();
 
 }
 
