@@ -1,3 +1,5 @@
+#include "../geoarray/data_types.hpp"
+
 namespace tws
 {
   namespace wcs
@@ -92,27 +94,11 @@ namespace tws
       envelope_t envelope;
     };
 
-    struct domain_set_t
-    {
-
-    };
-
-    struct attribute_t
-    {
-      std::string name;
-      // todo: complete it
-    };
-
-    struct data_record_t
-    {
-      std::vector<attribute_t> attributes;
-    };
-
     struct coverage_description_t
     {
       std::string id;
+      tws::geoarray::geoarray_t geoarray;
       bounded_by_t bounded_by;
-      domain_set_t domain_set;
     };
 
     //! Struct for handling describe coverage metadata in WCS xml response

@@ -206,9 +206,12 @@ tws::wcs::describe_coverage_t tws::wcs::wcs_manager::describe_coverage()
     envelope.max = max;
     envelope.dimension = dimension_size;
 
+
     bounded_by_t bounded;
     bounded.envelope = envelope;
     description.bounded_by = bounded;
+
+    description.geoarray = geoarray;
 
     describe.coverages_description.push_back(description);
   }

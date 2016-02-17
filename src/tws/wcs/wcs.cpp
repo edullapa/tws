@@ -34,6 +34,7 @@
 #include "../geoarray/geoarray_manager.hpp"
 #include "wcs_manager.hpp"
 #include "data_types.hpp"
+#include "utils.hpp"
 
 // STL
 #include <algorithm>
@@ -65,30 +66,7 @@ void tws::wcs::get_capabilities_functor::operator()(const tws::core::http_reques
     // create Capabilities document
     rapidxml::xml_document<> doc;
 
-    rapidxml::xml_node<> *root = doc.allocate_node(rapidxml::node_element, "wcs:Capabilities");
-
-    rapidxml::xml_attribute<>* attr = doc.allocate_attribute("xmlns:wcs", "http://www.opengis.net/wcs/2.0");
-    root->append_attribute(attr);
-
-    attr = doc.allocate_attribute("xmlns:ows", "http://www.opengis.net/ows/2.0");
-    root->append_attribute(attr);
-
-    attr = doc.allocate_attribute("xmlns:gml", "http://www.opengis.net/gml/3.2");
-    root->append_attribute(attr);
-
-    attr = doc.allocate_attribute("xmlns:gmlcov", "http://www.opengis.net/gmlcov/1.0");
-    root->append_attribute(attr);
-
-    attr = doc.allocate_attribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
-    root->append_attribute(attr);
-
-    attr = doc.allocate_attribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-    root->append_attribute(attr);
-
-    attr = doc.allocate_attribute("version", "2.0.1");
-    root->append_attribute(attr);
-
-    attr = doc.allocate_attribute("xsi:schemaLocation", "http://www.opengis.net/wcs/2.0 http://schemas.opengis.net/wcs/2.0/wcsGetCapabilities.xsd");
+    rapidxml::xml_node<> *root = initialize_wcs_xml_namespaces(doc);
 
     {
       // Service Identification node (service metadata)
@@ -224,31 +202,7 @@ tws::wcs::describe_coverage_functor::operator()(const tws::core::http_request& r
   // create DescribeCoverage document
   rapidxml::xml_document<> doc;
 
-  rapidxml::xml_node<> *root = doc.allocate_node(rapidxml::node_element, "wcs:CoverageDescriptions");
-
-  rapidxml::xml_attribute<>* attr = doc.allocate_attribute("xmlns:wcs", "http://www.opengis.net/wcs/2.0");
-  root->append_attribute(attr);
-
-  attr = doc.allocate_attribute("xmlns:ows", "http://www.opengis.net/ows/2.0");
-  root->append_attribute(attr);
-
-  attr = doc.allocate_attribute("xmlns:gml", "http://www.opengis.net/gml/3.2");
-  root->append_attribute(attr);
-
-  attr = doc.allocate_attribute("xmlns:gmlcov", "http://www.opengis.net/gmlcov/1.0");
-  root->append_attribute(attr);
-
-  attr = doc.allocate_attribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
-  root->append_attribute(attr);
-
-  attr = doc.allocate_attribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-  root->append_attribute(attr);
-
-  attr = doc.allocate_attribute("version", "2.0.1");
-  root->append_attribute(attr);
-
-  attr = doc.allocate_attribute("xsi:schemaLocation", "http://www.opengis.net/wcs/2.0 http://schemas.opengis.net/wcs/2.0/wcsGetCapabilities.xsd");
-  root->append_attribute(attr);
+  rapidxml::xml_node<> *root = initialize_wcs_xml_namespaces(doc);
 
   doc.append_node(root);
 
@@ -276,6 +230,60 @@ tws::wcs::describe_coverage_functor::operator()(const tws::core::http_request& r
     }
 
     node->append_node(doc.allocate_node(rapidxml::node_element, "wcs:CoverageId", coverage.id.c_str()));
+
+    rapidxml::xml_node<>* domain_set_node  = doc.allocate_node(rapidxml::node_element, "gml:domainSet");
+    {
+      rapidxml::xml_node<>* grid_node  = doc.allocate_node(rapidxml::node_element, "gml:Grid");
+      rapidxml::xml_attribute<>* attr = doc.allocate_attribute("srsDimension", std::to_string(coverage.bounded_by.envelope.dimension).c_str());
+      grid_node->append_attribute(attr);
+
+      rapidxml::xml_node<>* limits_node  = doc.allocate_node(rapidxml::node_element, "gml:limits");
+      rapidxml::xml_node<>* grid_envelope_node  = doc.allocate_node(rapidxml::node_element, "gml:GridEnvelope");
+
+      grid_envelope_node->append_node(doc.allocate_node(rapidxml::node_element, "low", coverage.bounded_by.envelope.min.c_str()));
+      grid_envelope_node->append_node(doc.allocate_node(rapidxml::node_element, "high", coverage.bounded_by.envelope.max.c_str()));
+
+      limits_node->append_node(grid_envelope_node);
+      grid_node->append_node(limits_node);
+
+      domain_set_node->append_node(grid_node);
+    }
+
+    node->append_node(domain_set_node);
+
+    rapidxml::xml_node<>* range_type_node  = doc.allocate_node(rapidxml::node_element, "gmlcov:rangeType");
+    {
+      rapidxml::xml_node<>* data_record = doc.allocate_node(rapidxml::node_element, "swe:DataRecord");
+      for(const auto& attribute: coverage.geoarray.attributes)
+      {
+        rapidxml::xml_node<>* swe_field = doc.allocate_node(rapidxml::node_element, "swe:Field");
+        rapidxml::xml_attribute<>* attr = doc.allocate_attribute("name", attribute.name.c_str());
+        swe_field->append_attribute(attr);
+
+        rapidxml::xml_node<>* swe_quantity = doc.allocate_node(rapidxml::node_element, "swe:Quantity");
+        swe_quantity->append_node(doc.allocate_node(rapidxml::node_element, "swe:description", attribute.description.c_str()));
+
+        rapidxml::xml_node<>* swe_constraint = doc.allocate_node(rapidxml::node_element, "swe:constraint");
+        rapidxml::xml_node<>* swe_allowed_values = doc.allocate_node(rapidxml::node_element, "swe:AllowedValues");
+
+        // todo: check it.  Its printing wcs description tag.  ????
+//        std::string range = std::to_string(attribute.valid_range.min_val) + " " + std::to_string(attribute.valid_range.max_val);
+
+//        swe_allowed_values->append_node(doc.allocate_node(rapidxml::node_element, "swe:interval", range.c_str()));
+
+        swe_constraint->append_node(swe_allowed_values);
+
+        swe_quantity->append_node(swe_constraint);
+
+        swe_field->append_node(swe_quantity);
+
+        data_record->append_node(swe_field);
+      }
+
+      range_type_node->append_node(data_record);
+    }
+
+    node->append_node(range_type_node);
 
     root->append_node(node);
   }
