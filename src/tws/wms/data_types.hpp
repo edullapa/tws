@@ -198,30 +198,31 @@ namespace tws
     //! Nested list of zero or more map Layers offered by this server.
     struct layer_t
     {
-      std::string name;
-      std::string title;
-      std::string abstract;
-      std::vector<keyword_t> keyword_list;
-      std::vector<std::string> crs;
-      ex_geographic_bounding_box_t ex_geographic_bounding_box;
-      std::vector<bounding_box_t> bounding_box;
-      std::vector<dimension_t> dimension;
-      attribution_t attribution;
-      authority_url_t authority_url;
-      std::vector<identifier_t> identifier;
-      std::vector<metadata_url_t> metadata_url;
-      std::vector<data_url_t> data_url;
-      std::vector<feature_list_url_t> feature_list_url;
+      std::string name;         //!< Same name as main geo-array name.
+      //std::string title;
+      //std::string abstract;
+      //std::vector<keyword_t> keyword_list;
+      //std::vector<std::string> crs;
+      //ex_geographic_bounding_box_t ex_geographic_bounding_box;
+      //std::vector<bounding_box_t> bounding_box;
+      //std::vector<dimension_t> dimension;
+      //attribution_t attribution;
+      //authority_url_t authority_url;
+      //std::vector<identifier_t> identifier;
+      //std::vector<metadata_url_t> metadata_url;
+      //std::vector<data_url_t> data_url;
+      //std::vector<feature_list_url_t> feature_list_url;
       std::vector<style_t> style;
       double min_scale_denominator;
       double max_scale_denominator;
       std::vector<layer_t> layers;
-      bool queryable;
-      uint32_t cascaded;
-      bool opaque;
-      bool no_subsets;
-      uint32_t fixed_width;
-      uint32_t fixed_height;
+      //bool queryable;
+      //uint32_t cascaded;
+      //bool opaque;
+      //bool no_subsets;
+      //uint32_t fixed_width;
+      //uint32_t fixed_height;
+      std::vector<tws::geoarray::geoarray_t> overviews;
     };
     
   
@@ -300,15 +301,15 @@ namespace tws
       std::string update_sequence;
     };
     
-    //! An overview of a given geo-array.
-    struct overview_t
-    {
-      std::string geo_array_name;                          //!< the original array name.
-      std::string o_array_name;                            //!< the name of an array that materizalies the overview.
-      std::vector<tws::geoarray::attribute_t> attributes;  //!< the list of attributes in the overview array.
-      std::vector<tws::geoarray::dimension_t> dimensions;  //!< the dimension information of the overview array.
-      tws::geoarray::geo_extent_t geo_extent;              //!< spatial and temporal resolution and extent of the new array.
-    };
+//    //! An overview of a given geo-array.
+//    struct overview_t
+//    {
+//      std::string geo_array_name;                          //!< the original array name.
+//      std::string o_geo_array_name;                        //!< the name of an array that materizalies the overview.
+//      std::vector<tws::geoarray::attribute_t> attributes;  //!< the list of attributes in the overview array.
+//      std::vector<tws::geoarray::dimension_t> dimensions;  //!< the dimension information of the overview array.
+//      tws::geoarray::geo_extent_t geo_extent;              //!< spatial and temporal resolution and extent of the new array.
+//    };
 
   }  // end namespace wms
 }    // end namespace tws

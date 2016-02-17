@@ -43,9 +43,15 @@ namespace tws
 
   //! An exception indicating that a given item was not found in a collection.
   struct item_not_found_error: virtual exception { };
-  
+
   //! An exception indicating that a given item already exists in a collection.
   struct item_already_exists_error: virtual exception { };
+
+  //! Type for handling missing parameter value in service request.
+  struct missing_argument_error: virtual exception { };
+
+  //! Type for handling invalid parameter value in service request.
+  struct invalid_argument_error: virtual exception { };
 
   //! An exception indicating that an error in the plugin system.
   struct plugin_error: virtual exception { };
