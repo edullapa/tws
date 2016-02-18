@@ -23,6 +23,8 @@
 #  Author: Gilberto Ribeiro de Queiroz
 #
 
+include_directories(${RAPIDJSON_INCLUDE_DIR})
+
 file(GLOB TWS_SRC_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/core/*.cpp)
 file(GLOB TWS_HDR_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/core/*.hpp)
 
