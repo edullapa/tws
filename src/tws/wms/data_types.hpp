@@ -225,7 +225,6 @@ namespace tws
       std::vector<tws::geoarray::geoarray_t> overviews;
     };
     
-  
     //! Output format and URI of an operation.
     struct operation_t
     {
@@ -272,7 +271,6 @@ namespace tws
       std::string contact_position;
       contact_address_t contact_address;
       std::string contact_voice_telephone;
-      std::string contact_organization;
       std::string contact_electronic_mail_address;
     };
     
