@@ -34,6 +34,7 @@
 #include "../geoarray/geoarray_manager.hpp"
 #include "wcs_manager.hpp"
 #include "data_types.hpp"
+#include "utils.hpp"
 
 // STL
 #include <algorithm>
@@ -65,115 +66,111 @@ void tws::wcs::get_capabilities_functor::operator()(const tws::core::http_reques
     // create Capabilities document
     rapidxml::xml_document<> doc;
 
-    rapidxml::xml_node<> *root = doc.allocate_node(rapidxml::node_element, "Capabilities");
-
-    rapidxml::xml_attribute<>* attr = doc.allocate_attribute("version", "2.0.1");
-    root->append_attribute(attr);
+    rapidxml::xml_node<> *root = initialize_wcs_xml_namespaces(doc);
 
     {
       // Service Identification node (service metadata)
-      rapidxml::xml_node<>* serviceIdentificationNode = doc.allocate_node(rapidxml::node_element, "ServiceIdentification");
+      rapidxml::xml_node<>* service_identification_node = doc.allocate_node(rapidxml::node_element, "ows:ServiceIdentification");
 
       {
         // Temp code. This metadata should be get from json file
-        rapidxml::xml_node<>* node = doc.allocate_node(rapidxml::node_element, "Title", capabilities.identification.title.c_str());
+        rapidxml::xml_node<>* node = doc.allocate_node(rapidxml::node_element, "ows:Title", capabilities.identification.title.c_str());
 
-        serviceIdentificationNode->append_node(node);
+        service_identification_node->append_node(node);
 
-        node = doc.allocate_node(rapidxml::node_element, "Abstract", capabilities.identification.abstract.c_str());
+        node = doc.allocate_node(rapidxml::node_element, "ows:Abstract", capabilities.identification.abstract.c_str());
 
-        serviceIdentificationNode->append_node(node);
+        service_identification_node->append_node(node);
 
-        node = doc.allocate_node(rapidxml::node_element, "ServiceType", capabilities.identification.service_type.c_str());
+        node = doc.allocate_node(rapidxml::node_element, "ows:ServiceType", capabilities.identification.service_type.c_str());
 
-        serviceIdentificationNode->append_node(node);
+        service_identification_node->append_node(node);
 
-        node = doc.allocate_node(rapidxml::node_element, "ServiceTypeVersion", "2.0.1");
+        node = doc.allocate_node(rapidxml::node_element, "ows:ServiceTypeVersion", "2.0.1");
 
-        serviceIdentificationNode->append_node(node);
+        service_identification_node->append_node(node);
 
         for(auto profile: capabilities.identification.profiles)
         {
-          serviceIdentificationNode->append_node(doc.allocate_node(rapidxml::node_element, "Profile", profile.c_str()));
+          service_identification_node->append_node(doc.allocate_node(rapidxml::node_element, "ows:Profile", profile.c_str()));
         }
       }
 
       // Service Provider node (service metadata)
-      rapidxml::xml_node<>* serviceProviderNode = doc.allocate_node(rapidxml::node_element, "ServiceProvider");
+      rapidxml::xml_node<>* service_provider_node = doc.allocate_node(rapidxml::node_element, "ows:ServiceProvider");
 
       {
         // Temp code. This metadata should be get from json file
-        rapidxml::xml_node<>* node = doc.allocate_node(rapidxml::node_element, "ProviderName", capabilities.provider.name.c_str());
+        rapidxml::xml_node<>* node = doc.allocate_node(rapidxml::node_element, "ows:ProviderName", capabilities.provider.name.c_str());
 
-        serviceProviderNode->append_node(node);
+        service_provider_node->append_node(node);
 
-        node = doc.allocate_node(rapidxml::node_element, "ProviderSite");
+        node = doc.allocate_node(rapidxml::node_element, "ows:ProviderSite");
 
         rapidxml::xml_attribute<>* attr = doc.allocate_attribute("href", capabilities.provider.site.c_str());
         node->append_attribute(attr);
 
-        serviceProviderNode->append_node(node);
+        service_provider_node->append_node(node);
 
         // ServiceContact node
-        rapidxml::xml_node<>* serviceContactNode = doc.allocate_node(rapidxml::node_element, "ServiceContact");
+        rapidxml::xml_node<>* service_contact_node = doc.allocate_node(rapidxml::node_element, "ows:ServiceContact");
 
-        node->append_node(serviceContactNode);
+        node->append_node(service_contact_node);
       }
 
       // Service Provider node (service metadata)
-      rapidxml::xml_node<>* operationsMetadataNode = doc.allocate_node(rapidxml::node_element, "OperationsMetadata");
+      rapidxml::xml_node<>* operations_metadata_node = doc.allocate_node(rapidxml::node_element, "ows:OperationsMetadata");
 
       {
         // getcapabilities
-        rapidxml::xml_node<>* node = doc.allocate_node(rapidxml::node_element, "Operation");
+        rapidxml::xml_node<>* node = doc.allocate_node(rapidxml::node_element, "ows:Operation");
 
         rapidxml::xml_attribute<>* attr = doc.allocate_attribute("name", "GetCapabilities");
         node->append_attribute(attr);
 
-        operationsMetadataNode->append_node(node);
+        operations_metadata_node->append_node(node);
 
         // describe coverage
-        node = doc.allocate_node(rapidxml::node_element, "Operation");
+        node = doc.allocate_node(rapidxml::node_element, "ows:Operation");
 
         attr = doc.allocate_attribute("name", "DescribeCoverage");
         node->append_attribute(attr);
 
-        operationsMetadataNode->append_node(node);
+        operations_metadata_node->append_node(node);
 
         // getcoverage
-        node = doc.allocate_node(rapidxml::node_element, "Operation");
+        node = doc.allocate_node(rapidxml::node_element, "ows:Operation");
 
         attr = doc.allocate_attribute("name", "GetCoverage");
         node->append_attribute(attr);
 
-        operationsMetadataNode->append_node(node);
+        operations_metadata_node->append_node(node);
       }
 
       // wcs:ServiceMetadata node
-      rapidxml::xml_node<>* serviceMetadataNode = doc.allocate_node(rapidxml::node_element, "ServiceMetadata");
-      serviceMetadataNode->append_node(doc.allocate_node(rapidxml::node_element, "formatSupported", "application/xml"));
-      serviceMetadataNode->append_node(doc.allocate_node(rapidxml::node_element, "formatSupported", "image/tiff"));
-      serviceMetadataNode->append_node(doc.allocate_node(rapidxml::node_element, "formatSupported", "image/hdf"));
+      rapidxml::xml_node<>* service_metadata_node = doc.allocate_node(rapidxml::node_element, "wcs:ServiceMetadata");
+      for(const auto& format: capabilities.metadata.formats_supported)
+        service_metadata_node->append_node(doc.allocate_node(rapidxml::node_element, "wcs:formatSupported", format.c_str()));
 
-      rapidxml::xml_node<>* contentsaNode = doc.allocate_node(rapidxml::node_element, "Contents");
+      rapidxml::xml_node<>* contents_node = doc.allocate_node(rapidxml::node_element, "wcs:Contents");
 
       // retrieve the list of registered geo-arrays
       std::vector<std::string> arrays = tws::geoarray::geoarray_manager::instance().list_arrays();
       for(const auto& array: arrays)
       {
-        rapidxml::xml_node<>* summary = doc.allocate_node(rapidxml::node_element, "CoverageSummary");
-        summary->append_node(doc.allocate_node(rapidxml::node_element, "CoverageId", array.c_str()));
+        rapidxml::xml_node<>* summary = doc.allocate_node(rapidxml::node_element, "wcs:CoverageSummary");
+        summary->append_node(doc.allocate_node(rapidxml::node_element, "wcs:CoverageId", array.c_str()));
         // todo: set it from file
-        summary->append_node(doc.allocate_node(rapidxml::node_element, "CoverageSubType", "GridCoverage"));
+        summary->append_node(doc.allocate_node(rapidxml::node_element, "wcs:CoverageSubType", "GridCoverage"));
 
-        contentsaNode->append_node(summary);
+        contents_node->append_node(summary);
       }
 
-      root->append_node(serviceIdentificationNode);
-      root->append_node(serviceProviderNode);
-      root->append_node(operationsMetadataNode);
-      root->append_node(serviceMetadataNode);
-      root->append_node(contentsaNode);
+      root->append_node(service_identification_node);
+      root->append_node(service_provider_node);
+      root->append_node(operations_metadata_node);
+      root->append_node(service_metadata_node);
+      root->append_node(contents_node);
     }
 
     doc.append_node(root);
@@ -200,31 +197,152 @@ void
 tws::wcs::describe_coverage_functor::operator()(const tws::core::http_request& request,
                                                 tws::core::http_response& response)
 {
-//// output result
-//  rapidjson::Document::AllocatorType allocator;
-//
-//  rapidjson::Document doc;
-//
-//  doc.SetObject();
-//
-//  rapidjson::Value jarrays(rapidjson::kArrayType);
-//
-//  rapidjson::StringBuffer str_buff;
-//
-//  rapidjson::Writer<rapidjson::StringBuffer> writer(str_buff);
-//
-//  doc.Accept(writer);
-//
-//  const char* p_str_buff = str_buff.GetString();
-//
-//  response.add_header("Content-Type", "application/json");
-//  response.add_header("Access-Control-Allow-Origin", "*");
-//  response.set_content(p_str_buff, str_buff.Size());
+  describe_coverage_t describe = wcs_manager::instance().describe_coverage();
+
+  // create DescribeCoverage document
+  rapidxml::xml_document<> doc;
+
+  rapidxml::xml_node<> *root = initialize_wcs_xml_namespaces(doc);
+
+  doc.append_node(root);
+
+  for(const auto& coverage: describe.coverages_description)
+  {
+    rapidxml::xml_node<>* node = doc.allocate_node(rapidxml::node_element, "wcs:CoverageDescription", coverage.id.c_str());
+    {
+      rapidxml::xml_node<>* bounded_by_node = doc.allocate_node(rapidxml::node_element, "bounded_by");
+      rapidxml::xml_node<>* envelope_node = doc.allocate_node(rapidxml::node_element, "Envelope");
+
+      rapidxml::xml_attribute<>* envelope_attr = doc.allocate_attribute("axisLabels", coverage.bounded_by.envelope.axis.c_str());
+      envelope_node->append_attribute(envelope_attr);
+
+      // todo: check. its printing "<"
+      envelope_attr = doc.allocate_attribute("srsDimension", std::to_string(coverage.bounded_by.envelope.dimension).c_str());
+      envelope_node->append_attribute(envelope_attr);
+
+//      rapidxml::xml_attribute<>* attribute = doc.allocate_attribute("srsName", "")
+      envelope_node->append_node(doc.allocate_node(rapidxml::node_element, "lowerCorner", coverage.bounded_by.envelope.min.c_str()));
+      envelope_node->append_node(doc.allocate_node(rapidxml::node_element, "upperCorner", coverage.bounded_by.envelope.max.c_str()));
+
+      bounded_by_node->append_node(envelope_node);
+
+      node->append_node(bounded_by_node);
+    }
+
+    node->append_node(doc.allocate_node(rapidxml::node_element, "wcs:CoverageId", coverage.id.c_str()));
+
+    rapidxml::xml_node<>* domain_set_node  = doc.allocate_node(rapidxml::node_element, "gml:domainSet");
+    {
+      rapidxml::xml_node<>* grid_node  = doc.allocate_node(rapidxml::node_element, "gml:Grid");
+      rapidxml::xml_attribute<>* attr = doc.allocate_attribute("srsDimension", std::to_string(coverage.bounded_by.envelope.dimension).c_str());
+      grid_node->append_attribute(attr);
+
+      rapidxml::xml_node<>* limits_node  = doc.allocate_node(rapidxml::node_element, "gml:limits");
+      rapidxml::xml_node<>* grid_envelope_node  = doc.allocate_node(rapidxml::node_element, "gml:GridEnvelope");
+
+      grid_envelope_node->append_node(doc.allocate_node(rapidxml::node_element, "low", coverage.bounded_by.envelope.min.c_str()));
+      grid_envelope_node->append_node(doc.allocate_node(rapidxml::node_element, "high", coverage.bounded_by.envelope.max.c_str()));
+
+      limits_node->append_node(grid_envelope_node);
+      grid_node->append_node(limits_node);
+
+      domain_set_node->append_node(grid_node);
+    }
+
+    node->append_node(domain_set_node);
+
+    rapidxml::xml_node<>* range_type_node  = doc.allocate_node(rapidxml::node_element, "gmlcov:rangeType");
+    {
+      rapidxml::xml_node<>* data_record = doc.allocate_node(rapidxml::node_element, "swe:DataRecord");
+      for(const auto& attribute: coverage.geoarray.attributes)
+      {
+        rapidxml::xml_node<>* swe_field = doc.allocate_node(rapidxml::node_element, "swe:Field");
+        rapidxml::xml_attribute<>* attr = doc.allocate_attribute("name", attribute.name.c_str());
+        swe_field->append_attribute(attr);
+
+        rapidxml::xml_node<>* swe_quantity = doc.allocate_node(rapidxml::node_element, "swe:Quantity");
+        swe_quantity->append_node(doc.allocate_node(rapidxml::node_element, "swe:description", attribute.description.c_str()));
+
+        rapidxml::xml_node<>* swe_constraint = doc.allocate_node(rapidxml::node_element, "swe:constraint");
+        rapidxml::xml_node<>* swe_allowed_values = doc.allocate_node(rapidxml::node_element, "swe:AllowedValues");
+
+        // todo: check it.  Its printing wcs description tag.  ????
+//        std::string range = std::to_string(attribute.valid_range.min_val) + " " + std::to_string(attribute.valid_range.max_val);
+
+//        swe_allowed_values->append_node(doc.allocate_node(rapidxml::node_element, "swe:interval", range.c_str()));
+
+        swe_constraint->append_node(swe_allowed_values);
+
+        swe_quantity->append_node(swe_constraint);
+
+        swe_field->append_node(swe_quantity);
+
+        data_record->append_node(swe_field);
+      }
+
+      range_type_node->append_node(data_record);
+    }
+
+    node->append_node(range_type_node);
+
+    root->append_node(node);
+  }
+
+  // output result
+  std::string str_buff;
+
+  rapidxml::print(std::back_inserter(str_buff), doc, 0);
+
+  const char* p_str_buff = str_buff.c_str();
+
+  response.add_header("Content-Type", "application/xml");
+  response.add_header("Access-Control-Allow-Origin", "*");
+  response.set_content(p_str_buff, str_buff.size());
 }
 
 void tws::wcs::get_coverage_functor::operator()(const tws::core::http_request& request,
                                                 tws::core::http_response& response)
 {
+  const char* query_string = request.query_string();
+  // temp code
+  if (query_string == nullptr)
+  {
+    throw tws::missing_argument_error() << tws::error_description("Arguments missing. OGC services requires at least three arguments: \"service\", \"version\" e \"request\"");
+  }
+
+  tws::core::query_string_t arguments = tws::core::expand(query_string);
+
+  const auto& coverage_id = arguments.find("coverageID");
+  if (coverage_id == arguments.end())
+    throw tws::missing_argument_error() << tws::error_description("Missing \"coverageID\" argument");
+
+  ////  std::string str_q_aql("SELECT " + attrs + " FROM " + coverage.from_clause);
+  ////
+  ////  if(!coverage.where_clause.empty())
+  ////    str_q_aql += " WHERE " + coverage.where_clause;
+  ////
+  ////  boost::format q_aql(str_q_aql);
+  ////  q_aql.bind_arg(1, pixel_col);
+  ////  q_aql.bind_arg(2, pixel_row);
+  ////  q_aql.bind_arg(3, start_time_pos);
+  ////  q_aql.bind_arg(4, pixel_col);
+  ////  q_aql.bind_arg(5, pixel_row);
+  ////  q_aql.bind_arg(6, end_time_pos);
+  //
+  //// get a connection to retrieve the time series
+  //  std::unique_ptr<tws::scidb::connection> conn(tws::scidb::connection_pool::instance().get());
+  //
+  ////  boost::shared_ptr< ::scidb::QueryResult > qresult = conn->execute(q_aql.str(), false);
+  //
+  ////  if((qresult.get() == nullptr) || (qresult->array.get() == nullptr))
+  ////    throw tws::core::http_request_error() << tws::error_description("no query result returned after querying database.");
+  //
+  ////  const ::scidb::ArrayDesc& array_desc = qresult->array->getArrayDesc();
+  //
+  ////  const ::scidb::Attributes& array_attributes = array_desc.getAttributes(true);
+  //
+  ////  const std::size_t nattributes = array_attributes.size();
+  //  const std::size_t nattributes = queried_attributes.size();
 
 }
 
