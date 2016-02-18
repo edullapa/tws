@@ -1,19 +1,19 @@
 /*
-  Copyright (C) 2014-2014 National Institute For Space Research (INPE) - Brazil.
-
-  This file is part of the TerraLib Web Services.
-
-  TerraLib Web Services is free software: you can redistribute it and/or modify
+  Copyright (C) 2014 National Institute For Space Research (INPE) - Brazil.
+ 
+  This file is part of the TerraLib GeoWeb Services.
+ 
+  TerraLib GeoWeb Services is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License version 3 as
   published by the Free Software Foundation.
-
-  TerraLib Web Services is distributed  "AS-IS" in the hope that it will be useful,
+ 
+  TerraLib GeoWeb Services is distributed  "AS-IS" in the hope that it will be useful,
   but WITHOUT ANY WARRANTY OF ANY KIND; without even the implied warranty
   of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License along
-  with TerraLib Web Services. See COPYING. If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
+  GNU Lesser General Public License for more details.
+ 
+  You should have received a copy of the GNU Lesser General Public License along
+  with TerraLib Web Services. See COPYING. If not, see <http://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
 /*!
@@ -21,20 +21,18 @@
 
   \brief Web Time Series Data Service.
 
-  \author Gilberto Ribeiro de Queiroz <gribeiro@dpi.inpe.br>
-
-  \date 2014-2014
-
-  \copyright GNU General Public License version 3
+  \author Gilberto Ribeiro de Queiroz
  */
 
 // TWS
+#include "wtss.hpp"
 #include "../core/http_request.hpp"
 #include "../core/http_response.hpp"
 #include "../core/service_operations_manager.hpp"
 #include "../core/utils.hpp"
 #include "../geoarray/geoarray_manager.hpp"
-#include "wtss.hpp"
+#include "utils.hpp"
+
 
 // STL
 #include <algorithm>
@@ -96,7 +94,7 @@ void
 tws::wtss::describe_coverage_functor::operator()(const tws::core::http_request& request,
                                                  tws::core::http_response& response)
 {
-  /*
+
   const char* qstring = request.query_string();
 
   if(qstring == nullptr)
@@ -111,17 +109,17 @@ tws::wtss::describe_coverage_functor::operator()(const tws::core::http_request& 
   if(it == it_end)
     throw tws::core::http_request_error() << tws::error_description("check describe_coverage operation: \"name\" parameter is missing!");
 
-// retrieve the coverage metadata
-  const coverage_t& cvmeta = coverage_manager::instance().get(it->second);
+// retrieve the coverage
+  const tws::geoarray::geoarray_t& cv = tws::geoarray::geoarray_manager::instance().get(it->second);
 
-// output result
+// output result: JSON document
   rapidjson::Document::AllocatorType allocator;
 
   rapidjson::Document doc;
 
   doc.SetObject();
 
-  write(cvmeta, doc, allocator);
+  write(cv, doc, allocator);
 
   rapidjson::StringBuffer str_buff;
 
@@ -134,7 +132,6 @@ tws::wtss::describe_coverage_functor::operator()(const tws::core::http_request& 
   response.add_header("Content-Type", "application/json");
   response.add_header("Access-Control-Allow-Origin", "*");
   response.set_content(p_str_buff, str_buff.Size());
-  */
 }
 
 void
