@@ -42,7 +42,6 @@ namespace tws
     //! A datatype for representing a single keyword.
     struct keyword_t
     {
-      std::string keyword;
       std::string vocabulary;
     };
     

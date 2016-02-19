@@ -4,13 +4,11 @@
             "name": "WMS",
             "title": "e-Sensing Server",
             "abstract": "Web Map Service maintained by e-Sensing team. Visualization of global Land Use and Land Cover maps.",
-            "keyword_list": {
-                "keyword": [
-                    "Amazônia",
-                    "floresta",
-                    "cerrado"
-                ]
-            },
+            "keyword_list": [
+                "Amazônia",
+                "floresta",
+                "cerrado"
+            ],
             "online_resource": {
                 "_xmlns:xlink": "http://www.w3.org/1999/xlink",
                 "xlink_type": "simple",
@@ -46,18 +44,14 @@
                     "dcptype": {
                         "http": {
                             "get": {
-                                "online_resource": {
-                                    "_xmlns:xlink": "http://www.w3.org/1999/xlink",
-                                    "xlink_type": "simple",
-                                    "xlink_href": "http://localhost/wms/GetCapabilities?"
-                                }
+                                "_xmlns:xlink": "http://www.w3.org/1999/xlink",
+                                "xlink_type": "simple",
+                                "xlink_href": "http://localhost/wms/GetCapabilities?"
                             },
                             "post": {
-                                "online_resource": {
-                                    "_xmlns:xlink": "http://www.w3.org/1999/xlink",
-                                    "xlink_type": "simple",
-                                    "xlink_href": "http://localhost/wms/GetCapabilities?"
-                                }
+                                "_xmlns:xlink": "http://www.w3.org/1999/xlink",
+                                "xlink_type": "simple",
+                                "xlink_href": "http://localhost/wms/GetCapabilities?"
                             }
                         }
                     }
@@ -71,11 +65,9 @@
                     "dcptype": {
                         "http": {
                             "get": {
-                                "online_resource": {
-                                    "_xmlns:xlink": "http://www.w3.org/1999/xlink",
-                                    "xlink_type": "simple",
-                                    "xlink_href": "http://localhost/wms/GetMap?"
-                                }
+                                "_xmlns:xlink": "http://www.w3.org/1999/xlink",
+                                "xlink_type": "simple",
+                                "xlink_href": "http://localhost/wms/GetMap?"
                             }
                         }
                     }
@@ -89,11 +81,9 @@
                     "dcptype": {
                         "http": {
                             "get": {
-                                "online_resource": {
-                                    "_xmlns:xlink": "http://www.w3.org/1999/xlink",
-                                    "xlink_type": "simple",
-                                    "xlink_href": "http://localhost/wms/GetFeatureInfo?"
-                                }
+                                "_xmlns:xlink": "http://www.w3.org/1999/xlink",
+                                "xlink_type": "simple",
+                                "xlink_href": "http://localhost/wms/GetFeatureInfo?"
                             }
                         }
                     }
