@@ -19,7 +19,7 @@
 /*!
   \file tws/wms/wms_manager.hpp
 
-  \brief A singleton for controlling the list of map layers to be served.
+  \brief A singleton for controlling the structs containing wms configuration.
 
   \author Roger Victor
  */
@@ -60,6 +60,12 @@ namespace tws
           \return A tws::wms::service_t struct containing wms configuration
         */
         service_t service();
+
+        /*!
+          \brief It makes a provider object with wms metadata
+          \return A tws::wms::capability_t struct containing wms configuration
+        */
+        capability_t capability();
 
       private:
         //! Constructor
