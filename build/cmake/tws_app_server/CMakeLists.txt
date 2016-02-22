@@ -27,6 +27,7 @@
 #
 
 include_directories(${terralib_INCLUDE_DIRS})
+include_directories(${RAPIDJSON_INCLUDE_DIR})
 
 file(GLOB TWS_SRC_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/app_server/*.cpp)
 file(GLOB TWS_HDR_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/app_server/*.hpp)
