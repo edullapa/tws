@@ -384,18 +384,11 @@ tws::wms::capability_t tws::wms::wms_manager::capability()
       throw tws::parser_error() << tws::error_description("Could not find post in wms config file");
     }
 
-    const rapidjson::Value& xlink_type = post_object["xlink_type"];
-    if (!xlink_type.IsString())
-    {
-      throw tws::parser_error() << tws::error_description("Could not find xlink type in wms config file");
-    }
-    post.xlink_type = xlink_type.GetString();
-
-    const rapidjson::Value& xlink_href = post_object["xlink_href"];
-    if (!xlink_href.IsString())
-    {
-      throw tws::parser_error() << tws::error_description("Could not find xlink href in wms config file");
-    }
+    //const rapidjson::Value& xlink_href = post_object["xlink_href"];
+    //if (!xlink_href.IsString())
+    //{
+    //  throw tws::parser_error() << tws::error_description("Could not find xlink href in wms config file");
+    //}
     post.xlink_href = xlink_href.GetString();
 
     http.post = post;

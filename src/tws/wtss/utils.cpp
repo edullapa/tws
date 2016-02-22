@@ -26,8 +26,6 @@
 
 // TWS
 #include "utils.hpp"
-//#include "../metadata/utils.hpp"
-//#include "coverage_manager.hpp"
 #include "exception.hpp"
 
 
@@ -406,7 +404,7 @@ tws::wtss::write(const tws::geoarray::geoarray_t& cv,
   jcv.AddMember("detail", jcv_detail, allocator);
 
   rapidjson::Value jcv_dimensions(rapidjson::kArrayType);
-  tws::metadata::write(cv.dimensions, jcv_dimensions, allocator);
+  write(cv.dimensions, jcv_dimensions, allocator);
   jcv.AddMember("dimensions", jcv_dimensions, allocator);
 
   rapidjson::Value jcv_attributes(rapidjson::kArrayType);
@@ -502,7 +500,7 @@ tws::wtss:: write(const std::vector<tws::geoarray::dimension_t>& cv_dimensions,
                   rapidjson::Value& jcv_dimensions,
                   rapidjson::Document::AllocatorType& allocator)
 {
-  if(!jdim.IsArray())
+  if(!jcv_dimensions.IsArray())
     throw tws::invalid_argument_error() << tws::error_description("JSON value must be a JSON array!");
 
   for(const auto& cv_dim : cv_dimensions)
@@ -533,6 +531,6 @@ tws::wtss::write(const tws::geoarray::dimension_t& dim,
 
   jdim.AddMember("max_idx", dim.min_idx, allocator);
 
-  jdim.AddMember("pos", dim.pos, allocator);
+  //jdim.AddMember("pos", dim.pos, allocator);
 }
 
