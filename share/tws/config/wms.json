@@ -1,0 +1,152 @@
+{
+    "wms_capabilities": {
+        "service": {
+            "name": "WMS",
+            "title": "e-Sensing Server",
+            "abstract": "Web Map Service maintained by e-Sensing team. Visualization of global Land Use and Land Cover maps.",
+            "keyword_list": [
+                "Amazônia",
+                "floresta",
+                "cerrado"
+            ],
+            "online_resource": {
+                "_xmlns:xlink": "http://www.w3.org/1999/xlink",
+                "xlink_type": "simple",
+                "xlink_href": "http://localhost/"
+            },
+            "contact_information": {
+                "contact_person_primary": {
+                    "contact_person": "Gilberto Ribeiro",
+                    "contact_organization": "INPE"
+                },
+                "contact_position": "Computer Scientist",
+                "contact_address": {
+                    "address_type": "postal",
+                    "address": "Av. Astronautas",
+                    "city": "São José dos Campos",
+                    "state_or_province": "SP",
+                    "post_code": "12227-010",
+                    "country": "Brazil"
+                },
+                "contact_voice_telephone": "3208 6803",
+                "contact_electronic_mail_address": "gribeiro"
+            },
+            "fees": "none",
+            "access_constraints": "none",
+            "layer_limit": "1",
+            "max_width": "2048",
+            "max_height": "2048"
+        },
+        "capability": {
+            "request": {
+                "get_capabilities": {
+                    "format": "text/xml",
+                    "dcptype": {
+                        "http": {
+                            "get": {
+                                "_xmlns:xlink": "http://www.w3.org/1999/xlink",
+                                "xlink_type": "simple",
+                                "xlink_href": "http://localhost/wms/GetCapabilities?"
+                            },
+                            "post": {
+                                "_xmlns:xlink": "http://www.w3.org/1999/xlink",
+                                "xlink_type": "simple",
+                                "xlink_href": "http://localhost/wms/GetCapabilities?"
+                            }
+                        }
+                    }
+                },
+                "get_map": {
+                    "format": [
+                        "image/png",
+                        "image/gif",
+                        "image/jpeg"
+                    ],
+                    "dcptype": {
+                        "http": {
+                            "get": {
+                                "_xmlns:xlink": "http://www.w3.org/1999/xlink",
+                                "xlink_type": "simple",
+                                "xlink_href": "http://localhost/wms/GetMap?"
+                            }
+                        }
+                    }
+                },
+                "get_feature_info": {
+                    "format": [
+                        "text/xml",
+                        "text/plain",
+                        "text/html"
+                    ],
+                    "dcptype": {
+                        "http": {
+                            "get": {
+                                "_xmlns:xlink": "http://www.w3.org/1999/xlink",
+                                "xlink_type": "simple",
+                                "xlink_href": "http://localhost/wms/GetFeatureInfo?"
+                            }
+                        }
+                    }
+                }
+            },
+            "exception": {
+                "format": [
+                    "xml",
+                    "inimage",
+                    "blank"
+                ]
+            },
+            "layer": {
+                "name": "All",
+                "layer": {
+                    "name": "mod13q1",
+                    "overviews": {
+                        "overview": {
+                            "dimensions": {
+                                "dimension": [
+                                    {
+                                        "_name": "col_id",
+                                        "_description": "column",
+                                        "_min_idx": "0",
+                                        "_max_idx": "172799",
+                                        "_pos": "0"
+                                    },
+                                    {
+                                        "_name": "row_id",
+                                        "_description": "row",
+                                        "_min_idx": "0",
+                                        "_max_idx": "86399",
+                                        "_pos": "1"
+                                    },
+                                    {
+                                        "_name": "time_id",
+                                        "_description": "time",
+                                        "_min_idx": "0",
+                                        "_max_idx": "1024",
+                                        "_pos": "2"
+                                    }
+                                ]
+                            },
+                            "attributes": {
+                                "attribute": {
+                                    "_name": "evi",
+                                    "_description": "250m 16 days EVI",
+                                    "_datatype": "16-bit signed integer",
+                                    "_valid_range_min": "-2000",
+                                    "_valid_range_max": "10000",
+                                    "_scale_factor": "0.0001",
+                                    "_missing_value": "-3000"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "_version": "1.3.0",
+        "_xmlns": "http://www.opengis.net/wms",
+        "_xmlns:xlink": "http://www.w3.org/1999/xlink",
+        "_xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+        "_xsi:schemaLocation": "http://www.opengis.net/wms http://schemas.opengis.net/wms/1.3.0/capabilities_1_3_0.xsd"
+    }
+}

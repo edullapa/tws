@@ -1,3 +1,5 @@
+#include "../geoarray/data_types.hpp"
+
 namespace tws
 {
   namespace wcs
@@ -75,7 +77,34 @@ namespace tws
     {
       service_identification_t identification;
       service_provider_t provider;
+      service_metadata_t metadata;
       contents_t contents;
+    };
+
+    struct envelope_t
+    {
+      std::string axis;
+      std::string min;
+      std::string max;
+      int dimension;
+    };
+
+    struct bounded_by_t
+    {
+      envelope_t envelope;
+    };
+
+    struct coverage_description_t
+    {
+      std::string id;
+      tws::geoarray::geoarray_t geoarray;
+      bounded_by_t bounded_by;
+    };
+
+    //! Struct for handling describe coverage metadata in WCS xml response
+    struct describe_coverage_t
+    {
+      std::vector<coverage_description_t> coverages_description;
     };
   }
 }

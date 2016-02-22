@@ -7,49 +7,11 @@ The following service is under development/investigation:
 - **Web Coverage Service 2.0 (WCS):** a web coverage service for data exchange with SciDB.
 - **Spatio-Temporal Web Map Service (WMS):** a web map service for visualizing remote sensing imagery data as dynamic maps (space + time) stored as 3D arrays in SciDB.
 
-**NOTE:**
-* **Until we reach version 1.0.0 this codebase will be instable and not fully operational.**
-* **TWS is under active development. We are preparing this site to host it!**
-* **If you have any question, please, send us an e-mail at: esensing-team@dpi.inpe.br.**
-
-## Source Code Organization
-
-### Codebase Documentation
-In the root directory of TWS codebase (the source code tree) there are some text files explaining the details of the codebase:
-
-- **[BRANCHES-AND-TAGS:](https://github.com/e-sensing/tws/blob/master/BRANCHES-AND-TAGS)** Notes on how to switch to the right branch to work on or the right tag to get the source code.
-
-- **[BUILD-INSTRUCTIONS:](https://github.com/e-sensing/tws/blob/master/BUILD-INSTRUCTIONS)** Notes on how to compile and install TWS for each platform.
-
-- **CHANGELOG:** List of changes in TWS source code. **Not available yet!**
-
-- **[DEPENDENCIES:](https://github.com/e-sensing/tws/blob/master/DEPENDENCIES)** The list of third-party library you must install before building TWS.
-
-- **[LICENSE:](https://github.com/e-sensing/tws/blob/master/LICENSE)** Licence statement in plain txt format.
-
-- **[README:](https://github.com/e-sensing/tws/blob/master/README)** Contains instructions about how to build and how is organized TWS plataform source code.
-
-### Directories
-
-- **[build/cmake:](https://github.com/e-sensing/tws/tree/master/build/cmake)** Contains the CMake scripts with commands, macros and functions used to build the environment for compiling libraries and executables in different platforms using CMake.
-
-- **[examples:](https://github.com/e-sensing/tws/tree/master/examples)** Some examples on how to use TWS API and Services.
- 
-- **[install:](https://github.com/e-sensing/tws/tree/master/install)** Bash scripts for helping building and installing TWS.
-
-- **licenses:** Copyright notices of third-party libraries used by TWS. **Not available yet!**
-
-- **[resources:](https://github.com/e-sensing/tws/tree/master/resources)** Fonts, images, sql, and xml files among other resources of general use.
-
-- **[share:](https://github.com/e-sensing/tws/tree/master/share)** XML Schema (.xsd), JSON files, plugin manifest files, translations files and OGC specifications that is shared and installed with TWS.
-
-- **[src:](https://github.com/e-sensing/tws/tree/master/src)** Contains the source code of TWS and its automatic test system.
- 
 ## Dependencies
 
 The file named **[DEPENDENCIES](https://github.com/e-sensing/tws/blob/master/DEPENDENCIES)** in the root of TWS source tree contains the official list of third-party libraries and tools that you must install before building TWS from source.
 
-If you want to build yourself TWS then you need to install some third-party libraries. Below we show the list of third-party libraries dependencies and its versions:
+If you want to build yourself TWS then you need to install some third-party libraries. Below we show the list of third-party libraries dependencies and its versions. Please, take a look at the section "Building and Installing the Dependencies".
 
 - **TerraLib (Mandatory):** TWS is built on top of TerraLib, a free and open source library for building GIS enabled applications. Make sure to have at least TerraLib version 5.1.0. You can download it from: http://www.dpi.inpe.br/terralib5.
 
@@ -62,6 +24,8 @@ If you want to build yourself TWS then you need to install some third-party libr
 **Note:**
 - When using TWS on a machine with a installed version of SciDB you probably already have Boost libraries installed.
 - If you have installed TerraLib you already have Boost and you don't need to install it again.
+
+## Building and Installing the Dependencies
 
 ### Bash script for building all dependencies on Linux Ubuntu 14.04 LTS
 
@@ -119,60 +83,9 @@ $ cd /home/user/mydevel/tws/codebase
 $ git clone https://github.com/e-sensing/tws.git .
 ```
 
-## Branches
-You can check all branches available (remotes and local) and see the current one (marked with "*"):
-
-`$ git branch -a`
-
-The output of above command will be something like:
-```
-  * master
-  remotes/origin/HEAD -> origin/master
-  remotes/origin/master
-```
-
-In the above output the "* master" means that the current branch is master.
-
-We have the following branches:
-- **master:** This is the branch where the development team is working to add new features to future versions of TWS. It may be instable although the codebase is subject to automatic tests (regression and unittests). We don't recommend to generate production versions of TWS from this branch. Use it for testing new features and get involved with TWS development.
-
-- **b-1.0.0-alpha:** This will be the first branch in TWS' codebase for the generation 1.
-
-To switch to one of the branches listed above, use the checkout command and create a local branch to track the remote branch. The syntax of "git checkout" is:
-
-`$ git checkout -b <local_branch_name> <remote_branch_name without this part "remotes/">`
-
-In order to switch to branch *b-1.0.0-alpha* you can use the following command:
-
-`$ git checkout -b b-1.0.0-alpha origin/b-1.0.0-alpha`
-
-## Tags
-
-Also there are tags which usually are originated from a release branch. For instance, tag *t-1.0.0-alpha1* will be originated from branch *b-1.0.0-alpha*.
-
-To check all tags available, use:
-
-`$ git tag -l           (list all tag names)`
-```
-  t-1.0.0-alpha1
-  t-1.0.0-alpha2
-  t-1.0.0-beta1
-  t-1.0.0-rc1
-  t-1.0.0
-  ...
-```
-
-If you want to checkout a specific version given by a tag and create a local branch to work on you can use the following git command:
-
-`$ git checkout -b <local_branch_tag_name> <one_of_tag_name_listed>`
-
-For instance, to checkout *t-1.0.0-alpha1* you can enter the following command:
-
-`$ git checkout -b t-1.0.0-alpha1  t-1.0.0-alpha1`
-
 ## Build Instructions
 
-After choosing the right branch or tag to work on, follow the insructions on **DEPENDENCIES** section. Make sure you have all the third-party library dependencies listed in this section before trying to build TWS.
+Make sure you have all the third-party library dependencies before trying to build TWS.
 
 The `build/cmake` folder contains a CMake project for building TWS.
 
@@ -299,7 +212,7 @@ DYLD_FALLBACK_FRAMEWORK_PATH
 
 ### Building on Microsoft Windows with Visual C++
 
-**TO BE DONE**
+This is not supported yet! If you need to build on Windows, please, let us know!
 
 
 ### Quick Notes for Developers
@@ -311,6 +224,39 @@ For Mac OS X, you can set the following variables:
 $ export DYLD_FALLBACK_LIBRARY_PATH=/Users/user/MyLibs/lib
 $ export DYLD_FALLBACK_FRAMEWORK_PATH=/Users/user/MyLibs/lib/
 ```
+
+## Source Code Organization
+
+### Codebase Documentation
+In the root directory of TWS codebase (the source code tree) there are some text files explaining the details of the codebase:
+
+- **[BRANCHES-AND-TAGS:](https://github.com/e-sensing/tws/blob/master/BRANCHES-AND-TAGS)** Notes on how to switch to the right branch to work on or the right tag to get the source code.
+
+- **[BUILD-INSTRUCTIONS:](https://github.com/e-sensing/tws/blob/master/BUILD-INSTRUCTIONS)** Notes on how to compile and install TWS for each platform.
+
+- **CHANGELOG:** List of changes in TWS source code. **Not available yet!**
+
+- **[DEPENDENCIES:](https://github.com/e-sensing/tws/blob/master/DEPENDENCIES)** The list of third-party library you must install before building TWS.
+
+- **[LICENSE:](https://github.com/e-sensing/tws/blob/master/LICENSE)** Licence statement in plain txt format.
+
+- **[README:](https://github.com/e-sensing/tws/blob/master/README)** Contains instructions about how to build and how is organized TWS plataform source code.
+
+### Directories
+
+- **[build/cmake:](https://github.com/e-sensing/tws/tree/master/build/cmake)** Contains the CMake scripts with commands, macros and functions used to build the environment for compiling libraries and executables in different platforms using CMake.
+
+- **[examples:](https://github.com/e-sensing/tws/tree/master/examples)** Some examples on how to use TWS API and Services.
+ 
+- **[install:](https://github.com/e-sensing/tws/tree/master/install)** Bash scripts for helping building and installing TWS.
+
+- **licenses:** Copyright notices of third-party libraries used by TWS. **Not available yet!**
+
+- **[resources:](https://github.com/e-sensing/tws/tree/master/resources)** Fonts, images, sql, and xml files among other resources of general use.
+
+- **[share:](https://github.com/e-sensing/tws/tree/master/share)** XML Schema (.xsd), JSON files, plugin manifest files, translations files and OGC specifications that is shared and installed with TWS.
+
+- **[src:](https://github.com/e-sensing/tws/tree/master/src)** Contains the source code of TWS and its automatic test system.
 
 ## Reporting Bugs
 

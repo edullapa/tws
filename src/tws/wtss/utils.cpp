@@ -26,8 +26,6 @@
 
 // TWS
 #include "utils.hpp"
-//#include "../metadata/utils.hpp"
-//#include "coverage_manager.hpp"
 #include "exception.hpp"
 
 
@@ -533,6 +531,6 @@ tws::wtss::write(const tws::geoarray::dimension_t& dim,
 
   jdim.AddMember("max_idx", dim.min_idx, allocator);
 
-  jdim.AddMember("pos", dim.pos, allocator);
+  //jdim.AddMember("pos", dim.pos, allocator);
 }
 
