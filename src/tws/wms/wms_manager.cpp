@@ -159,7 +159,6 @@ tws::wms::service_t tws::wms::wms_manager::service()
     {
       throw tws::parser_error() << tws::error_description("Could not find service keyword list in wms config file");
     }
-
     keyword_t keyword;
     for (unsigned int i = 0; i < keyword_list.Size(); ++i)
     {
@@ -319,7 +318,79 @@ tws::wms::capability_t tws::wms::wms_manager::capability()
       throw tws::parser_error() << tws::error_description("Could not find capability in wms config file");
     }
 
+    const rapidjson::Value& exception_formats = capability_object["exception"];
+    if (!exception_formats.IsArray())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find exception formats in wms config file");
+    }
+    for (unsigned int i = 0; i < exception_formats.Size(); ++i)
+    {
+      capability.exception_formats.push_back(exception_formats[i].GetString());
+    }
+
+    capability.request = request();
+
+    capability.layer = layer();
+
+    return capability;
+  }
+  catch (...)
+  {
+    throw;
+  }
+}
+
+tws::wms::request_t tws::wms::wms_manager::request()
+{
+  try
+  {
+    const rapidjson::Value& wms_capabilities_object = (*pimpl_->json_file)["wms_capabilities"];
+    if (!wms_capabilities_object.IsObject())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find capabilities in wms config file");
+    }
+
+    const rapidjson::Value& capability_object = wms_capabilities_object["capability"];
+    if (!capability_object.IsObject())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find capability in wms config file");
+    }
+
     request_t request;
+    const rapidjson::Value& request_object = capability_object["request"];
+    if (!request_object.IsObject())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find request in wms config file");
+    }
+
+    request.get_capabilities = get_capabilities();
+    request.get_map = get_map();
+    request.get_feature_info = get_feature_info();
+
+    return request;
+  }
+  catch (...)
+  {
+    throw;
+  }
+}
+
+tws::wms::operation_t tws::wms::wms_manager::get_capabilities()
+{
+  try
+  {
+    const rapidjson::Value& wms_capabilities_object = (*pimpl_->json_file)["wms_capabilities"];
+    if (!wms_capabilities_object.IsObject())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find capabilities in wms config file");
+    }
+
+    const rapidjson::Value& capability_object = wms_capabilities_object["capability"];
+    if (!capability_object.IsObject())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find capability in wms config file");
+    }
+
     const rapidjson::Value& request_object = capability_object["request"];
     if (!request_object.IsObject())
     {
@@ -334,14 +405,128 @@ tws::wms::capability_t tws::wms::wms_manager::capability()
     }
 
     const rapidjson::Value& format = get_capabilities_object["format"];
-    if (!format.IsString())
+    if (!format.IsArray())
     {
       throw tws::parser_error() << tws::error_description("Could not find format in wms config file");
     }
-    get_capabilities.format = format.GetString();
+    for (unsigned int i = 0; i < format.Size(); ++i)
+    {
+      get_capabilities.format.push_back(format[i].GetString());
+    }
 
     dcp_type_t dcptype;
     const rapidjson::Value& dcptype_object = get_capabilities_object["dcptype"];
+    if (!dcptype_object.IsObject())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find dcp type in wms config file");
+    }
+
+    http_t http;
+    const rapidjson::Value& http_object = dcptype_object["http"];
+    if (!http_object.IsObject())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find http in wms config file");
+    }
+
+    online_resource_t get;
+    const rapidjson::Value& get_object = http_object["get"];
+    if (!get_object.IsObject())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find get in wms config file");
+    }
+
+    const rapidjson::Value& get_xlink_type = get_object["xlink_type"];
+    if (!get_xlink_type.IsString())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find xlink type in wms config file");
+    }
+    get.xlink_type = get_xlink_type.GetString();
+
+    const rapidjson::Value& get_xlink_href = get_object["xlink_href"];
+    if (!get_xlink_href.IsString())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find xlink href in wms config file");
+    }
+    get.xlink_href = get_xlink_href.GetString();
+
+    http.get = get;
+
+    online_resource_t post;
+    const rapidjson::Value& post_object = http_object["post"];
+    if (!post_object.IsObject())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find post in wms config file");
+    }
+
+    const rapidjson::Value& post_xlink_type = post_object["xlink_type"];
+    if (!post_xlink_type.IsString())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find xlink type in wms config file");
+    }
+    post.xlink_type = post_xlink_type.GetString();
+
+    const rapidjson::Value& post_xlink_href = post_object["xlink_href"];
+    if (!post_xlink_href.IsString())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find xlink href in wms config file");
+    }
+    post.xlink_href = post_xlink_href.GetString();
+
+    http.post = post;
+
+    dcptype.http = http;
+
+    get_capabilities.dcp_type = dcptype;
+
+    return get_capabilities;
+  }
+  catch (...)
+  {
+    throw;
+  }
+}
+
+tws::wms::operation_t tws::wms::wms_manager::get_map()
+{
+  try
+  {
+    const rapidjson::Value& wms_capabilities_object = (*pimpl_->json_file)["wms_capabilities"];
+    if (!wms_capabilities_object.IsObject())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find capabilities in wms config file");
+    }
+
+    const rapidjson::Value& capability_object = wms_capabilities_object["capability"];
+    if (!capability_object.IsObject())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find capability in wms config file");
+    }
+
+    const rapidjson::Value& request_object = capability_object["request"];
+    if (!request_object.IsObject())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find request in wms config file");
+    }
+
+    operation_t get_map;
+    const rapidjson::Value& get_map_object = request_object["get_map"];
+    if (!get_map_object.IsObject())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find get map in wms config file");
+    }
+
+    const rapidjson::Value& format = get_map_object["format"];
+    if (!format.IsArray())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find format in wms config file");
+    }
+    for (unsigned int i = 0; i < format.Size(); ++i)
+    {
+      get_map.format.push_back(format[i].GetString());
+    }
+
+    dcp_type_t dcptype;
+    const rapidjson::Value& dcptype_object = get_map_object["dcptype"];
     if (!dcptype_object.IsObject())
     {
       throw tws::parser_error() << tws::error_description("Could not find dcp type in wms config file");
@@ -377,29 +562,137 @@ tws::wms::capability_t tws::wms::wms_manager::capability()
 
     http.get = get;
 
-    online_resource_t post;
-    const rapidjson::Value& post_object = http_object["post"];
-    if (!post_object.IsObject())
+    dcptype.http = http;
+
+    get_map.dcp_type = dcptype;
+
+    return get_map;
+  }
+  catch (...)
+  {
+    throw;
+  }
+}
+
+tws::wms::operation_t tws::wms::wms_manager::get_feature_info()
+{
+  try
+  {
+    const rapidjson::Value& wms_capabilities_object = (*pimpl_->json_file)["wms_capabilities"];
+    if (!wms_capabilities_object.IsObject())
     {
-      throw tws::parser_error() << tws::error_description("Could not find post in wms config file");
+      throw tws::parser_error() << tws::error_description("Could not find capabilities in wms config file");
     }
 
-    //const rapidjson::Value& xlink_href = post_object["xlink_href"];
-    //if (!xlink_href.IsString())
-    //{
-    //  throw tws::parser_error() << tws::error_description("Could not find xlink href in wms config file");
-    //}
-    post.xlink_href = xlink_href.GetString();
+    const rapidjson::Value& capability_object = wms_capabilities_object["capability"];
+    if (!capability_object.IsObject())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find capability in wms config file");
+    }
 
-    http.post = post;
+    const rapidjson::Value& request_object = capability_object["request"];
+    if (!request_object.IsObject())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find request in wms config file");
+    }
+
+    operation_t get_feature_info;
+    const rapidjson::Value& get_feature_info_object = request_object["get_feature_info"];
+    if (!get_feature_info_object.IsObject())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find get feature info in wms config file");
+    }
+
+    const rapidjson::Value& format = get_feature_info_object["format"];
+    if (!format.IsArray())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find format in wms config file");
+    }
+    for (unsigned int i = 0; i < format.Size(); ++i)
+    {
+      get_feature_info.format.push_back(format[i].GetString());
+    }
+
+    dcp_type_t dcptype;
+    const rapidjson::Value& dcptype_object = get_feature_info_object["dcptype"];
+    if (!dcptype_object.IsObject())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find dcp type in wms config file");
+    }
+
+    http_t http;
+    const rapidjson::Value& http_object = dcptype_object["http"];
+    if (!http_object.IsObject())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find http in wms config file");
+    }
+
+    online_resource_t get;
+    const rapidjson::Value& get_object = http_object["get"];
+    if (!get_object.IsObject())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find get in wms config file");
+    }
+
+    const rapidjson::Value& xlink_type = get_object["xlink_type"];
+    if (!xlink_type.IsString())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find xlink type in wms config file");
+    }
+    get.xlink_type = xlink_type.GetString();
+
+    const rapidjson::Value& xlink_href = get_object["xlink_href"];
+    if (!xlink_href.IsString())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find xlink href in wms config file");
+    }
+    get.xlink_href = xlink_href.GetString();
+
+    http.get = get;
 
     dcptype.http = http;
 
-    get_capabilities.dcp_type = dcptype;
+    get_feature_info.dcp_type = dcptype;
 
-    request.get_capabilities = get_capabilities;
+    return get_feature_info;
+  }
+  catch (...)
+  {
+    throw;
+  }
+}
 
-    return capability;
+tws::wms::layer_t tws::wms::wms_manager::layer()
+{
+  try
+  {
+    const rapidjson::Value& wms_capabilities_object = (*pimpl_->json_file)["wms_capabilities"];
+    if (!wms_capabilities_object.IsObject())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find capabilities in wms config file");
+    }
+
+    const rapidjson::Value& capability_object = wms_capabilities_object["capability"];
+    if (!capability_object.IsObject())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find capability in wms config file");
+    }
+
+    layer_t layer;
+    const rapidjson::Value& layer_object = capability_object["layer"];
+    if (!layer_object.IsObject())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer in wms config file");
+    }
+
+    const rapidjson::Value& name = layer_object["name"];
+    if (!name.IsString())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find service name in wms config file");
+    }
+    layer.name = name.GetString();
+
+    return layer;
   }
   catch (...)
   {

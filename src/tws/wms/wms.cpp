@@ -69,7 +69,7 @@ tws::wms::get_capabilities_functor::operator()(const tws::core::http_request& re
     root->append_attribute(attr);
     
     {
-      // Service Identification node (service metadata)
+      // Service node (service metadata)
       rapidxml::xml_node<>* serviceNode = doc.allocate_node(rapidxml::node_element, "Service");
 
       {

@@ -204,7 +204,7 @@ namespace tws
       //std::vector<std::string> crs;
       //ex_geographic_bounding_box_t ex_geographic_bounding_box;
       //std::vector<bounding_box_t> bounding_box;
-      //std::vector<dimension_t> dimension;
+      std::vector<dimension_t> dimension;
       //attribution_t attribution;
       //authority_url_t authority_url;
       //std::vector<identifier_t> identifier;
@@ -227,7 +227,7 @@ namespace tws
     //! Output format and URI of an operation.
     struct operation_t
     {
-      std::string format;
+      std::vector<std::string> format;
       dcp_type_t dcp_type;
     };
     
