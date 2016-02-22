@@ -104,10 +104,11 @@ if [ ! -f "$TWS_DIR/include/rapidjson/rapidjson.h" ]; then
   tar xzvf rapidjson-0.11.tar.gz
   valid $? "Error: could not uncompress rapidjson-0.11.tar.gz!"
 
-  cd rapidjson
+  cd rapidjson/include
   valid $? "Error: could not enter rapidjson!"
 
-  mv rapidjson/include $TWS_DIR/include/
+  mv rapidjson $TWS_DIR/include/
+  valid $? "Error: could not move rapidjson files to target directory: $TWS_DIR/include/"
 
   cd ..
 fi
