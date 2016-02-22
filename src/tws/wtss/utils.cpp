@@ -17,7 +17,7 @@
  */
 
 /*!
-  \file tws/wtss/utils.cpp edu
+  \file tws/wtss/utils.cpp
 
   \brief Utility functions for WTSS service.
 
