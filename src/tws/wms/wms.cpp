@@ -63,96 +63,155 @@ tws::wms::get_capabilities_functor::operator()(const tws::core::http_request& re
     // create Capabilities document
     rapidxml::xml_document<> doc;
     
-    rapidxml::xml_node<> *root = doc.allocate_node(rapidxml::node_element, "WMS_Capabilities");
+    rapidxml::xml_node<>* root = doc.allocate_node(rapidxml::node_element, "WMS_Capabilities");
     
     rapidxml::xml_attribute<>* attr = doc.allocate_attribute("version", "1.3.0");
     root->append_attribute(attr);
     
+    attr = doc.allocate_attribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
+    root->append_attribute(attr);
+
     {
       // Service node (service metadata)
-      rapidxml::xml_node<>* serviceNode = doc.allocate_node(rapidxml::node_element, "Service");
+      rapidxml::xml_node<>* service_node = doc.allocate_node(rapidxml::node_element, "Service");
 
       {
         // Temp code. This metadata should be get from json file
         rapidxml::xml_node<>* node = doc.allocate_node(rapidxml::node_element, "Name", capabilities.service.name.c_str());
 
-        serviceNode->append_node(node);
+        service_node->append_node(node);
         
         node = doc.allocate_node(rapidxml::node_element, "Title", capabilities.service.title.c_str());
 
-        serviceNode->append_node(node);
+        service_node->append_node(node);
 
         node = doc.allocate_node(rapidxml::node_element, "Abstract", capabilities.service.abstract.c_str());
 
-        serviceNode->append_node(node);
-      }
+        service_node->append_node(node);
 
-      // Service Provider node (service metadata)
-      rapidxml::xml_node<>* contactInformationNode = doc.allocate_node(rapidxml::node_element, "Contact Information");
+        // KeywordList node
+        rapidxml::xml_node<>* keyword_list_node = doc.allocate_node(rapidxml::node_element, "KeywordList");
 
-      {
-        // Temp code. This metadata should be get from json file
-        rapidxml::xml_node<>* node = doc.allocate_node(rapidxml::node_element, "Contact Position", capabilities.service.contact_information.contact_position.c_str());
+        for(auto keyword: capabilities.service.keyword_list)
+        {
+          keyword_list_node->append_node(doc.allocate_node(rapidxml::node_element, "Keyword", keyword.vocabulary.c_str()));
+        }
 
-        serviceNode->append_node(node);
-      }
+        service_node->append_node(keyword_list_node);
 
-      /* // Service Provider node (service metadata)
-      rapidxml::xml_node<>* operationsMetadataNode = doc.allocate_node(rapidxml::node_element, "OperationsMetadata");
+        node = doc.allocate_node(rapidxml::node_element, "OnlineResource");
 
-      {
-        // getcapabilities
-        rapidxml::xml_node<>* node = doc.allocate_node(rapidxml::node_element, "Operation");
-
-        rapidxml::xml_attribute<>* attr = doc.allocate_attribute("name", "GetCapabilities");
+        rapidxml::xml_attribute<>* attr = doc.allocate_attribute("xlink:type", capabilities.service.online_resource.xlink_type.c_str());
         node->append_attribute(attr);
 
-        operationsMetadataNode->append_node(node);
-
-        // describe coverage
-        node = doc.allocate_node(rapidxml::node_element, "Operation");
-
-        attr = doc.allocate_attribute("name", "DescribeCoverage");
+        attr = doc.allocate_attribute("xlink:href", capabilities.service.online_resource.xlink_href.c_str());
         node->append_attribute(attr);
 
-        operationsMetadataNode->append_node(node);
+        service_node->append_node(node);
 
-        // getcoverage
-        node = doc.allocate_node(rapidxml::node_element, "Operation");
+        // Contact Information node
+        rapidxml::xml_node<>* contact_information_node = doc.allocate_node(rapidxml::node_element, "ContactInformation");
 
-        attr = doc.allocate_attribute("name", "GetCoverage");
-        node->append_attribute(attr);
+        {
+          // Temp code. This metadata should be get from json file
+          rapidxml::xml_node<>* contact_person_node = doc.allocate_node(rapidxml::node_element, "ContactPersonPrimary");
 
-        operationsMetadataNode->append_node(node);
+          rapidxml::xml_node<>* node = doc.allocate_node(rapidxml::node_element, "ContactPerson", capabilities.service.contact_information.contact_person_primary.contact_person.c_str());
+
+          contact_person_node->append_node(node);
+
+          node = doc.allocate_node(rapidxml::node_element, "ContactOrganization", capabilities.service.contact_information.contact_person_primary.contact_organization.c_str());
+
+          contact_person_node->append_node(node);
+
+          contact_information_node->append_node(contact_person_node);
+
+          node = doc.allocate_node(rapidxml::node_element, "ContactPosition", capabilities.service.contact_information.contact_position.c_str());
+
+          contact_information_node->append_node(node);
+
+          rapidxml::xml_node<>* contact_address_node = doc.allocate_node(rapidxml::node_element, "ContactAddress");
+
+          node = doc.allocate_node(rapidxml::node_element, "AddressType", capabilities.service.contact_information.contact_address.address_type.c_str());
+
+          contact_address_node->append_node(node);
+
+          node = doc.allocate_node(rapidxml::node_element, "Address", capabilities.service.contact_information.contact_address.address.c_str());
+
+          contact_address_node->append_node(node);
+
+          node = doc.allocate_node(rapidxml::node_element, "City", capabilities.service.contact_information.contact_address.city.c_str());
+
+          contact_address_node->append_node(node);
+
+          node = doc.allocate_node(rapidxml::node_element, "StateOrProvince", capabilities.service.contact_information.contact_address.state_or_province.c_str());
+
+          contact_address_node->append_node(node);
+
+          node = doc.allocate_node(rapidxml::node_element, "PostCode", capabilities.service.contact_information.contact_address.post_code.c_str());
+
+          contact_address_node->append_node(node);
+
+          node = doc.allocate_node(rapidxml::node_element, "Country", capabilities.service.contact_information.contact_address.country.c_str());
+
+          contact_address_node->append_node(node);
+
+          contact_information_node->append_node(contact_address_node);
+
+          node = doc.allocate_node(rapidxml::node_element, "ContactVoiceTelephone", capabilities.service.contact_information.contact_voice_telephone.c_str());
+
+          contact_information_node->append_node(node);
+
+          node = doc.allocate_node(rapidxml::node_element, "ContactElectronicMailAddress", capabilities.service.contact_information.contact_electronic_mail_address.c_str());
+
+          contact_information_node->append_node(node);
+        }
+
+        service_node->append_node(contact_information_node);
+
+        node = doc.allocate_node(rapidxml::node_element, "Fees", capabilities.service.fees.c_str());
+
+        service_node->append_node(node);
+
+        node = doc.allocate_node(rapidxml::node_element, "AccessConstraints", capabilities.service.access_constraints.c_str());
+
+        service_node->append_node(node);
+
+        node = doc.allocate_node(rapidxml::node_element, "LayerLimit", std::to_string(capabilities.service.layer_limit).c_str());
+
+        service_node->append_node(node);
+
+        node = doc.allocate_node(rapidxml::node_element, "MaxWidth", std::to_string(capabilities.service.max_width).c_str());
+
+        service_node->append_node(node);
+
+        node = doc.allocate_node(rapidxml::node_element, "MaxHeight", std::to_string(capabilities.service.max_height).c_str());
+
+        service_node->append_node(node);
       }
 
-      // wcs:ServiceMetadata node
-      rapidxml::xml_node<>* serviceMetadataNode = doc.allocate_node(rapidxml::node_element, "ServiceMetadata");
-      serviceMetadataNode->append_node(doc.allocate_node(rapidxml::node_element, "formatSupported", "application/xml"));
-      serviceMetadataNode->append_node(doc.allocate_node(rapidxml::node_element, "formatSupported", "image/tiff"));
-      serviceMetadataNode->append_node(doc.allocate_node(rapidxml::node_element, "formatSupported", "image/hdf"));
+      // Capability node
+      rapidxml::xml_node<>* capability_node = doc.allocate_node(rapidxml::node_element, "Capability");
 
-      rapidxml::xml_node<>* contentsaNode = doc.allocate_node(rapidxml::node_element, "Contents");
-
-      // retrieve the list of registered geo-arrays
-      std::vector<std::string> arrays = tws::geoarray::geoarray_manager::instance().list_arrays();
-      for(const auto& array: arrays)
       {
-        rapidxml::xml_node<>* summary = doc.allocate_node(rapidxml::node_element, "CoverageSummary");
-        summary->append_node(doc.allocate_node(rapidxml::node_element, "CoverageId", array.c_str()));
-        // todo: set it from file
-        summary->append_node(doc.allocate_node(rapidxml::node_element, "CoverageSubType", "GridCoverage"));
+        // Request node
+        rapidxml::xml_node<>* request_node = doc.allocate_node(rapidxml::node_element, "Request");
 
-        contentsaNode->append_node(summary);
-      } */
+        {
 
-      root->append_node(serviceNode);
-      root->append_node(contactInformationNode);
+        }
+
+        capability_node->append_node(request_node);
+      }
+
+      root->append_node(service_node);
+
+      root->append_node(capability_node);
     }
 
     doc.append_node(root);
 
-  // output result
+    // output result
     std::string str_buff;
 
     rapidxml::print(std::back_inserter(str_buff), doc, 0);
@@ -167,7 +226,6 @@ tws::wms::get_capabilities_functor::operator()(const tws::core::http_request& re
   {
 
   }
-
 }
 
 void
@@ -232,4 +290,3 @@ tws::wms::initialize_operations()
 {
 
 }
-

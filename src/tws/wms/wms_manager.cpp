@@ -134,21 +134,21 @@ tws::wms::service_t tws::wms::wms_manager::service()
     service.access_constraints = access_constraints.GetString();
 
     const rapidjson::Value& layer_limit = service_object["layer_limit"];
-    if (!layer_limit.IsString())
+    if (!layer_limit.IsInt())
     {
       throw tws::parser_error() << tws::error_description("Could not find service layer limit in wms config file");
     }
     service.layer_limit = layer_limit.GetInt();
 
     const rapidjson::Value& max_width = service_object["max_width"];
-    if (!max_width.IsString())
+    if (!max_width.IsInt())
     {
       throw tws::parser_error() << tws::error_description("Could not find service max width in wms config file");
     }
     service.max_width = max_width.GetInt();
 
     const rapidjson::Value& max_height = service_object["max_height"];
-    if (!max_height.IsString())
+    if (!max_height.IsInt())
     {
       throw tws::parser_error() << tws::error_description("Could not find service max height in wms config file");
     }
