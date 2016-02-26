@@ -688,9 +688,28 @@ tws::wms::layer_t tws::wms::wms_manager::layer()
     const rapidjson::Value& name = layer_object["name"];
     if (!name.IsString())
     {
-      throw tws::parser_error() << tws::error_description("Could not find service name in wms config file");
+      throw tws::parser_error() << tws::error_description("Could not find layer name in wms config file");
     }
     layer.name = name.GetString();
+
+    const rapidjson::Value& layers_list_object = layer_object["layers"];
+    if (!layers_list_object.IsArray())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layers list in wms config file");
+    }
+
+    layer_t sub_layer;
+    for (unsigned int i = 0; i < layers_list_object.Size(); ++i)
+    {
+      const rapidjson::Value& name = layers_list_object[i]["name"];
+      if (!name.IsString())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer name in wms config file");
+      }
+      sub_layer.name = name.GetString();
+
+      layer.layers.push_back(sub_layer);
+    }
 
     return layer;
   }
