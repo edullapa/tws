@@ -45,7 +45,7 @@
 #include <boost/lexical_cast.hpp>
 
 // SciDB
-//#include <SciDBAPI.h>
+#include <SciDBAPI.h>
 
 // RapidJSON
 #include <rapidjson/document.h>
