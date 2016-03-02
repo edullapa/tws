@@ -692,6 +692,366 @@ tws::wms::layer_t tws::wms::wms_manager::layer()
     }
     layer.name = name.GetString();
 
+    const rapidjson::Value& title = layer_object["title"];
+    if (!title.IsString())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer title in wms config file");
+    }
+    layer.title = title.GetString();
+
+    const rapidjson::Value& abstract = layer_object["abstract"];
+    if (!abstract.IsString())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer abstract in wms config file");
+    }
+    layer.abstract = abstract.GetString();
+
+    const rapidjson::Value& keyword_list = layer_object["keyword_list"];
+    if (!keyword_list.IsArray())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer keyword list in wms config file");
+    }
+    keyword_t keyword;
+    for (unsigned int i = 0; i < keyword_list.Size(); ++i)
+    {
+      keyword.vocabulary = keyword_list[i].GetString();
+      layer.keyword_list.push_back(keyword);
+    }
+
+    const rapidjson::Value& crs = layer_object["crs"];
+    if (!crs.IsArray())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer crs in wms config file");
+    }
+    for (unsigned int i = 0; i < crs.Size(); ++i)
+    {
+      layer.crs.push_back(crs[i].GetString());
+    }
+
+    ex_geographic_bounding_box_t ex_geographic_bounding_box;
+    const rapidjson::Value& ex_geographic_bounding_box_object = layer_object["ex_geographic_bounding_box"];
+    if (!ex_geographic_bounding_box_object.IsObject())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer EX_GeographicBoundingBox in wms config file");
+    }
+
+    const rapidjson::Value& west_bound_longitude = ex_geographic_bounding_box_object["west_bound_longitude"];
+    if (!west_bound_longitude.IsDouble())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer EX_GeographicBoundingBox west bound longitude in wms config file");
+    }
+    ex_geographic_bounding_box.west_bound_longitude = west_bound_longitude.GetDouble();
+
+    const rapidjson::Value& east_bound_longitude = ex_geographic_bounding_box_object["east_bound_longitude"];
+    if (!east_bound_longitude.IsDouble())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer EX_GeographicBoundingBox east bound longitude in wms config file");
+    }
+    ex_geographic_bounding_box.east_bound_longitude = east_bound_longitude.GetDouble();
+
+    const rapidjson::Value& south_bound_latitude = ex_geographic_bounding_box_object["south_bound_latitude"];
+    if (!south_bound_latitude.IsDouble())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer EX_GeographicBoundingBox south bound latitude in wms config file");
+    }
+    ex_geographic_bounding_box.south_bound_latitude = south_bound_latitude.GetDouble();
+
+    const rapidjson::Value& north_bound_latitude = ex_geographic_bounding_box_object["north_bound_latitude"];
+    if (!north_bound_latitude.IsDouble())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer EX_GeographicBoundingBox north bound latitude in wms config file");
+    }
+    ex_geographic_bounding_box.north_bound_latitude = north_bound_latitude.GetDouble();
+
+    layer.ex_geographic_bounding_box = ex_geographic_bounding_box;
+
+    // bounding_box_t
+    const rapidjson::Value& bounding_box_list = layer_object["bounding_box"];
+    if (!bounding_box_list.IsArray())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer bounding box in wms config file");
+    }
+    bounding_box_t bounding_box;
+    for (unsigned int i = 0; i < bounding_box_list.Size(); ++i)
+    {
+      const rapidjson::Value& crs = bounding_box_list[i]["crs"];
+      if (!crs.IsString())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer bounding box crs in wms config file");
+      }
+      bounding_box.crs = crs.GetString();
+
+      const rapidjson::Value& min_x = bounding_box_list[i]["min_x"];
+      if (!min_x.IsDouble())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer bounding box min_x in wms config file");
+      }
+      bounding_box.min_x = min_x.GetDouble();
+
+      const rapidjson::Value& min_y = bounding_box_list[i]["min_y"];
+      if (!min_y.IsDouble())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer bounding box min_y in wms config file");
+      }
+      bounding_box.min_y = min_y.GetDouble();
+
+      const rapidjson::Value& max_x = bounding_box_list[i]["max_x"];
+      if (!max_x.IsDouble())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer bounding box max_x in wms config file");
+      }
+      bounding_box.max_x = max_x.GetDouble();
+
+      const rapidjson::Value& max_y = bounding_box_list[i]["max_y"];
+      if (!max_y.IsDouble())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer bounding box max_y in wms config file");
+      }
+      bounding_box.max_y = max_y.GetDouble();
+
+      const rapidjson::Value& res_x = bounding_box_list[i]["res_x"];
+      if (!res_x.IsDouble())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer bounding box res_x in wms config file");
+      }
+      bounding_box.res_x = res_x.GetDouble();
+
+      const rapidjson::Value& res_y = bounding_box_list[i]["res_y"];
+      if (!res_y.IsDouble())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer bounding box res_y in wms config file");
+      }
+      bounding_box.res_y = res_y.GetDouble();
+
+      layer.bounding_box.push_back(bounding_box);
+    }
+
+    // dimension_t
+    const rapidjson::Value& dimension_list = layer_object["dimension"];
+    if (!dimension_list.IsArray())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer dimension in wms config file");
+    }
+    dimension_t dimension;
+    for (unsigned int i = 0; i < dimension_list.Size(); ++i)
+    {
+      const rapidjson::Value& name = dimension_list[i]["name"];
+      if (!name.IsString())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer dimension name in wms config file");
+      }
+      dimension.name = name.GetString();
+
+      const rapidjson::Value& units = dimension_list[i]["units"];
+      if (!units.IsString())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer dimension units in wms config file");
+      }
+      dimension.units = units.GetString();
+
+      const rapidjson::Value& unit_symbol = dimension_list[i]["unit_symbol"];
+      if (!unit_symbol.IsString())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer dimension unit symbol in wms config file");
+      }
+      dimension.unit_symbol = unit_symbol.GetString();
+
+      const rapidjson::Value& default_dim = dimension_list[i]["default_dim"];
+      if (!default_dim.IsString())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer dimension default_dim in wms config file");
+      }
+      dimension.default_dim = default_dim.GetString();
+
+      const rapidjson::Value& multiple_values = dimension_list[i]["multiple_values"];
+      if (!multiple_values.IsBool())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer dimension multiple values in wms config file");
+      }
+      dimension.multiple_values = multiple_values.GetBool();
+
+      const rapidjson::Value& nearest_value = dimension_list[i]["nearest_value"];
+      if (!nearest_value.IsBool())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer dimension nearest value in wms config file");
+      }
+      dimension.nearest_value = nearest_value.GetBool();
+
+      const rapidjson::Value& current = dimension_list[i]["current"];
+      if (!current.IsBool())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer dimension current in wms config file");
+      }
+      dimension.current = current.GetBool();
+
+      layer.dimension.push_back(dimension);
+    }
+
+    attribution_t attribution;
+    const rapidjson::Value& attribution_object = layer_object["attribution"];
+    if (!attribution_object.IsObject())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer attribution in wms config file");
+    }
+
+    const rapidjson::Value& title = attribution_object["title"];
+    if (!title.IsString())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer attribution title in wms config file");
+    }
+    attribution.title = title.GetString();
+
+    online_resource_t online_resource;
+    {
+      const rapidjson::Value& online_resource_object = attribution_object["online_resource"];
+      if (!online_resource_object.IsObject())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer attribution online resource in wms config file");
+      }
+
+      const rapidjson::Value& xlink_type = online_resource_object["xlink_type"];
+      if (!xlink_type.IsString())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer attribution online resource xlink type in wms config file");
+      }
+      online_resource.xlink_type = xlink_type.GetString();
+
+      const rapidjson::Value& xlink_href = online_resource_object["xlink_href"];
+      if (!xlink_href.IsString())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer attribution online resource xlink href in wms config file");
+      }
+      online_resource.xlink_href = xlink_href.GetString();
+    }
+
+    attribution.online_resource = online_resource;
+
+    logo_url_t logo_url;
+    {
+      const rapidjson::Value& logo_url_object = attribution_object["logo_url"];
+      if (!logo_url_object.IsObject())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer attribution logo url in wms config file");
+      }
+
+      const rapidjson::Value& format = logo_url_object["format"];
+      if (!format.IsString())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer attribution logo url format in wms config file");
+      }
+      logo_url.format = format.GetString();
+
+      online_resource_t online_resource;
+      {
+        const rapidjson::Value& online_resource_object = logo_url_object["online_resource"];
+        if (!online_resource_object.IsObject())
+        {
+          throw tws::parser_error() << tws::error_description("Could not find layer attribution online resource in wms config file");
+        }
+
+        const rapidjson::Value& xlink_type = online_resource_object["xlink_type"];
+        if (!xlink_type.IsString())
+        {
+          throw tws::parser_error() << tws::error_description("Could not find layer attribution online resource xlink type in wms config file");
+        }
+        online_resource.xlink_type = xlink_type.GetString();
+
+        const rapidjson::Value& xlink_href = online_resource_object["xlink_href"];
+        if (!xlink_href.IsString())
+        {
+          throw tws::parser_error() << tws::error_description("Could not find layer attribution online resource xlink href in wms config file");
+        }
+        online_resource.xlink_href = xlink_href.GetString();
+      }
+
+      logo_url.online_resource = online_resource;
+
+      const rapidjson::Value& width = logo_url_object["width"];
+      if (!width.IsInt())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer attribution logo url width format in wms config file");
+      }
+      logo_url.width = width.GetInt();
+
+      const rapidjson::Value& height = logo_url_object["height"];
+      if (!height.IsInt())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer attribution logo url height format in wms config file");
+      }
+      logo_url.height = height.GetInt();
+    }
+
+    attribution.logo_url = logo_url;
+
+    layer.attribution = attribution;
+
+    authority_url_t authority_url;
+    const rapidjson::Value& authority_url_object = layer_object["authority_url"];
+    if (!authority_url_object.IsObject())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer authority url in wms config file");
+    }
+
+    online_resource_t online_resource;
+    {
+      const rapidjson::Value& online_resource_object = authority_url_object["online_resource"];
+      if (!online_resource_object.IsObject())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer authority url online resource in wms config file");
+      }
+
+      const rapidjson::Value& xlink_type = online_resource_object["xlink_type"];
+      if (!xlink_type.IsString())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer authority url online resource xlink type in wms config file");
+      }
+      online_resource.xlink_type = xlink_type.GetString();
+
+      const rapidjson::Value& xlink_href = online_resource_object["xlink_href"];
+      if (!xlink_href.IsString())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer authority url online resource xlink href in wms config file");
+      }
+      online_resource.xlink_href = xlink_href.GetString();
+    }
+
+    authority_url.online_resource = online_resource;
+
+    const rapidjson::Value& name = authority_url_object["name"];
+    if (!name.IsString())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer authority url name in wms config file");
+    }
+    authority_url.name = name.GetString();
+
+    layer.authority_url = authority_url;
+
+    // identifier_t
+    const rapidjson::Value& identifier_list = layer_object["identifier"];
+    if (!identifier_list.IsArray())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer identifier in wms config file");
+    }
+    identifier_t identifier;
+    for (unsigned int i = 0; i < identifier_list.Size(); ++i)
+    {
+      const rapidjson::Value& value = identifier_list[i]["value"];
+      if (!value.IsString())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer identifier value in wms config file");
+      }
+      identifier.value = value.GetString();
+
+      const rapidjson::Value& authority = identifier_list[i]["authority"];
+      if (!authority.IsString())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer identifier authority in wms config file");
+      }
+      identifier.authority = authority.GetString();
+
+      layer.identifier.push_back(identifier);
+    }
+
     const rapidjson::Value& layers_list_object = layer_object["layers"];
     if (!layers_list_object.IsArray())
     {

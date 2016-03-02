@@ -30,6 +30,8 @@
 find_path(SCIDB_INCLUDE_DIR SciDBAPI.h
           PATHS /usr
                 /usr/local
+                /opt/scidb/15.7
+                /opt/scidb/14.12
                 /opt/scidb/14.3
                 /opt/scidb/13.12
           PATH_SUFFIXES include
@@ -39,6 +41,8 @@ find_library(SCIDB_CLIENT_LIBRARY
              NAMES scidbclient
              PATHS /usr
                    /usr/local
+                   /opt/scidb/15.7
+                   /opt/scidb/14.12
                    /opt/scidb/14.3
                    /opt/scidb/13.12
              PATH_SUFFIXES lib
