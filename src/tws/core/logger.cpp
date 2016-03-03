@@ -4,7 +4,7 @@
 // Boost
 #include <boost/log/attributes.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/core/null_deleter.hpp>
+//#include <boost/core/null_deleter.hpp>
 #include <boost/log/expressions.hpp>
 
 // STL
@@ -109,7 +109,7 @@ void tws::core::logger::disable_log()
 void tws::core::logger::add_stream(const std::string& stream_name)
 {
   logger_path_ = stream_name;
-  boost::shared_ptr<std::ostream> stream_out(&std::clog, boost::null_deleter());
+  boost::shared_ptr<std::ostream> stream_out(&std::clog);//, boost::null_deleter());
   boost::shared_ptr<std::ostream> stream_file(new std::ofstream(stream_name, std::ostream::app));
   sink_->locked_backend()->add_stream(stream_file);
   sink_->locked_backend()->add_stream(stream_out);
