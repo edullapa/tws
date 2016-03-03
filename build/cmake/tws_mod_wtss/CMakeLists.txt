@@ -28,6 +28,9 @@
 
 include_directories(${RAPIDJSON_INCLUDE_DIR})
 include_directories(${terralib_INCLUDE_DIRS})
+include_directories(${SCIDB_INCLUDE_DIR})
+
+add_definitions(-DSCIDB_CLIENT)
 
 file(GLOB TWS_SRC_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/wtss/*.cpp)
 file(GLOB TWS_HDR_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/wtss/*.hpp)
@@ -35,10 +38,11 @@ file(GLOB TWS_HDR_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/wtss/*.hpp)
 add_library(tws_mod_wtss SHARED ${TWS_SRC_FILES} ${TWS_HDR_FILES})
 
 target_link_libraries(tws_mod_wtss tws_mod_geoarray
-                                  tws_mod_core
-                                  terralib_mod_plugin
-                                  ${Boost_FILESYSTEM_LIBRARY}
-                                  ${Boost_SYSTEM_LIBRARY})
+                                   tws_mod_core
+                                   terralib_mod_plugin
+                                   ${SCIDB_CLIENT_LIBRARY}
+                                   ${Boost_FILESYSTEM_LIBRARY}
+                                   ${Boost_SYSTEM_LIBRARY})
 
 set_target_properties(tws_mod_wtss
                       PROPERTIES VERSION ${TWS_VERSION_MAJOR}.${TWS_VERSION_MINOR}
