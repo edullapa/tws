@@ -23,7 +23,8 @@
 #  Author: Gilberto Ribeiro de Queiroz
 #
 
-include_directories(${RAPIDJSON_INCLUDE_DIR})
+include_directories(${RAPIDJSON_INCLUDE_DIR}
+                    ${Boost_INCLUDE_DIR})
 
 file(GLOB TWS_SRC_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/core/*.cpp)
 file(GLOB TWS_HDR_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/core/*.hpp)
@@ -39,7 +40,8 @@ target_link_libraries(tws_mod_core   ${Boost_SYSTEM_LIBRARY}
                                      ${Boost_TIMER_LIBRARY}
                                      ${Boost_FILESYSTEM_LIBRARY}
                                      ${Boost_PROGRAM_OPTIONS_LIBRARY}
-                                     ${Boost_THREAD_LIBRARY})
+                                     ${Boost_THREAD_LIBRARY}
+                                     ${Boost_LOG_LIBRARY})
 
 install(TARGETS tws_mod_core
         EXPORT tws-targets

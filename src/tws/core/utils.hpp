@@ -126,6 +126,26 @@ namespace tws
       \exception tws::file_open_error It may throwed when the file is invalid or cannot be open.
     */
     rapidjson::Document *open_json_file(const std::string& path);
+
+    /*!
+      \brief Initializes tws logger module.
+      \param pathFile A string value defining where is to open/save log file.
+    */
+    void initialize_logger(const std::string& path_file);
+
+    /*!
+      \brief It enables the global logger module.
+
+      \note It just enable logging core application. It is not guaranteed that logger has been initialized to display output in console and file.
+    */
+    void enable_logger();
+
+    /*!
+      \brief It disables the global logger module.
+
+      It may be useful during tests execution to do not display status message in data stream.
+    */
+    void disable_logger();
     
     //! Copy the JSON string array to a range beginning at result.
     template<class OutputIterator> void
