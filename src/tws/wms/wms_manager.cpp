@@ -969,14 +969,14 @@ tws::wms::layer_t tws::wms::wms_manager::layer()
       const rapidjson::Value& width = logo_url_object["width"];
       if (!width.IsInt())
       {
-        throw tws::parser_error() << tws::error_description("Could not find layer attribution logo url width format in wms config file");
+        throw tws::parser_error() << tws::error_description("Could not find layer attribution logo url width in wms config file");
       }
       logo_url.width = width.GetInt();
 
       const rapidjson::Value& height = logo_url_object["height"];
       if (!height.IsInt())
       {
-        throw tws::parser_error() << tws::error_description("Could not find layer attribution logo url height format in wms config file");
+        throw tws::parser_error() << tws::error_description("Could not find layer attribution logo url height in wms config file");
       }
       logo_url.height = height.GetInt();
     }
@@ -1052,12 +1052,345 @@ tws::wms::layer_t tws::wms::wms_manager::layer()
       layer.identifier.push_back(identifier);
     }
 
+    // metadata_url_t
+    const rapidjson::Value& metadata_url_list = layer_object["metadata_url"];
+    if (!metadata_url_list.IsArray())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer metadata url in wms config file");
+    }
+    metadata_url_t metadata_url;
+    for (unsigned int i = 0; i < metadata_url_list.Size(); ++i)
+    {
+      const rapidjson::Value& format = metadata_url_list[i]["format"];
+      if (!format.IsString())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer metadata url format in wms config file");
+      }
+      metadata_url.format = format.GetString();
+
+      online_resource_t online_resource;
+      {
+        const rapidjson::Value& online_resource_object = metadata_url_list[i]["online_resource"];
+        if (!online_resource_object.IsObject())
+        {
+          throw tws::parser_error() << tws::error_description("Could not find layer metadata url online resource in wms config file");
+        }
+
+        const rapidjson::Value& xlink_type = online_resource_object["xlink_type"];
+        if (!xlink_type.IsString())
+        {
+          throw tws::parser_error() << tws::error_description("Could not find layer metadata url online resource xlink type in wms config file");
+        }
+        online_resource.xlink_type = xlink_type.GetString();
+
+        const rapidjson::Value& xlink_href = online_resource_object["xlink_href"];
+        if (!xlink_href.IsString())
+        {
+          throw tws::parser_error() << tws::error_description("Could not find layer metadata url online resource xlink href in wms config file");
+        }
+        online_resource.xlink_href = xlink_href.GetString();
+      }
+
+      metadata_url.online_resource = online_resource;
+
+      const rapidjson::Value& type = metadata_url_list[i]["type"];
+      if (!type.IsString())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer metadata url type in wms config file");
+      }
+      metadata_url.type = type.GetString();
+
+      layer.metadata_url.push_back(metadata_url);
+    }
+
+    // data_url_t
+    const rapidjson::Value& data_url_list = layer_object["data_url"];
+    if (!data_url_list.IsArray())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer data url in wms config file");
+    }
+    data_url_t data_url;
+    for (unsigned int i = 0; i < data_url_list.Size(); ++i)
+    {
+      const rapidjson::Value& format = data_url_list[i]["format"];
+      if (!format.IsString())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer data url format in wms config file");
+      }
+      data_url.format = format.GetString();
+
+      online_resource_t online_resource;
+      {
+        const rapidjson::Value& online_resource_object = data_url_list[i]["online_resource"];
+        if (!online_resource_object.IsObject())
+        {
+          throw tws::parser_error() << tws::error_description("Could not find layer data url online resource in wms config file");
+        }
+
+        const rapidjson::Value& xlink_type = online_resource_object["xlink_type"];
+        if (!xlink_type.IsString())
+        {
+          throw tws::parser_error() << tws::error_description("Could not find layer data url online resource xlink type in wms config file");
+        }
+        online_resource.xlink_type = xlink_type.GetString();
+
+        const rapidjson::Value& xlink_href = online_resource_object["xlink_href"];
+        if (!xlink_href.IsString())
+        {
+          throw tws::parser_error() << tws::error_description("Could not find layer data url online resource xlink href in wms config file");
+        }
+        online_resource.xlink_href = xlink_href.GetString();
+      }
+
+      data_url.online_resource = online_resource;
+
+      layer.data_url.push_back(data_url);
+    }
+
+    // feature_list_url_t
+    const rapidjson::Value& feature_list_url_list = layer_object["feature_list_url"];
+    if (!feature_list_url_list.IsArray())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer feature list url in wms config file");
+    }
+    feature_list_url_t feature_list_url;
+    for (unsigned int i = 0; i < feature_list_url_list.Size(); ++i)
+    {
+      const rapidjson::Value& format = feature_list_url_list[i]["format"];
+      if (!format.IsString())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer feature list url format in wms config file");
+      }
+      feature_list_url.format = format.GetString();
+
+      online_resource_t online_resource;
+      {
+        const rapidjson::Value& online_resource_object = feature_list_url_list[i]["online_resource"];
+        if (!online_resource_object.IsObject())
+        {
+          throw tws::parser_error() << tws::error_description("Could not find layer data url online resource in wms config file");
+        }
+
+        const rapidjson::Value& xlink_type = online_resource_object["xlink_type"];
+        if (!xlink_type.IsString())
+        {
+          throw tws::parser_error() << tws::error_description("Could not find layer data url online resource xlink type in wms config file");
+        }
+        online_resource.xlink_type = xlink_type.GetString();
+
+        const rapidjson::Value& xlink_href = online_resource_object["xlink_href"];
+        if (!xlink_href.IsString())
+        {
+          throw tws::parser_error() << tws::error_description("Could not find layer data url online resource xlink href in wms config file");
+        }
+        online_resource.xlink_href = xlink_href.GetString();
+      }
+
+      feature_list_url.online_resource = online_resource;
+
+      layer.feature_list_url.push_back(feature_list_url);
+    }
+
+    // style_t
+    const rapidjson::Value& style_list = layer_object["style"];
+    if (!style_list.IsArray())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer style in wms config file");
+    }
+    style_t style;
+    for (unsigned int i = 0; i < style_list.Size(); ++i)
+    {
+      const rapidjson::Value& name = style_list[i]["name"];
+      if (!name.IsString())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer style name in wms config file");
+      }
+      style.name = name.GetString();
+
+      const rapidjson::Value& title = style_list[i]["title"];
+      if (!title.IsString())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer style title in wms config file");
+      }
+      style.title = title.GetString();
+
+      const rapidjson::Value& abstract = style_list[i]["abstract"];
+      if (!abstract.IsString())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer style abstract in wms config file");
+      }
+      style.abstract= abstract.GetString();
+
+      // legend_url_t
+      const rapidjson::Value& legend_url_list = style_list[i]["legend_url"];
+      if (!legend_url_list.IsArray())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer style legend url in wms config file");
+      }
+      legend_url_t legend_url;
+      for (unsigned int i = 0; i < legend_url_list.Size(); ++i)
+      {
+        const rapidjson::Value& format = legend_url_list[i]["format"];
+        if (!format.IsString())
+        {
+          throw tws::parser_error() << tws::error_description("Could not find layer style legend url format in wms config file");
+        }
+        legend_url.format = format.GetString();
+
+        online_resource_t online_resource;
+        {
+          const rapidjson::Value& online_resource_object = legend_url_list[i]["online_resource"];
+          if (!online_resource_object.IsObject())
+          {
+            throw tws::parser_error() << tws::error_description("Could not find layer style legend url online resource in wms config file");
+          }
+
+          const rapidjson::Value& xlink_type = online_resource_object["xlink_type"];
+          if (!xlink_type.IsString())
+          {
+            throw tws::parser_error() << tws::error_description("Could not find layer style legend url online resource xlink type in wms config file");
+          }
+          online_resource.xlink_type = xlink_type.GetString();
+
+          const rapidjson::Value& xlink_href = online_resource_object["xlink_href"];
+          if (!xlink_href.IsString())
+          {
+            throw tws::parser_error() << tws::error_description("Could not find layer style legend url online resource xlink href in wms config file");
+          }
+          online_resource.xlink_href = xlink_href.GetString();
+        }
+
+        legend_url.online_resource = online_resource;
+
+        const rapidjson::Value& width = legend_url_list[i]["width"];
+        if (!width.IsInt())
+        {
+          throw tws::parser_error() << tws::error_description("Could not find layer style legend url width in wms config file");
+        }
+        legend_url.width = width.GetInt();
+
+        const rapidjson::Value& height = legend_url_list[i]["height"];
+        if (!height.IsInt())
+        {
+          throw tws::parser_error() << tws::error_description("Could not find layer style legend url height in wms config file");
+        }
+        legend_url.height = height.GetInt();
+
+        style.legend_url.push_back(legend_url);
+      }
+
+      // style_sheet_url_t
+      style_sheet_url_t style_sheet_url;
+      {
+        const rapidjson::Value& style_sheet_url_object = style_list[i]["style_sheet_url"];
+        if (!style_sheet_url_object.IsObject())
+        {
+          throw tws::parser_error() << tws::error_description("Could not find layer style sheet url in wms config file");
+        }
+
+        const rapidjson::Value& format = style_sheet_url_object["format"];
+        if (!format.IsString())
+        {
+          throw tws::parser_error() << tws::error_description("Could not find layer style sheet url format in wms config file");
+        }
+        style_sheet_url.format = format.GetString();
+
+        online_resource_t online_resource;
+        {
+          const rapidjson::Value& online_resource_object = style_sheet_url_object["online_resource"];
+          if (!online_resource_object.IsObject())
+          {
+            throw tws::parser_error() << tws::error_description("Could not find layer style sheet url online resource in wms config file");
+          }
+
+          const rapidjson::Value& xlink_type = online_resource_object["xlink_type"];
+          if (!xlink_type.IsString())
+          {
+            throw tws::parser_error() << tws::error_description("Could not find layer style sheet url online resource xlink type in wms config file");
+          }
+          online_resource.xlink_type = xlink_type.GetString();
+
+          const rapidjson::Value& xlink_href = online_resource_object["xlink_href"];
+          if (!xlink_href.IsString())
+          {
+            throw tws::parser_error() << tws::error_description("Could not find layer style sheet url online resource xlink href in wms config file");
+          }
+          online_resource.xlink_href = xlink_href.GetString();
+        }
+
+        style_sheet_url.online_resource = online_resource;
+      }
+
+      style.style_sheet_url = style_sheet_url;
+
+      // style_url_t
+      style_url_t style_url;
+      {
+        const rapidjson::Value& style_url_object = style_list[i]["style_url"];
+        if (!style_url_object.IsObject())
+        {
+          throw tws::parser_error() << tws::error_description("Could not find layer style url in wms config file");
+        }
+
+        const rapidjson::Value& format = style_url_object["format"];
+        if (!format.IsString())
+        {
+          throw tws::parser_error() << tws::error_description("Could not find layer style url format in wms config file");
+        }
+        style_url.format = format.GetString();
+
+        online_resource_t online_resource;
+        {
+          const rapidjson::Value& online_resource_object = style_url_object["online_resource"];
+          if (!online_resource_object.IsObject())
+          {
+            throw tws::parser_error() << tws::error_description("Could not find layer style url online resource in wms config file");
+          }
+
+          const rapidjson::Value& xlink_type = online_resource_object["xlink_type"];
+          if (!xlink_type.IsString())
+          {
+            throw tws::parser_error() << tws::error_description("Could not find layer style url online resource xlink type in wms config file");
+          }
+          online_resource.xlink_type = xlink_type.GetString();
+
+          const rapidjson::Value& xlink_href = online_resource_object["xlink_href"];
+          if (!xlink_href.IsString())
+          {
+            throw tws::parser_error() << tws::error_description("Could not find layer style url online resource xlink href in wms config file");
+          }
+          online_resource.xlink_href = xlink_href.GetString();
+        }
+
+        style_url.online_resource = online_resource;
+      }
+
+      style.style_url = style_url;
+
+      layer.style.push_back(style);
+    }
+
+    const rapidjson::Value& min_scale_denominator = layer_object["min_scale_denominator"];
+    if (!min_scale_denominator.IsDouble())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer min scale denominator in wms config file");
+    }
+    layer.min_scale_denominator = min_scale_denominator.GetDouble();
+
+    const rapidjson::Value& max_scale_denominator = layer_object["max_scale_denominator"];
+    if (!max_scale_denominator.IsDouble())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer max scale denominator in wms config file");
+    }
+    layer.max_scale_denominator = max_scale_denominator.GetDouble();
+
     const rapidjson::Value& layers_list_object = layer_object["layers"];
     if (!layers_list_object.IsArray())
     {
       throw tws::parser_error() << tws::error_description("Could not find layers list in wms config file");
     }
 
+    // sub_layers
     layer_t sub_layer;
     for (unsigned int i = 0; i < layers_list_object.Size(); ++i)
     {
@@ -1070,6 +1403,48 @@ tws::wms::layer_t tws::wms::wms_manager::layer()
 
       layer.layers.push_back(sub_layer);
     }
+
+    const rapidjson::Value& queryable = layer_object["queryable"];
+    if (!queryable.IsBool())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer queryable in wms config file");
+    }
+    layer.queryable = queryable.GetBool();
+
+    const rapidjson::Value& cascaded = layer_object["cascaded"];
+    if (!cascaded.IsInt())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer cascaded in wms config file");
+    }
+    layer.cascaded = cascaded.GetInt();
+
+    const rapidjson::Value& opaque = layer_object["opaque"];
+    if (!opaque.IsBool())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer opaque in wms config file");
+    }
+    layer.opaque = opaque.GetBool();
+
+    const rapidjson::Value& no_subsets = layer_object["no_subsets"];
+    if (!no_subsets.IsBool())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer subsets in wms config file");
+    }
+    layer.no_subsets = no_subsets.GetBool();
+
+    const rapidjson::Value& fixed_width = layer_object["fixed_width"];
+    if (!fixed_width.IsInt())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer fixed width in wms config file");
+    }
+    layer.fixed_width = fixed_width.GetInt();
+
+    const rapidjson::Value& fixed_height = layer_object["fixed_height"];
+    if (!fixed_height.IsInt())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layer fixed height in wms config file");
+    }
+    layer.fixed_height = fixed_height.GetInt();
 
     return layer;
   }
