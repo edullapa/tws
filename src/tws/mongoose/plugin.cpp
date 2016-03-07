@@ -77,7 +77,7 @@ class Plugin : public te::plugin::Plugin
 
 #define export_macro
 
-PLUGIN_CALL_BACK_DECLARATION(export_macro);
+PLUGIN_CALL_BACK_DECLARATION(export_macro)
 
 PLUGIN_CALL_BACK_IMPL(Plugin)
 

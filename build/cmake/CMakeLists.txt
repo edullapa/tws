@@ -99,7 +99,7 @@ endif()
 #
 
 # Common definitions to all modules
-add_definitions(-DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_VERSION=3 -DBOOST_UBLAS_TYPE_CHECK=0)
+add_definitions(-DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_VERSION=3 -DBOOST_UBLAS_TYPE_CHECK=0 -DBOOST_LOG_DYN_LINK)
 
 # Specific definitions per platform
 if(APPLE)

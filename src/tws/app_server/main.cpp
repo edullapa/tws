@@ -28,6 +28,7 @@
 #include "../core/http_server.hpp"
 #include "../core/http_server_builder.hpp"
 #include "../core/utils.hpp"
+#include "../core/logger.hpp"
 
 // TerraLib
 #include <terralib/common/TerraLib.h>
@@ -74,12 +75,12 @@ void UnloadModules()
 
 int main(int argc, char *argv[])
 {
-  std::cout << "\nStarting TerraLib GeoWeb Services...\n" << std::endl;
+  tws::core::initialize_logger("tws.log");
+
+  TWS_LOG_INFO() << "Starting TerraLib GeoWeb Services...\n" << std::endl;
   
   TerraLib::getInstance().initialize();
   
-  
-
   try
   {
     tws::core::init_terralib_web_services();
@@ -96,9 +97,9 @@ int main(int argc, char *argv[])
   catch(const boost::exception& e)
   {
     if(const std::string* d = boost::get_error_info<tws::error_description>(e))
-      std::cout << "\n\nthe following error has occurried: " << *d << std::endl;
+      TWS_LOG_ERROR() << "\n\nthe following error has occurried: " << *d << std::endl;
     else
-      std::cout << "\n\nan unknown error has occurried" << std::endl;
+      TWS_LOG_ERROR() << "\n\nan unknown error has occurried" << std::endl;
 
     return EXIT_FAILURE;
   }
@@ -110,7 +111,7 @@ int main(int argc, char *argv[])
   }
   catch(...)
   {
-    std::cout << "\n\nan unknown error has occurried." << std::endl;
+    TWS_LOG_ERROR()  << "\n\nan unknown error has occurried." << std::endl;
 
     return EXIT_FAILURE;
   }
@@ -118,7 +119,7 @@ int main(int argc, char *argv[])
   
   TerraLib::getInstance().finalize();
 
-  std::cout << "\nFinished TerraLib GeoWeb Services!\n" << std::endl;
+  TWS_LOG_INFO()  << "\nFinished TerraLib GeoWeb Services!\n" << std::endl;
 
   return EXIT_SUCCESS;
 }
