@@ -31,6 +31,8 @@
 #include "../core/service_operations_manager.hpp"
 #include "../core/utils.hpp"
 #include "../geoarray/geoarray_manager.hpp"
+#include "../scidb/connection.hpp"
+#include "../scidb/connection_pool.hpp"
 #include "utils.hpp"
 
 
@@ -138,72 +140,84 @@ void
 tws::wtss::time_series_functor::operator()(const tws::core::http_request& request,
                                            tws::core::http_response& response)
 {
-//
-//  const char* qstring = request.query_string();
-//
-//  if(qstring == nullptr)
-//    throw tws::core::http_request_error() << tws::error_description("time_series operation requires the following parameters: \"coverage\", \"attributes\", \"latitude\", \"longitude\", \"start\", \"end\".");
-//
-//  tws::core::query_string_t qstr = tws::core::expand(qstring);
-//
-//// which coverage?
-//  tws::core::query_string_t::const_iterator it = qstr.find("coverage");
-//  tws::core::query_string_t::const_iterator it_end = qstr.end();
-//
-//  if(it == it_end)
-//    throw tws::core::http_request_error() << tws::error_description("check time_series operation: \"coverage\" parameter is missing!");
-//
-//  const std::string coverage_name = it->second;
-//
-//// which attributes
-//  it = qstr.find("attributes");
-//
-//  if(it == it_end)
-//  {
-//    boost::format err_ms("check time_series operation: \"attributes\" parameter is missing!");
-//
-//    throw tws::core::http_request_error() << tws::error_description((err_ms % coverage_name).str());
-//  }
-//
-//  std::vector<std::string> queried_attributes;
-//
-//  boost::split(queried_attributes, it->second, boost::is_any_of(","));
-//
-//  if(queried_attributes.empty())
-//  {
-//    boost::format err_ms("check time_series operation for coverage '%1%': please, inform at least one attribute.");
-//
-//    throw tws::core::http_request_error() << tws::error_description((err_ms % coverage_name).str());
-//  }
-//
-//// extract longitude
-//  it = qstr.find("longitude");
-//
-//  if(it == it_end || it->second.empty())
-//    throw tws::core::http_request_error() << tws::error_description("check time_series operation: \"longitude\" parameter is missing!");
-//
-//  const double longitude = boost::lexical_cast<double>(it->second);
-//
-//// extract latitude
-//  it = qstr.find("latitude");
-//
-//  if(it == it_end || it->second.empty())
-//    throw tws::core::http_request_error() << tws::error_description("check time_series operation: \"latitude\" parameter is missing!");
-//
-//  const double latitude = boost::lexical_cast<double>(it->second);
-//
-//// extract start and end times if any
-//  it = qstr.find("start");
-//
-//  const std::string start_time = (it != it_end) ? it->second : std::string("");
-//
-//  it = qstr.find("end");
-//
-//  const std::string end_time = (it != it_end) ? it->second : std::string("");
-//
-//// get coverage definition
-//  const coverage_t& coverage = coverage_manager::instance().get(coverage_name);
-//
+  const char* qstring = request.query_string();
+
+  if(qstring == nullptr)
+    throw tws::core::http_request_error() << tws::error_description("time_series operation requires the following parameters: \"coverage\", \"attributes\", \"latitude\", \"longitude\", \"start\", \"end\".");
+
+  tws::core::query_string_t qstr = tws::core::expand(qstring);
+
+// which coverage?
+  tws::core::query_string_t::const_iterator it = qstr.find("coverage");
+  tws::core::query_string_t::const_iterator it_end = qstr.end();
+
+  if(it == it_end)
+    throw tws::core::http_request_error() << tws::error_description("check time_series operation: \"coverage\" parameter is missing!");
+
+// retrieve the coverage
+  const tws::geoarray::geoarray_t& cv = tws::geoarray::geoarray_manager::instance().get(it->second);
+
+// which attributes
+  it = qstr.find("attributes");
+
+  if(it == it_end)
+  {
+    boost::format err_ms("check time_series operation: \"attributes\" parameter is missing!");
+
+    throw tws::core::http_request_error() << tws::error_description((err_ms % cv.name).str());
+  }
+
+  std::vector<std::string> queried_attributes;
+
+  boost::split(queried_attributes, it->second, boost::is_any_of(","));
+
+  if(queried_attributes.empty())
+  {
+    boost::format err_ms("check time_series operation for coverage '%1%': please, inform at least one attribute.");
+
+    throw tws::core::http_request_error() << tws::error_description((err_ms % cv.name).str());
+  }
+
+// check if attributes are valid
+  for(const std::string& attr_name : queried_attributes)
+  {
+      std::vector<tws::geoarray::attribute_t>::const_iterator it = std::find_if(cv.attributes.begin(),
+                                                                                cv.attributes.end(),
+                                                                                [&attr_name](const tws::geoarray::attribute_t& attr){ return (attr.name == attr_name); });
+
+      if(it == cv.attributes.end())
+      {
+        boost::format err_ms("attribute '%1%' doesn't belong to coverage '%2%'!");
+        throw tws::core::http_request_error() << tws::error_description((err_ms % attr_name % cv.name).str());
+      }
+
+  }
+
+// extract longitude
+  it = qstr.find("longitude");
+
+  if(it == it_end || it->second.empty())
+    throw tws::core::http_request_error() << tws::error_description("check time_series operation: \"longitude\" parameter is missing!");
+
+  const double longitude = boost::lexical_cast<double>(it->second);
+
+// extract latitude
+  it = qstr.find("latitude");
+
+  if(it == it_end || it->second.empty())
+    throw tws::core::http_request_error() << tws::error_description("check time_series operation: \"latitude\" parameter is missing!");
+
+  const double latitude = boost::lexical_cast<double>(it->second);
+
+// extract start and end times if any
+  it = qstr.find("start");
+
+  const std::string start_time = (it != it_end) ? it->second : std::string("");
+
+  it = qstr.find("end");
+
+  const std::string end_time = (it != it_end) ? it->second : std::string("");
+
 //// prepare SRS conversor that allows to go from lat/long to array projection system and then come back to lat/long
 //  te::srs::Converter srs_conv(4326, coverage.geo_extent.spatial.crs_code);
 //
@@ -311,15 +325,17 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 ////  q_aql.bind_arg(4, pixel_col);
 ////  q_aql.bind_arg(5, pixel_row);
 ////  q_aql.bind_arg(6, end_time_pos);
-//
-//// get a connection to retrieve the time series
-//  std::unique_ptr<tws::scidb::connection> conn(tws::scidb::connection_pool::instance().get());
-//
+
+// get a connection from the pool in order to retrieve the time series data
+  std::unique_ptr<tws::scidb::connection> conn(tws::scidb::connection_pool::instance().get());
+
+  boost::shared_ptr< ::scidb::QueryResult > qresult = conn->execute("between(mod09q1, 57600, 43200, 0, 57600, 43200, 4)", true);
+
 ////  boost::shared_ptr< ::scidb::QueryResult > qresult = conn->execute(q_aql.str(), false);
-//
-////  if((qresult.get() == nullptr) || (qresult->array.get() == nullptr))
-////    throw tws::core::http_request_error() << tws::error_description("no query result returned after querying database.");
-//
+
+  if((qresult.get() == nullptr) || (qresult->array.get() == nullptr))
+    throw tws::core::http_request_error() << tws::error_description("no query result returned after querying database.");
+
 ////  const ::scidb::ArrayDesc& array_desc = qresult->array->getArrayDesc();
 //
 ////  const ::scidb::Attributes& array_attributes = array_desc.getAttributes(true);

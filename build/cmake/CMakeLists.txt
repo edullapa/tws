@@ -192,6 +192,8 @@ CMAKE_DEPENDENT_OPTION(TWS_MOD_MONGOOSE_ENABLED "Build Mongoose Web Server suppo
 
 CMAKE_DEPENDENT_OPTION(TWS_MOD_GEOARRAY_ENABLED "Build Geo-Array metadata support?" ON "TWS_MOD_CORE_ENABLED" OFF)
 
+CMAKE_DEPENDENT_OPTION(TWS_MOD_SCIDB_ENABLED "Build SciDB support for web services?" ON "TWS_MOD_CORE_ENABLED" OFF)
+
 CMAKE_DEPENDENT_OPTION(TWS_MOD_WMS_ENABLED "Build Application Web Map Service?" ON "TWS_MOD_GEOARRAY_ENABLED;RAPIDXML_FOUND" OFF)
 
 CMAKE_DEPENDENT_OPTION(TWS_MOD_WTSS_ENABLED "Build Application Web Time Series Data Service?" ON "TWS_MOD_GEOARRAY_ENABLED" OFF)
@@ -223,6 +225,10 @@ endif()
 
 if(TWS_MOD_GEOARRAY_ENABLED)
   add_subdirectory(tws_mod_geoarray)
+endif()
+
+if(TWS_MOD_SCIDB_ENABLED)
+  add_subdirectory(tws_mod_scidb)
 endif()
 
 if(TWS_MOD_WMS_ENABLED)

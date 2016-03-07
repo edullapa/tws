@@ -894,12 +894,12 @@ tws::wms::layer_t tws::wms::wms_manager::layer()
       throw tws::parser_error() << tws::error_description("Could not find layer attribution in wms config file");
     }
 
-    const rapidjson::Value& title = attribution_object["title"];
-    if (!title.IsString())
+    const rapidjson::Value& att_title = attribution_object["title"];
+    if (!att_title.IsString())
     {
       throw tws::parser_error() << tws::error_description("Could not find layer attribution title in wms config file");
     }
-    attribution.title = title.GetString();
+    attribution.title = att_title.GetString();
 
     online_resource_t online_resource;
     {
@@ -992,7 +992,7 @@ tws::wms::layer_t tws::wms::wms_manager::layer()
       throw tws::parser_error() << tws::error_description("Could not find layer authority url in wms config file");
     }
 
-    online_resource_t online_resource;
+    //online_resource_t online_resource;
     {
       const rapidjson::Value& online_resource_object = authority_url_object["online_resource"];
       if (!online_resource_object.IsObject())
@@ -1017,12 +1017,12 @@ tws::wms::layer_t tws::wms::wms_manager::layer()
 
     authority_url.online_resource = online_resource;
 
-    const rapidjson::Value& name = authority_url_object["name"];
-    if (!name.IsString())
+    const rapidjson::Value& auth_name = authority_url_object["name"];
+    if (!auth_name.IsString())
     {
       throw tws::parser_error() << tws::error_description("Could not find layer authority url name in wms config file");
     }
-    authority_url.name = name.GetString();
+    authority_url.name = auth_name.GetString();
 
     layer.authority_url = authority_url;
 

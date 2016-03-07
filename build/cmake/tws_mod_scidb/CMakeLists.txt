@@ -21,41 +21,38 @@
 #
 #  CMake scripts for TerraLib Web Services
 #
-#  Description: Script for generating the build of Web Time Series Data Service support.
+#  Description: Script for generating the build of SciDB support for all Web Services.
 #
-#  Author: Matheus Cavassan Zaglia
+#  Author: Gilberto Ribeiro de Queiroz
+#          Eduardo Llapa Rodriguez
+#          Luiz Fernando Ferreira Gomes de Assis
 #
 
 include_directories(${RAPIDJSON_INCLUDE_DIR})
-include_directories(${terralib_INCLUDE_DIRS})
 include_directories(${SCIDB_INCLUDE_DIR})
 
 add_definitions(-DSCIDB_CLIENT)
 
-file(GLOB TWS_SRC_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/wtss/*.cpp)
-file(GLOB TWS_HDR_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/wtss/*.hpp)
+file(GLOB TWS_SRC_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/scidb/*.cpp)
+file(GLOB TWS_HDR_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/scidb/*.hpp)
 
-add_library(tws_mod_wtss SHARED ${TWS_SRC_FILES} ${TWS_HDR_FILES})
+add_library(tws_mod_scidb SHARED ${TWS_SRC_FILES} ${TWS_HDR_FILES})
 
-target_link_libraries(tws_mod_wtss tws_mod_geoarray
-                                   tws_mod_scidb
-                                   tws_mod_core
-                                   terralib_mod_plugin
-                                   ${SCIDB_CLIENT_LIBRARY}
-                                   ${Boost_FILESYSTEM_LIBRARY}
-                                   ${Boost_SYSTEM_LIBRARY})
+target_link_libraries(tws_mod_scidb tws_mod_core
+                                    ${SCIDB_CLIENT_LIBRARY})
 
-set_target_properties(tws_mod_wtss
+set_target_properties(tws_mod_scidb
                       PROPERTIES VERSION ${TWS_VERSION_MAJOR}.${TWS_VERSION_MINOR}
                                  SOVERSION ${TWS_VERSION_MAJOR}.${TWS_VERSION_MINOR})
 
-install(TARGETS tws_mod_wtss
+install(TARGETS tws_mod_scidb
         EXPORT tws-targets
         RUNTIME DESTINATION ${TWS_DESTINATION_RUNTIME} COMPONENT runtime
         LIBRARY DESTINATION ${TWS_DESTINATION_LIBRARY} COMPONENT runtime
         ARCHIVE DESTINATION ${TWS_DESTINATION_ARCHIVE} COMPONENT runtime)
 
 install(FILES ${TWS_HDR_FILES}
-        DESTINATION ${TWS_DESTINATION_HEADERS}/tws/wtss COMPONENT devel)
+        DESTINATION ${TWS_DESTINATION_HEADERS}/tws/scidb COMPONENT devel)
 
-export(TARGETS tws_mod_wtss APPEND FILE ${CMAKE_BINARY_DIR}/tws-exports.cmake)
+export(TARGETS tws_mod_scidb APPEND FILE ${CMAKE_BINARY_DIR}/tws-exports.cmake)
+
