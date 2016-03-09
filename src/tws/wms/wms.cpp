@@ -336,6 +336,146 @@ tws::wms::get_capabilities_functor::operator()(const tws::core::http_request& re
 
           layer_node->append_node(node);
 
+          node = doc.allocate_node(rapidxml::node_element, "Title", capabilities.capability.layer.title.c_str());
+
+          layer_node->append_node(node);
+
+          node = doc.allocate_node(rapidxml::node_element, "Abstract", capabilities.capability.layer.abstract.c_str());
+
+          layer_node->append_node(node);
+
+          // KeywordList node
+          rapidxml::xml_node<>* keyword_list_node = doc.allocate_node(rapidxml::node_element, "KeywordList");
+
+          for(auto keyword: capabilities.capability.layer.keyword_list)
+          {
+            keyword_list_node->append_node(doc.allocate_node(rapidxml::node_element, "Keyword", keyword.vocabulary.c_str()));
+          }
+
+          layer_node->append_node(keyword_list_node);
+
+          // CRS node
+          for(auto crs: capabilities.capability.layer.crs)
+          {
+            layer_node->append_node(doc.allocate_node(rapidxml::node_element, "CRS", crs.c_str()));
+          }
+
+          // EX_GeographicBoundingBox node
+          rapidxml::xml_node<>* ex_geographic_bounding_box_node = doc.allocate_node(rapidxml::node_element, "EX_GeographicBoundingBox");
+
+          ex_geographic_bounding_box_node->append_node(doc.allocate_node(rapidxml::node_element, "westBoundLongitude", std::to_string(capabilities.capability.layer.ex_geographic_bounding_box.west_bound_longitude).c_str()));
+
+          ex_geographic_bounding_box_node->append_node(doc.allocate_node(rapidxml::node_element, "eastBoundLongitude", std::to_string(capabilities.capability.layer.ex_geographic_bounding_box.east_bound_longitude).c_str()));
+
+          ex_geographic_bounding_box_node->append_node(doc.allocate_node(rapidxml::node_element, "southBoundLatitude", std::to_string(capabilities.capability.layer.ex_geographic_bounding_box.south_bound_latitude).c_str()));
+
+          ex_geographic_bounding_box_node->append_node(doc.allocate_node(rapidxml::node_element, "northBoundLatitude", std::to_string(capabilities.capability.layer.ex_geographic_bounding_box.north_bound_latitude).c_str()));
+
+          layer_node->append_node(ex_geographic_bounding_box_node);
+
+          // BoundingBox node
+          for(auto bounding_box: capabilities.capability.layer.bounding_box)
+          {
+            rapidxml::xml_node<>* bounding_box_node = doc.allocate_node(rapidxml::node_element, "BoundingBox");
+
+            rapidxml::xml_attribute<>* attr = doc.allocate_attribute("CRS", bounding_box.crs.c_str());
+            bounding_box_node->append_attribute(attr);
+
+            attr = doc.allocate_attribute("minx", std::to_string(bounding_box.min_x).c_str());
+            bounding_box_node->append_attribute(attr);
+
+            attr = doc.allocate_attribute("miny", std::to_string(bounding_box.min_y).c_str());
+            bounding_box_node->append_attribute(attr);
+
+            attr = doc.allocate_attribute("maxx", std::to_string(bounding_box.max_x).c_str());
+            bounding_box_node->append_attribute(attr);
+
+            attr = doc.allocate_attribute("maxy", std::to_string(bounding_box.max_y).c_str());
+            bounding_box_node->append_attribute(attr);
+
+            attr = doc.allocate_attribute("resx", std::to_string(bounding_box.res_x).c_str());
+            bounding_box_node->append_attribute(attr);
+
+            attr = doc.allocate_attribute("resy", std::to_string(bounding_box.res_y).c_str());
+            bounding_box_node->append_attribute(attr);
+
+            layer_node->append_node(bounding_box_node);
+          }
+
+          // Dimension node
+          for(auto dimension: capabilities.capability.layer.dimension)
+          {
+            rapidxml::xml_node<>* dimension_node = doc.allocate_node(rapidxml::node_element, "Dimension");
+
+            rapidxml::xml_attribute<>* attr = doc.allocate_attribute("name", dimension.name.c_str());
+            dimension_node->append_attribute(attr);
+
+            attr = doc.allocate_attribute("units", dimension.units.c_str());
+            dimension_node->append_attribute(attr);
+
+            attr = doc.allocate_attribute("unitSymbol", dimension.unit_symbol.c_str());
+            dimension_node->append_attribute(attr);
+
+            attr = doc.allocate_attribute("default", dimension.default_dim.c_str());
+            dimension_node->append_attribute(attr);
+
+            attr = doc.allocate_attribute("multipleValues", std::to_string(dimension.multiple_values).c_str());
+            dimension_node->append_attribute(attr);
+
+            attr = doc.allocate_attribute("nearestValue", std::to_string(dimension.nearest_value).c_str());
+            dimension_node->append_attribute(attr);
+
+            attr = doc.allocate_attribute("current", std::to_string(dimension.current).c_str());
+            dimension_node->append_attribute(attr);
+
+            layer_node->append_node(dimension_node);
+          }
+
+          // Attribution node
+          rapidxml::xml_node<>* attribution_node = doc.allocate_node(rapidxml::node_element, "Attribution");
+
+          {
+            attribution_node->append_node(doc.allocate_node(rapidxml::node_element, "Title", capabilities.capability.layer.attribution.title.c_str()));
+
+            rapidxml::xml_node<>* node = doc.allocate_node(rapidxml::node_element, "OnlineResource");
+
+            rapidxml::xml_attribute<>* attr = doc.allocate_attribute("xlink:type", capabilities.capability.layer.attribution.online_resource.xlink_type.c_str());
+            node->append_attribute(attr);
+
+            attr = doc.allocate_attribute("xlink:href", capabilities.capability.layer.attribution.online_resource.xlink_href.c_str());
+            node->append_attribute(attr);
+
+            attribution_node->append_node(node);
+
+            // LogoURL node
+            rapidxml::xml_node<>* logo_url_node = doc.allocate_node(rapidxml::node_element, "LogoURL");
+
+            {
+              logo_url_node->append_node(doc.allocate_node(rapidxml::node_element, "Format", capabilities.capability.layer.attribution.logo_url.format.c_str()));
+
+              rapidxml::xml_node<>* node = doc.allocate_node(rapidxml::node_element, "OnlineResource");
+
+              rapidxml::xml_attribute<>* attr = doc.allocate_attribute("xlink:type", capabilities.capability.layer.attribution.logo_url.online_resource.xlink_type.c_str());
+              node->append_attribute(attr);
+
+              attr = doc.allocate_attribute("xlink:href", capabilities.capability.layer.attribution.logo_url.online_resource.xlink_href.c_str());
+              node->append_attribute(attr);
+
+              logo_url_node->append_node(node);
+
+              attr = doc.allocate_attribute("width", std::to_string(capabilities.capability.layer.attribution.logo_url.width).c_str());
+              logo_url_node->append_attribute(attr);
+
+              attr = doc.allocate_attribute("height", std::to_string(capabilities.capability.layer.attribution.logo_url.height).c_str());
+              logo_url_node->append_attribute(attr);
+            }
+
+            attribution_node->append_node(logo_url_node);
+          }
+
+          layer_node->append_node(attribution_node);
+
+          // subLayers node
           for(auto layer: capabilities.capability.layer.layers)
           {
             rapidxml::xml_node<>* sub_layer_node = doc.allocate_node(rapidxml::node_element, "Layer");
