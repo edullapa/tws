@@ -97,21 +97,21 @@ int main(int argc, char *argv[])
   catch(const boost::exception& e)
   {
     if(const std::string* d = boost::get_error_info<tws::error_description>(e))
-      TWS_LOG_ERROR() << "\n\nthe following error has occurried: " << *d << std::endl;
+      TWS_LOG_ERROR() << "\n\nthe following error has occurred: " << *d << std::endl;
     else
-      TWS_LOG_ERROR() << "\n\nan unknown error has occurried" << std::endl;
+      TWS_LOG_ERROR() << "\n\nan unknown error has occurred" << std::endl;
 
     return EXIT_FAILURE;
   }
   catch(const std::exception& e)
   {
-    std::cout << "\n\nthe following error has occurried: " << e.what() << std::endl;
+    std::cout << "\n\nthe following error has occurred: " << e.what() << std::endl;
 
     return EXIT_FAILURE;
   }
   catch(...)
   {
-    TWS_LOG_ERROR()  << "\n\nan unknown error has occurried." << std::endl;
+    TWS_LOG_ERROR()  << "\n\nan unknown error has occurred." << std::endl;
 
     return EXIT_FAILURE;
   }
