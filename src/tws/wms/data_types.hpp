@@ -96,6 +96,7 @@ namespace tws
     //! Used to indicate what values along a dimension are valid.
     struct dimension_t
     {
+      std::string value;
       std::string name;
       std::string units;
       std::string unit_symbol;
@@ -206,7 +207,7 @@ namespace tws
       std::vector<bounding_box_t> bounding_box;
       std::vector<dimension_t> dimension;
       attribution_t attribution;
-      authority_url_t authority_url;
+      std::vector<authority_url_t> authority_url;
       std::vector<identifier_t> identifier;
       std::vector<metadata_url_t> metadata_url;
       std::vector<data_url_t> data_url;

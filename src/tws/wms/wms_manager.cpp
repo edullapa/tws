@@ -834,7 +834,14 @@ tws::wms::layer_t tws::wms::wms_manager::layer()
     }
     dimension_t dimension;
     for (unsigned int i = 0; i < dimension_list.Size(); ++i)
-    {
+    { 
+      const rapidjson::Value& value = dimension_list[i]["value"];
+      if (!value.IsString())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer dimension value in wms config file");
+      }
+      dimension.value = value.GetString();
+
       const rapidjson::Value& name = dimension_list[i]["name"];
       if (!name.IsString())
       {
@@ -985,46 +992,49 @@ tws::wms::layer_t tws::wms::wms_manager::layer()
 
     layer.attribution = attribution;
 
-    authority_url_t authority_url;
-    const rapidjson::Value& authority_url_object = layer_object["authority_url"];
-    if (!authority_url_object.IsObject())
+    // authority_url_t
+    const rapidjson::Value& authority_url_list = layer_object["authority_url"];
+    if (!authority_url_list.IsArray())
     {
       throw tws::parser_error() << tws::error_description("Could not find layer authority url in wms config file");
     }
-
-    //online_resource_t online_resource;
+    authority_url_t authority_url;
+    for (unsigned int i = 0; i < authority_url_list.Size(); ++i)
     {
-      const rapidjson::Value& online_resource_object = authority_url_object["online_resource"];
-      if (!online_resource_object.IsObject())
+      online_resource_t online_resource;
       {
-        throw tws::parser_error() << tws::error_description("Could not find layer authority url online resource in wms config file");
+        const rapidjson::Value& online_resource_object = authority_url_list[i]["online_resource"];
+        if (!online_resource_object.IsObject())
+        {
+          throw tws::parser_error() << tws::error_description("Could not find layer authority url online resource in wms config file");
+        }
+
+        const rapidjson::Value& xlink_type = online_resource_object["xlink_type"];
+        if (!xlink_type.IsString())
+        {
+          throw tws::parser_error() << tws::error_description("Could not find layer authority url online resource xlink type in wms config file");
+        }
+        online_resource.xlink_type = xlink_type.GetString();
+
+        const rapidjson::Value& xlink_href = online_resource_object["xlink_href"];
+        if (!xlink_href.IsString())
+        {
+          throw tws::parser_error() << tws::error_description("Could not find layer authority url online resource xlink href in wms config file");
+        }
+        online_resource.xlink_href = xlink_href.GetString();
       }
 
-      const rapidjson::Value& xlink_type = online_resource_object["xlink_type"];
-      if (!xlink_type.IsString())
-      {
-        throw tws::parser_error() << tws::error_description("Could not find layer authority url online resource xlink type in wms config file");
-      }
-      online_resource.xlink_type = xlink_type.GetString();
+      authority_url.online_resource = online_resource;
 
-      const rapidjson::Value& xlink_href = online_resource_object["xlink_href"];
-      if (!xlink_href.IsString())
+      const rapidjson::Value& name = authority_url_list[i]["name"];
+      if (!name.IsString())
       {
-        throw tws::parser_error() << tws::error_description("Could not find layer authority url online resource xlink href in wms config file");
+        throw tws::parser_error() << tws::error_description("Could not find layer authority url name in wms config file");
       }
-      online_resource.xlink_href = xlink_href.GetString();
+      authority_url.name = name.GetString();
+
+      layer.authority_url.push_back(authority_url);
     }
-
-    authority_url.online_resource = online_resource;
-
-    const rapidjson::Value& auth_name = authority_url_object["name"];
-    if (!auth_name.IsString())
-    {
-      throw tws::parser_error() << tws::error_description("Could not find layer authority url name in wms config file");
-    }
-    authority_url.name = auth_name.GetString();
-
-    layer.authority_url = authority_url;
 
     // identifier_t
     const rapidjson::Value& identifier_list = layer_object["identifier"];

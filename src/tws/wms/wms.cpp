@@ -405,7 +405,7 @@ tws::wms::get_capabilities_functor::operator()(const tws::core::http_request& re
           // Dimension node
           for(auto dimension: capabilities.capability.layer.dimension)
           {
-            rapidxml::xml_node<>* dimension_node = doc.allocate_node(rapidxml::node_element, "Dimension");
+            rapidxml::xml_node<>* dimension_node = doc.allocate_node(rapidxml::node_element, "Dimension", dimension.value.c_str());
 
             rapidxml::xml_attribute<>* attr = doc.allocate_attribute("name", dimension.name.c_str());
             dimension_node->append_attribute(attr);
@@ -474,6 +474,101 @@ tws::wms::get_capabilities_functor::operator()(const tws::core::http_request& re
           }
 
           layer_node->append_node(attribution_node);
+
+          // AuthorityURL node
+          for(auto authority_url: capabilities.capability.layer.authority_url)
+          {
+            rapidxml::xml_node<>* authority_url_node = doc.allocate_node(rapidxml::node_element, "AuthorityURL");
+
+            rapidxml::xml_node<>* node = doc.allocate_node(rapidxml::node_element, "OnlineResource");
+
+            rapidxml::xml_attribute<>* attr = doc.allocate_attribute("xlink:type", authority_url.online_resource.xlink_type.c_str());
+            node->append_attribute(attr);
+
+            attr = doc.allocate_attribute("xlink:href", authority_url.online_resource.xlink_href.c_str());
+            node->append_attribute(attr);
+
+            authority_url_node->append_node(node);
+
+            attr = doc.allocate_attribute("name", authority_url.name.c_str());
+            authority_url_node->append_attribute(attr);
+
+            layer_node->append_node(authority_url_node);
+          }
+
+          // Identifier node
+          for(auto identifier: capabilities.capability.layer.identifier)
+          {
+            rapidxml::xml_node<>* identifier_node = doc.allocate_node(rapidxml::node_element, "Identifier", identifier.value.c_str());
+
+            rapidxml::xml_attribute<>* attr = doc.allocate_attribute("authority", identifier.authority.c_str());
+            identifier_node->append_attribute(attr);
+
+            layer_node->append_node(identifier_node);
+          }
+
+          // MetadataURL node
+          for(auto metadata_url: capabilities.capability.layer.metadata_url)
+          {
+            rapidxml::xml_node<>* metadata_url_node = doc.allocate_node(rapidxml::node_element, "MetadataURL");
+
+            metadata_url_node->append_node(doc.allocate_node(rapidxml::node_element, "Format", metadata_url.format.c_str()));
+
+            rapidxml::xml_node<>* node = doc.allocate_node(rapidxml::node_element, "OnlineResource");
+
+            rapidxml::xml_attribute<>* attr = doc.allocate_attribute("xlink:type", metadata_url.online_resource.xlink_type.c_str());
+            node->append_attribute(attr);
+
+            attr = doc.allocate_attribute("xlink:href", metadata_url.online_resource.xlink_href.c_str());
+            node->append_attribute(attr);
+
+            metadata_url_node->append_node(node);
+
+            attr = doc.allocate_attribute("type", metadata_url.type.c_str());
+            metadata_url_node->append_attribute(attr);
+
+            layer_node->append_node(metadata_url_node);
+          }
+
+          // DataURL node
+          for(auto data_url: capabilities.capability.layer.data_url)
+          {
+            rapidxml::xml_node<>* data_url_node = doc.allocate_node(rapidxml::node_element, "DataURL");
+
+            data_url_node->append_node(doc.allocate_node(rapidxml::node_element, "Format", data_url.format.c_str()));
+
+            rapidxml::xml_node<>* node = doc.allocate_node(rapidxml::node_element, "OnlineResource");
+
+            rapidxml::xml_attribute<>* attr = doc.allocate_attribute("xlink:type", data_url.online_resource.xlink_type.c_str());
+            node->append_attribute(attr);
+
+            attr = doc.allocate_attribute("xlink:href", data_url.online_resource.xlink_href.c_str());
+            node->append_attribute(attr);
+
+            data_url_node->append_node(node);
+
+            layer_node->append_node(data_url_node);
+          }
+
+          // FeatureListURL node
+          for(auto feature_list_url: capabilities.capability.layer.feature_list_url)
+          {
+            rapidxml::xml_node<>* feature_list_url_node = doc.allocate_node(rapidxml::node_element, "FeatureListURL");
+
+            feature_list_url_node->append_node(doc.allocate_node(rapidxml::node_element, "Format", feature_list_url.format.c_str()));
+
+            rapidxml::xml_node<>* node = doc.allocate_node(rapidxml::node_element, "OnlineResource");
+
+            rapidxml::xml_attribute<>* attr = doc.allocate_attribute("xlink:type", feature_list_url.online_resource.xlink_type.c_str());
+            node->append_attribute(attr);
+
+            attr = doc.allocate_attribute("xlink:href", feature_list_url.online_resource.xlink_href.c_str());
+            node->append_attribute(attr);
+
+            feature_list_url_node->append_node(node);
+
+            layer_node->append_node(feature_list_url_node);
+          }
 
           // subLayers node
           for(auto layer: capabilities.capability.layer.layers)
