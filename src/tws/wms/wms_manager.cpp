@@ -1394,26 +1394,6 @@ tws::wms::layer_t tws::wms::wms_manager::layer()
     }
     layer.max_scale_denominator = max_scale_denominator.GetDouble();
 
-    const rapidjson::Value& layers_list_object = layer_object["layers"];
-    if (!layers_list_object.IsArray())
-    {
-      throw tws::parser_error() << tws::error_description("Could not find layers list in wms config file");
-    }
-
-    // sub_layers
-    layer_t sub_layer;
-    for (unsigned int i = 0; i < layers_list_object.Size(); ++i)
-    {
-      const rapidjson::Value& name = layers_list_object[i]["name"];
-      if (!name.IsString())
-      {
-        throw tws::parser_error() << tws::error_description("Could not find layer name in wms config file");
-      }
-      sub_layer.name = name.GetString();
-
-      layer.layers.push_back(sub_layer);
-    }
-
     const rapidjson::Value& queryable = layer_object["queryable"];
     if (!queryable.IsBool())
     {
@@ -1455,6 +1435,25 @@ tws::wms::layer_t tws::wms::wms_manager::layer()
       throw tws::parser_error() << tws::error_description("Could not find layer fixed height in wms config file");
     }
     layer.fixed_height = fixed_height.GetInt();
+
+    // sub_layers
+    const rapidjson::Value& layers_list_object = layer_object["layers"];
+    if (!layers_list_object.IsArray())
+    {
+      throw tws::parser_error() << tws::error_description("Could not find layers list in wms config file");
+    }
+    layer_t sub_layer;
+    for (unsigned int i = 0; i < layers_list_object.Size(); ++i)
+    {
+      const rapidjson::Value& name = layers_list_object[i]["name"];
+      if (!name.IsString())
+      {
+        throw tws::parser_error() << tws::error_description("Could not find layer name in wms config file");
+      }
+      sub_layer.name = name.GetString();
+
+      layer.layers.push_back(sub_layer);
+    }
 
     return layer;
   }
