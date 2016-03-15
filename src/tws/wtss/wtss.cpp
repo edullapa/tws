@@ -218,39 +218,39 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 
   const std::string end_time = (it != it_end) ? it->second : std::string("");
 
-//// prepare SRS conversor that allows to go from lat/long to array projection system and then come back to lat/long
-//  te::srs::Converter srs_conv(4326, coverage.geo_extent.spatial.crs_code);
-//
-//  double x = longitude;
-//  double y = latitude;
-//
-//  srs_conv.convert(longitude, latitude, x, y); // degrees to radians
-//
-//// compute pixel location from input Lat/Long WGS84 coordinate
-//  te::rst::Grid array_grid(coverage.dimensions[0].max_idx - coverage.dimensions[0].min_idx + 1,
-//                           coverage.dimensions[1].max_idx - coverage.dimensions[1].min_idx + 1,
-//                           coverage.geo_extent.spatial.resolution.x, coverage.geo_extent.spatial.resolution.y,
-//                           new te::gm::Envelope(coverage.geo_extent.spatial.extent.xmin, coverage.geo_extent.spatial.extent.ymin,
-//                                                coverage.geo_extent.spatial.extent.xmax, coverage.geo_extent.spatial.extent.ymax),
-//                           coverage.geo_extent.spatial.crs_code);
-//
-//  double dpixel_col = 0.0;
-//  double dpixel_row = 0.0;
-//
-//  array_grid.geoToGrid(x, y, dpixel_col, dpixel_row);
-//
-//  int64_t pixel_col = static_cast<int64_t>(dpixel_col);
-//  int64_t pixel_row = static_cast<int64_t>(dpixel_row);
-//
-//// then compute the location of the center of the pixel
-//  array_grid.gridToGeo(pixel_col, pixel_row, x, y);
-//
-//// get back from sinu to lat/long
-//  srs_conv.invert(x, y, x, y);
-//
-//// find array timeline strategy and retrieve its timeline
-//  const std::vector<std::string>& timeline = timeline_manager::instance().get(coverage.name);
-//
+// prepare SRS conversor that allows to go from lat/long to array projection system and then come back to lat/long
+  te::srs::Converter srs_conv(4326, cv.geo_extent.spatial.crs_code);
+
+  double x = longitude;
+  double y = latitude;
+
+  srs_conv.convert(longitude, latitude, x, y);
+
+// compute pixel location from input Lat/Long WGS84 coordinate
+  te::rst::Grid array_grid(cv.dimensions[0].max_idx - cv.dimensions[0].min_idx + 1,
+                           cv.dimensions[1].max_idx - cv.dimensions[1].min_idx + 1,
+                           cv.geo_extent.spatial.resolution.x, cv.geo_extent.spatial.resolution.y,
+                           new te::gm::Envelope(cv.geo_extent.spatial.extent.xmin, cv.geo_extent.spatial.extent.ymin,
+                                                cv.geo_extent.spatial.extent.xmax, cv.geo_extent.spatial.extent.ymax),
+                           cv.geo_extent.spatial.crs_code);
+
+  double dpixel_col = 0.0;
+  double dpixel_row = 0.0;
+
+  array_grid.geoToGrid(x, y, dpixel_col, dpixel_row);
+
+  int64_t pixel_col = static_cast<int64_t>(dpixel_col);
+  int64_t pixel_row = static_cast<int64_t>(dpixel_row);
+
+// then compute the location of the center of the pixel
+  array_grid.gridToGeo(pixel_col, pixel_row, x, y);
+
+// get back from sinu to lat/long
+  srs_conv.invert(x, y, x, y);
+
+// find array timeline strategy and retrieve its timeline
+  //const std::vector<std::string>& timeline = timeline_manager::instance().get(coverage.name);
+
 //  std::size_t ntime_pts = timeline.size();
 //
 //  if(ntime_pts == 0)
@@ -327,27 +327,27 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 ////  q_aql.bind_arg(6, end_time_pos);
 
 // get a connection from the pool in order to retrieve the time series data
-  std::unique_ptr<tws::scidb::connection> conn(tws::scidb::connection_pool::instance().get());
+//  std::unique_ptr<tws::scidb::connection> conn(tws::scidb::connection_pool::instance().get());
 
-  boost::shared_ptr< ::scidb::QueryResult > qresult = conn->execute("between(mod09q1, 57600, 43200, 0, 57600, 43200, 4)", true);
+//  boost::shared_ptr< ::scidb::QueryResult > qresult = conn->execute("between(mod09q1, 57600, 43200, 0, 57600, 43200, 4)", true);
 
 ////  boost::shared_ptr< ::scidb::QueryResult > qresult = conn->execute(q_aql.str(), false);
 
-  if((qresult.get() == nullptr) || (qresult->array.get() == nullptr))
-    throw tws::core::http_request_error() << tws::error_description("no query result returned after querying database.");
+//  if((qresult.get() == nullptr) || (qresult->array.get() == nullptr))
+//    throw tws::core::http_request_error() << tws::error_description("no query result returned after querying database.");
 
 ////  const ::scidb::ArrayDesc& array_desc = qresult->array->getArrayDesc();
-//
+
 ////  const ::scidb::Attributes& array_attributes = array_desc.getAttributes(true);
-//
-////  const std::size_t nattributes = array_attributes.size();
-//  const std::size_t nattributes = queried_attributes.size();
-//
-//// iterate through each attribute and add it to the result
-//  rapidjson::Document::AllocatorType allocator;
-//
-//  rapidjson::Value jattributes(rapidjson::kArrayType);
-//
+
+//  const std::size_t nattributes = array_attributes.size();
+  const std::size_t nattributes = queried_attributes.size();
+
+// iterate through each attribute and add it to the result
+  rapidjson::Document::AllocatorType allocator;
+
+  rapidjson::Value jattributes(rapidjson::kArrayType);
+
 //  for(std::size_t i = 0; i != nattributes; ++i)
 //  {
 //// find attribute expression
@@ -449,60 +449,59 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 //    jattributes.PushBack(jattribute, allocator);
 //
 //  }
-//
-//// prepare result part in response
-//  rapidjson::Value jresult(rapidjson::kObjectType);
-//
-//  jresult.AddMember("attributes", jattributes, allocator);
-//
+
+// prepare result part in response
+  rapidjson::Value jresult(rapidjson::kObjectType);
+
+  jresult.AddMember("attributes", jattributes, allocator);
+
 //// add timeline in the response
 //  rapidjson::Value jtimeline(rapidjson::kArrayType);
 //  tws::json::copy_string_array(timeline.begin() + start_time_pos, timeline.begin() + end_time_pos + 1, jtimeline, allocator);
 //  jresult.AddMember("timeline", jtimeline, allocator);
-//
-//// add the pixel center location in response
-//  rapidjson::Value jcenter(rapidjson::kObjectType);
-//  jcenter.AddMember("latitude", y, allocator);
-//  jcenter.AddMember("longitude", x, allocator);
-//  jresult.AddMember("center_coordinates", jcenter, allocator);
-//
-//// prepare the query part in response
-//  rapidjson::Value jquery(rapidjson::kObjectType);
-//
-//  jquery.AddMember("coverage", coverage_name.c_str(), allocator);
-//
-//  rapidjson::Value jqattributes(rapidjson::kArrayType);
-//
-//  tws::json::copy_string_array(queried_attributes.begin(), queried_attributes.end(), jqattributes, allocator);
-//
-//  jquery.AddMember("attributes", jqattributes, allocator);
-//
-//  jquery.AddMember("latitude", latitude, allocator);
-//
-//  jquery.AddMember("longitude", longitude, allocator);
-//
-//// form the final response
-//  rapidjson::Document doc;
-//
-//  doc.SetObject();
-//
-//  doc.AddMember("result", jresult, allocator);
-//  doc.AddMember("query", jquery, allocator);
-//
-//// send response
-//  rapidjson::StringBuffer str_buff;
-//
-//  rapidjson::Writer<rapidjson::StringBuffer> writer(str_buff);
-//
-//  doc.Accept(writer);
-//
-//  const char* p_str_buff = str_buff.GetString();
-//
-//  //response.add_header("Content-Length", boost::lexical_cast<std::string>(content.size()).c_str());
-//  response.add_header("Content-Type", "application/json");
-//  response.add_header("Access-Control-Allow-Origin", "*");
-//  response.set_content(p_str_buff, str_buff.Size());
-//
+
+// add the pixel center location in response
+  rapidjson::Value jcenter(rapidjson::kObjectType);
+  jcenter.AddMember("latitude", y, allocator);
+  jcenter.AddMember("longitude", x, allocator);
+  jresult.AddMember("center_coordinates", jcenter, allocator);
+
+// prepare the query part in response
+  rapidjson::Value jquery(rapidjson::kObjectType);
+
+  jquery.AddMember("coverage", cv.name.c_str(), allocator);
+
+  rapidjson::Value jqattributes(rapidjson::kArrayType);
+
+  tws::core::copy_string_array(queried_attributes.begin(), queried_attributes.end(), jqattributes, allocator);
+
+  jquery.AddMember("attributes", jqattributes, allocator);
+
+  jquery.AddMember("latitude", latitude, allocator);
+
+  jquery.AddMember("longitude", longitude, allocator);
+
+// prepare the final response
+  rapidjson::Document doc;
+
+  doc.SetObject();
+
+  doc.AddMember("result", jresult, allocator);
+  doc.AddMember("query", jquery, allocator);
+
+// send response
+  rapidjson::StringBuffer str_buff;
+
+  rapidjson::Writer<rapidjson::StringBuffer> writer(str_buff);
+
+  doc.Accept(writer);
+
+  const char* p_str_buff = str_buff.GetString();
+
+//response.add_header("Content-Length", boost::lexical_cast<std::string>(content.size()).c_str());
+  response.add_header("Content-Type", "application/json");
+  response.add_header("Access-Control-Allow-Origin", "*");
+  response.set_content(p_str_buff, str_buff.Size());
 }
 
 void
