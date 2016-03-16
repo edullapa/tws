@@ -356,16 +356,21 @@ tws::geoarray::read_spatial_extent(const rapidjson::Value& jspatial_extent)
 
   sp_extent.resolution = read_spatial_resolution(jres);
 
-  const rapidjson::Value& jcrs = jspatial_extent["crs"];
+  //const rapidjson::Value& jcrs = jspatial_extent["crs"];
 
-  if(!jcrs.IsString() || jcrs.IsNull())
-    throw tws::parser_error() << tws::error_description("error in CRS in metadata.");
+  //if(!jcrs.IsString() || jcrs.IsNull())
+    //throw tws::parser_error() << tws::error_description("error in CRS in metadata.");
 
-  std::string crs = jcrs.GetString();
+  //std::string crs = jcrs.GetString();
 
   //std::pair<std::string,unsigned int> crs_id = te::srs::SpatialReferenceSystemManager::getInstance().getIdFromP4Txt(crs);
 
-  //sp_extent.crs_code = crs_id.second;
+  const rapidjson::Value& jsrid = jspatial_extent["srid"];
+
+  if(!jsrid.IsInt() || jsrid.IsNull())
+    throw tws::parser_error() << tws::error_description("error reading geoarray srid.");
+
+  sp_extent.crs_code = jsrid.GetUint();
 
   return sp_extent;
 }

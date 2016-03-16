@@ -122,7 +122,8 @@
             "x": 231.65635826395825,
             "y": 231.65635826374995
           },
-          "crs": "+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs "
+          "crs": "+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs ",
+          "srid": 100002
         },
         "temporal": {
           "interval": {
@@ -130,6 +131,77 @@
             "end": "2014-08-13"
           },
           "resolution": 16,
+          "unit": "day"
+        }
+      }
+    },
+    { "name": "mod09q1",
+      "description": "Surface Reflectance 8-Day L3 Global 250m",
+      "detail": "https://lpdaac.usgs.gov/dataset_discovery/modis/modis_products_table/mod09q1",
+      "dimensions": [
+        { "name": "col_id",
+          "description": "column",
+          "min_idx": 0,
+          "max_idx": 172799,
+          "pos": 0
+        },
+        { "name": "row_id",
+          "description": "row",
+          "min_idx": 0,
+          "max_idx": 86399,
+          "pos": 1
+        },
+        { "name": "time_id",
+          "description": "time",
+          "min_idx": 0,
+          "max_idx": 1024,
+          "pos": 2
+        }
+      ],
+      "attributes": [
+        { "name": "red",
+          "description": "250m Surface Reflectance Band 1 (620–670 nm)",
+          "datatype": "16-bit signed integer",
+          "valid_range": { "min": -100, "max": 16000 },
+          "scale_factor": 0.0001,
+          "missing_value": -28672
+        },
+        { "name": "nir",
+          "description": "250m Surface Reflectance Band 2 (841–876 nm)",
+          "datatype": "16-bit signed integer",
+          "valid_range": { "min": -100, "max": 16000 },
+          "scale_factor": 0.0001,
+          "missing_value": -28672
+        },
+        { "name": "quality",
+          "description": "250m Reflectance Band Quality",
+          "datatype": "16-bit unsigned integer",
+          "valid_range": { "min": 0, "max": 32767 },
+          "scale_factor": 1,
+          "missing_value": 65535
+        }
+      ],
+      "geo_extent": {
+        "spatial": {
+          "extent": {
+            "xmin": -20015109.35400599,
+            "ymin": -10007554.676994,
+            "xmax": 20015109.35400599,
+            "ymax": 10007554.676994
+          },
+          "resolution": {
+            "x": 231.65635826395825,
+            "y": 231.65635826374995
+          },
+          "crs": "+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs ",
+          "srid": 100002
+        },
+        "temporal": {
+          "interval": {
+            "start": "2000-02-18",
+            "end": "2014-08-13"
+          },
+          "resolution": 8,
           "unit": "day"
         }
       }

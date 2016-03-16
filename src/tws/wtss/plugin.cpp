@@ -51,7 +51,7 @@ class Plugin : public te::plugin::Plugin
     {
       if(m_initialized)
         return;
-      
+
       tws::wtss::register_operations();
       
       tws::wtss::initialize_operations();
