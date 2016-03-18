@@ -296,7 +296,6 @@ namespace tws
       service_t service;
       capability_t capability;
       std::string version;
-      std::string update_sequence;
     };
     
 //    //! An overview of a given geo-array.

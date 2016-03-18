@@ -48,7 +48,8 @@ struct tws::wms::wms_manager::impl
   {
   }
 
-  std::shared_ptr<rapidjson::Document> json_file;
+  std::unique_ptr<rapidjson::Document> json_file;
+  //capabilities_t capabilities;
 };
 
 tws::wms::wms_manager::wms_manager()

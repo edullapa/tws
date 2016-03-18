@@ -1,0 +1,33 @@
+{
+  "overviews": {
+    "dimensions": [
+      { "name": "col_id",
+           "description": "column",
+                  "min_idx": 0,
+                  "max_idx": 172799,
+                  "pos": 0
+                },
+                { "name": "row_id",
+                  "description": "row",
+                  "min_idx": 0,
+                  "max_idx": 86399,
+                  "pos": 1
+                },
+                { "name": "time_id",
+                  "description": "time",
+                  "min_idx": 0,
+                  "max_idx": 1024,
+                  "pos": 2
+                }
+              ],
+              "attributes": [
+                { "_name": "evi",
+                  "_description": "250m 16 days EVI",
+                  "_datatype": "16-bit signed integer",
+                  "_valid_range_min": -2000,
+                  "_valid_range_max": 10000,
+                  "_scale_factor": 0.0001,
+                  "_missing_value": -3000
+                }
+              ]
+            }

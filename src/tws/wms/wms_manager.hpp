@@ -32,20 +32,21 @@
 #include "data_types.hpp"
 
 // STL
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace tws
 {
   namespace wms
   {
-    // forward declarations
+// forward declarations
     struct capabilities_t;
     struct service_t;
 
     class wms_manager
     {
       public:
+
         //! Singleton method
         static wms_manager& instance();
 
@@ -98,13 +99,16 @@ namespace tws
         layer_t layer();
 
       private:
+
+// singleton is accesible through class member function: instance()
         //! Constructor
         wms_manager();
 
         //! Destructor
         ~wms_manager();
 
-        struct impl; //!< Pimpl idiom
+// Pimpl idiom
+        struct impl;
 
         impl* pimpl_;
     };
