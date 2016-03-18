@@ -336,6 +336,8 @@ tws::wms::get_capabilities_functor::operator()(const tws::core::http_request& re
 
           layer_node->append_node(node);
 
+          /*
+
           node = doc.allocate_node(rapidxml::node_element, "Title", capabilities.capability.layer.title.c_str());
 
           layer_node->append_node(node);
@@ -679,6 +681,8 @@ tws::wms::get_capabilities_functor::operator()(const tws::core::http_request& re
 
           attr = doc.allocate_attribute("fixedHeight", std::to_string(capabilities.capability.layer.fixed_height).c_str());
           layer_node->append_attribute(attr);
+
+          */
 
           // subLayers node
           for(auto layer: capabilities.capability.layer.layers)

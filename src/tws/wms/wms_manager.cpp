@@ -692,6 +692,8 @@ tws::wms::layer_t tws::wms::wms_manager::layer()
     }
     layer.name = name.GetString();
 
+    /*
+
     const rapidjson::Value& title = layer_object["title"];
     if (!title.IsString())
     {
@@ -1435,6 +1437,8 @@ tws::wms::layer_t tws::wms::wms_manager::layer()
       throw tws::parser_error() << tws::error_description("Could not find layer fixed height in wms config file");
     }
     layer.fixed_height = fixed_height.GetInt();
+
+    */
 
     // sub_layers
     const rapidjson::Value& layers_list_object = layer_object["layers"];
