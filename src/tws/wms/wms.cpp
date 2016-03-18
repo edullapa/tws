@@ -61,7 +61,14 @@ tws::wms::get_capabilities_functor::operator()(const tws::core::http_request& re
   {
     // create WMS_Capabilities document
     rapidxml::xml_document<> doc;
+
+    // xml declaration
+    rapidxml::xml_node<>* decl = doc.allocate_node(rapidxml::node_declaration);
+    decl->append_attribute(doc.allocate_attribute("version", "1.0"));
+    decl->append_attribute(doc.allocate_attribute("encoding", "utf-8"));
+    doc.append_node(decl);
     
+    // root node
     rapidxml::xml_node<>* root = doc.allocate_node(rapidxml::node_element, "WMS_Capabilities");
     
     rapidxml::xml_attribute<>* attr = doc.allocate_attribute("version", "1.3.0");
@@ -109,7 +116,10 @@ tws::wms::get_capabilities_functor::operator()(const tws::core::http_request& re
 
         node = doc.allocate_node(rapidxml::node_element, "OnlineResource");
 
-        rapidxml::xml_attribute<>* attr = doc.allocate_attribute("xlink:type", capabilities.service.online_resource.xlink_type.c_str());
+        rapidxml::xml_attribute<>* attr = doc.allocate_attribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
+        node->append_attribute(attr);
+
+        attr = doc.allocate_attribute("xlink:type", capabilities.service.online_resource.xlink_type.c_str());
         node->append_attribute(attr);
 
         attr = doc.allocate_attribute("xlink:href", capabilities.service.online_resource.xlink_href.c_str());
