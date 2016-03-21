@@ -231,18 +231,34 @@ tws::wms::get_capabilities_functor::operator()(const tws::core::http_request& re
             rapidxml::xml_node<>* http_node = doc.allocate_node(rapidxml::node_element, "HTTP");
 
             rapidxml::xml_node<>* get_node = doc.allocate_node(rapidxml::node_element, "Get");
+            {
+              rapidxml::xml_node<>* node = doc.allocate_node(rapidxml::node_element, "OnlineResource");
 
-            rapidxml::xml_node<>* node = doc.allocate_node(rapidxml::node_element, "OnlineResource");
+              rapidxml::xml_attribute<>* attr = doc.allocate_attribute("xlink:type", capabilities.capability.request.get_capabilities.dcp_type.http.get.xlink_type.c_str());
+              node->append_attribute(attr);
 
-            rapidxml::xml_attribute<>* attr = doc.allocate_attribute("xlink:type", capabilities.capability.request.get_capabilities.dcp_type.http.get.xlink_type.c_str());
-            node->append_attribute(attr);
+              attr = doc.allocate_attribute("xlink:href", capabilities.capability.request.get_capabilities.dcp_type.http.get.xlink_href.c_str());
+              node->append_attribute(attr);
 
-            attr = doc.allocate_attribute("xlink:href", capabilities.capability.request.get_capabilities.dcp_type.http.get.xlink_href.c_str());
-            node->append_attribute(attr);
-
-            get_node->append_node(node);
+              get_node->append_node(node);
+            }
 
             http_node->append_node(get_node);
+
+            rapidxml::xml_node<>* post_node = doc.allocate_node(rapidxml::node_element, "Post");
+            {
+              rapidxml::xml_node<>* node = doc.allocate_node(rapidxml::node_element, "OnlineResource");
+
+              rapidxml::xml_attribute<>* attr = doc.allocate_attribute("xlink:type", capabilities.capability.request.get_capabilities.dcp_type.http.post.xlink_type.c_str());
+              node->append_attribute(attr);
+
+              attr = doc.allocate_attribute("xlink:href", capabilities.capability.request.get_capabilities.dcp_type.http.post.xlink_href.c_str());
+              node->append_attribute(attr);
+
+              post_node->append_node(node);
+            }
+
+            http_node->append_node(post_node);
 
             dcp_type_node->append_node(http_node);
 
