@@ -315,12 +315,14 @@ tws::wms::read_http(const rapidjson::Value& jhttp)
 
   http.get = read_online_resource(jget_online_resource);
 
-//  const rapidjson::Value& jpost = jhttp["post"];
+  if (jhttp.HasMember("post"))
+  {
+    const rapidjson::Value& jpost = jhttp["post"];
 
-//  const rapidjson::Value& jpost_online_resource = jpost["online_resource"];
+    const rapidjson::Value& jpost_online_resource = jpost["online_resource"];
 
-//  if (!jpost_online_resource.IsNull())
-//    http.post = read_online_resource(jpost_online_resource);
+    http.post = read_online_resource(jpost_online_resource);
+  }
 
   return http;
 }
