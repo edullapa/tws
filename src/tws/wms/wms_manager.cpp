@@ -67,14 +67,16 @@ tws::wms::wms_manager::~wms_manager()
   delete pimpl_;
 }
 
-tws::wms::wms_manager& tws::wms::wms_manager::instance()
+tws::wms::wms_manager&
+tws::wms::wms_manager::instance()
 {
   static wms_manager instance;
 
   return instance;
 }
 
-tws::wms::capabilities_t tws::wms::wms_manager::capabilities()
+tws::wms::capabilities_t
+tws::wms::wms_manager::capabilities()
 {
   const rapidjson::Value& jcapabilities = (*pimpl_->json_file)["wms_capabilities"];
 
