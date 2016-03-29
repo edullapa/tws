@@ -56,48 +56,6 @@ namespace tws
         */
         capabilities_t capabilities();
 
-        /*!
-          \brief It makes a service object with wms metadata
-          \return A tws::wms::service_t struct containing wms configuration
-        */
-        service_t service();
-
-        /*!
-          \brief It makes a capability object with wms metadata
-          \return A tws::wms::capability_t struct containing wms configuration
-        */
-        capability_t capability();
-
-        /*!
-          \brief It makes a request object with wms metadata
-          \return A tws::wms::request_t struct containing wms configuration
-        */
-        request_t request();
-
-        /*!
-          \brief It makes a get_capabilities operation object with wms metadata
-          \return A tws::wms::operation_t struct containing wms configuration
-        */
-        operation_t get_capabilities();
-
-        /*!
-          \brief It makes a get_map operation object with wms metadata
-          \return A tws::wms::operation_t struct containing wms configuration
-        */
-        operation_t get_map();
-
-        /*!
-          \brief It makes a get_feature_info operation object with wms metadata
-          \return A tws::wms::operation_t struct containing wms configuration
-        */
-        operation_t get_feature_info();
-
-        /*!
-          \brief It makes a layer object with wms metadata
-          \return A tws::wms::layer_t struct containing wms configuration
-        */
-        layer_t layer();
-
       private:
 
 // singleton is accesible through class member function: instance()
