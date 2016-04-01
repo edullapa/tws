@@ -230,7 +230,11 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 
   srs_conv.convert(longitude, latitude, x, y); // degrees to radians
 
-// TODO: check if x and y values are within coverage boundary
+  // check if x and y values are within coverage boundary
+  if (!(x > cv.geo_extent.spatial.extent.xmin && x < cv.geo_extent.spatial.extent.xmax &&
+          y > cv.geo_extent.spatial.extent.ymin && y < cv.geo_extent.spatial.extent.ymax))
+     throw tws::core::http_request_error() << tws::error_description("\"latitude\" and \"longitude\" parameters are not within the coverage boundary!");
+
 
   // compute pixel location from input Lat/Long WGS84 coordinate
   te::rst::Grid array_grid(cv.dimensions[0].max_idx - cv.dimensions[0].min_idx + 1,
@@ -248,7 +252,10 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
   int64_t pixel_col = static_cast<int64_t>(dpixel_col);
   int64_t pixel_row = static_cast<int64_t>(dpixel_row);
 
-// TODO: check if row and col are within array dimension ranges!
+  // check if row and col are within array dimension ranges!
+  if (!(pixel_col > cv.dimensions[0].min_idx  && x < cv.dimensions[0].max_idx &&
+          pixel_row > cv.dimensions[1].min_idx && y < cv.dimensions[1].max_idx))
+     throw tws::core::http_request_error() << tws::error_description("\"pixelrow\" and \"pixelcol\" are not within the array dimension ranges!");
 
   // then compute the location of the center of the pixel
   array_grid.gridToGeo(pixel_col, pixel_row, x, y);
