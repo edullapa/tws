@@ -253,8 +253,8 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
   int64_t pixel_row = static_cast<int64_t>(dpixel_row);
 
   // check if row and col are within array dimension ranges!
-  if (!(pixel_col > cv.dimensions[0].min_idx  && x < cv.dimensions[0].max_idx &&
-          pixel_row > cv.dimensions[1].min_idx && y < cv.dimensions[1].max_idx))
+  if (!(pixel_col > cv.dimensions[0].min_idx  && pixel_col < cv.dimensions[0].max_idx &&
+          pixel_row > cv.dimensions[1].min_idx && pixel_row < cv.dimensions[1].max_idx))
      throw tws::core::http_request_error() << tws::error_description("\"pixelrow\" and \"pixelcol\" are not within the array dimension ranges!");
 
   // then compute the location of the center of the pixel
@@ -314,11 +314,41 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 
       std::shared_ptr< ::scidb::ConstChunkIterator > chunk_it = chunk.getConstIterator();
 
+      std::string type = chunk.getAttributeDesc().getType();
+
       while(!chunk_it->end())
       {
         const ::scidb::Value& v = chunk_it->getItem();
 
-        values.push_back(v.getInt16());
+        if(!type.compare("int8"))
+             values.push_back(v.getInt8());
+        else
+            if(!type.compare("int16"))
+                values.push_back(v.getInt16());
+            else
+                if(!type.compare("double"))
+                    values.push_back(v.getDouble());
+                else
+                    if(!type.compare("float"))
+                          values.push_back(v.getFloat());
+                    else
+                       if(!type.compare("int32"))
+                             values.push_back(v.getInt32());
+                       else
+                          if(!type.compare("int64"))
+                                values.push_back(v.getInt64());
+                          else
+                             if(!type.compare("uint8"))
+                                   values.push_back(v.getUint8());
+                             else
+                                if(!type.compare("uint16"))
+                                      values.push_back(v.getUint16());
+                                else
+                                   if(!type.compare("uint32"))
+                                         values.push_back(v.getUint32());
+                                   else
+                                      if(!type.compare("uint64"))
+                                         values.push_back(v.getUint64());
 
         ++(*chunk_it);
       }
