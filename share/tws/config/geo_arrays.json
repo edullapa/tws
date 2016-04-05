@@ -205,6 +205,63 @@
           "unit": "day"
         }
       }
+    },
+    { "name": "fire_risk_montlhy",
+      "description": "Fire risk monthly aggregate data",
+      "detail": "www.inpe.br/queimadas",
+      "dimensions": [
+        { "name": "col",
+          "description": "column",
+          "min_idx": 0,
+          "max_idx": 1020,
+          "pos": 0
+        },
+        { "name": "row",
+          "description": "row",
+          "min_idx": 0,
+          "max_idx": 1380,
+          "pos": 1
+        },
+        { "name": "time_idx",
+          "description": "time index",
+          "min_idx": 1,
+          "max_idx": 1000
+          "pos": 2
+        }
+      ],
+      "attributes": [
+        { "name": "value",
+          "description": "Value",
+          "datatype": "8-bit unsigned integer",
+          "valid_range": { "min": 0, "max": 255 },
+          "scale_factor": 1.0,
+          "missing_value": 0
+        }
+      ],
+      "geo_extent": {
+        "spatial": {
+          "extent": {
+            "xmin": -82.025,
+            "ymin": -56.025,
+            "xmax": -30.975,
+            "ymax": 13.025
+          },
+          "resolution": {
+            "x": 0.05,
+            "y": 0.05
+          },
+          "crs": "+proj=... ",
+          "srid": 4326
+        },
+        "temporal": {
+          "interval": {
+            "start": "2000-01",
+            "end": "2014-12"
+          },
+          "resolution": 1,
+          "unit": "month"
+        }
+      }
     }
   ]
 }
