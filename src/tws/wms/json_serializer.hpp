@@ -43,7 +43,29 @@ namespace tws
 
     service_t read_service(const rapidjson::Value& jservice);
 
-    capability_t read_capability(const rapidjson::Value& jcapability);
+    contact_information_t read_contact_information(const rapidjson::Value& jcontact_information);
+
+    contact_person_primary_t read_contact_person_primary(const rapidjson::Value& jcontact_person_primary);
+
+    contact_address_t read_contact_address(const rapidjson::Value& jcontact_address);
+
+    capability_t read_capability(const rapidjson::Value& jformats);
+
+    request_t read_request(const rapidjson::Value& jrequest);
+
+    operation_t read_operation(const rapidjson::Value& joperation);
+
+    dcp_type_t read_dcp_type(const rapidjson::Value& jdcp_type);
+
+    http_t read_http(const rapidjson::Value& jhttp);
+
+    std::vector<keyword_t> read_keyword_list(const rapidjson::Value& jkeyword_list);
+
+    std::vector<std::string> read_formats(const rapidjson::Value& jformats);
+
+    online_resource_t read_online_resource(const rapidjson::Value& jonline_resource);
+
+    layer_t read_layer(const rapidjson::Value& jlayer);
 
   }  // end namespace wms
 }    // end namespace tws
