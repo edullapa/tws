@@ -38,6 +38,8 @@
 
 // STL
 #include <algorithm>
+//#include <chrono>
+//#include <iostream>
 #include <memory>
 #include <string>
 
@@ -220,6 +222,11 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 
   const std::string end_time = (it != it_end) ? it->second : std::string("");
 
+// benchmark
+  //std::chrono::time_point<std::chrono::steady_clock> start, end;
+
+  //start = std::chrono::steady_clock::now();
+
 // TODO: check time interval and get a valid time range
 
   // prepare SRS conversor that allows to go from lat/long to array projection system and then come back to lat/long
@@ -256,8 +263,22 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
   // get back from sinu to lat/long
   srs_conv.invert(x, y, x, y);
 
+  //end = std::chrono::steady_clock::now();
+
+  //std::chrono::duration<double> elapsed_time = end - start;
+
+  //std::cout << "\n\tSRS conversion time: " << elapsed_time.count() << "s" << std::endl;
+
+  //start = std::chrono::steady_clock::now();
+
   // get a connection from the pool in order to retrieve the time series data
   std::unique_ptr<tws::scidb::connection> conn(tws::scidb::connection_pool::instance().get());
+
+  //end = std::chrono::steady_clock::now();
+
+  //elapsed_time = end - start;
+
+  //std::cout << "\tRetrieving a database connection: " << elapsed_time.count() << "s" << std::endl;
 
   // prepare the JSON root document
   rapidjson::Document::AllocatorType allocator;
@@ -273,7 +294,17 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
                         + std::to_string(pixel_col) + "," + std::to_string(pixel_row) + ", 400), "
                         + attr_name + ")";
 
+    //start = std::chrono::steady_clock::now();
+
     boost::shared_ptr< ::scidb::QueryResult > qresult = conn->execute(str_afl, true);
+
+    //end = std::chrono::steady_clock::now();
+
+    //elapsed_time = end - start;
+
+    //std::cout << "\tQuery: " << str_afl << "; executed in " << elapsed_time.count() << "s" << std::endl;
+
+    //start = std::chrono::steady_clock::now();
 
     if((qresult.get() == nullptr) || (qresult->array.get() == nullptr))
     {
@@ -319,6 +350,12 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
       ++(*array_it);
 
     }
+
+    //end = std::chrono::steady_clock::now();
+
+    //elapsed_time = end - start;
+
+    //std::cout << "\tTraversing array in " << elapsed_time.count() << "s" << std::endl;
 
 // TODO: check (values.size() == ntime_pts)
 
