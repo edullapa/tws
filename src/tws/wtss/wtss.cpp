@@ -61,6 +61,13 @@
 #include <terralib/raster/Grid.h>
 #include <terralib/srs/Converter.h>
 
+// Time performance
+#include <ctime>
+#include <iostream>
+#include <fstream>
+
+
+
 void
 tws::wtss::list_coverages_functor::operator()(const tws::core::http_request& request,
                                               tws::core::http_response& response)
@@ -274,13 +281,23 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 // iterate through each queried attribute
   for(const auto& attr_name : queried_attributes)
   {
+
 // TODO: fix the query string when we have the time range
     std::string str_afl = "project( between(" + cv.name + ", "
                         + std::to_string(pixel_col) + "," + std::to_string(pixel_row) + ", 0,"
-                        + std::to_string(pixel_col) + "," + std::to_string(pixel_row) + ", 400), "
+                        + std::to_string(pixel_col) + "," + std::to_string(pixel_row) + ", "+end_time+"), "
                         + attr_name + ")";
 
+
+    clock_t begin = clock();
+
     boost::shared_ptr< ::scidb::QueryResult > qresult = conn->execute(str_afl, true);
+
+    clock_t end = clock();
+
+    double elapsed_sec = 1000*double(end - begin) / CLOCKS_PER_SEC;
+
+    clock_t begin2 = clock();
 
     if((qresult.get() == nullptr) || (qresult->array.get() == nullptr))
     {
@@ -356,6 +373,15 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
       ++(*array_it);
 
     }
+
+    clock_t end2 = clock();
+
+    double elapsed_secs2 = 1000*double(end2 - begin2) / CLOCKS_PER_SEC;
+
+    std::ofstream myfile;
+    myfile.open ("performance.txt", std::ios::app);
+    myfile << "Attribute: " << attr_name.c_str() << " Connection Time: "<< std::setprecision(5) << boost::lexical_cast<std::string>(elapsed_sec) + " ms Processing Time: " << std::setprecision(5) << boost::lexical_cast<std::string>(elapsed_secs2) + " ms End Time:" << end_time << std::endl;
+    myfile.close();
 
 // TODO: check (values.size() == ntime_pts)
 
