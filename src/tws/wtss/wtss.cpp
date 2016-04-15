@@ -34,8 +34,8 @@
 #include "../scidb/connection.hpp"
 #include "../scidb/connection_pool.hpp"
 #include "../scidb/utils.hpp"
-#include "timeline.hpp"
-#include "timeline_manager.hpp"
+//#include "timeline.hpp"
+//#include "timeline_manager.hpp"
 #include "utils.hpp"
 
 // STL
@@ -222,20 +222,20 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 
   const std::string start_time = (it != it_end) ? it->second : std::string("");
 
-  const timeline& tl = timeline_manager::instance().get(cv.name);
+  //const timeline& tl = timeline_manager::instance().get(cv.name);
 
-  std::size_t start_time_idx = start_time.empty() ? tl.index(tl.time_points().front()) : tl.index(start_time);
+  //std::size_t start_time_idx = start_time.empty() ? tl.index(tl.time_points().front()) : tl.index(start_time);
 
   it = qstr.find("end");
 
-  const std::string end_time = (it != it_end) ? it->second : std::string("");
+  //const std::string end_time = (it != it_end) ? it->second : std::string("");
 
-  std::size_t end_time_idx = end_time.empty() ? tl.index(tl.time_points().back()) : tl.index(end_time);
+  //std::size_t end_time_idx = end_time.empty() ? tl.index(tl.time_points().back()) : tl.index(end_time);
 
-  if(end_time_idx < start_time_idx)
-    throw tws::core::http_request_error() << tws::error_description("invalid time range!");
+  //if(end_time_idx < start_time_idx)
+  //  throw tws::core::http_request_error() << tws::error_description("invalid time range!");
 
-  std::size_t ntime_pts = end_time_idx - start_time_idx + 1;
+  //std::size_t ntime_pts = end_time_idx - start_time_idx + 1;
 
 // benchmark
   //std::chrono::time_point<std::chrono::steady_clock> start, end;
@@ -304,10 +304,11 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
   for(const auto& attr_name : queried_attributes)
   {
 // TODO: fix the query string when we have the time range
-    std::string str_afl = "project( between(" + cv.name + ", "
-                        + std::to_string(pixel_col) + "," + std::to_string(pixel_row) + "," + std::to_string(start_time_idx) + ","
-                        + std::to_string(pixel_col) + "," + std::to_string(pixel_row) + "," + std::to_string(end_time_idx) + "), "
-                        + attr_name + ")";
+    //std::string str_afl = "project( between(" + cv.name + ", "
+    //                    + std::to_string(pixel_col) + "," + std::to_string(pixel_row) + "," + std::to_string(start_time_idx) + ","
+    //                    + std::to_string(pixel_col) + "," + std::to_string(pixel_row) + "," + std::to_string(end_time_idx) + "), "
+    //                    + attr_name + ")";
+      std::string str_afl = "";
 
     //start = std::chrono::steady_clock::now();
 
@@ -337,7 +338,7 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
     }
 
     std::vector<double> values;
-    values.reserve(ntime_pts);
+    //values.reserve(ntime_pts);
 
     const ::scidb::ArrayDesc& array_desc = qresult->array->getArrayDesc();
     const ::scidb::Attributes& array_attributes = array_desc.getAttributes(true);
@@ -353,11 +354,11 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 
     //std::cout << "\tTraversing array in " << elapsed_time.count() << "s" << std::endl;
 
-    if(values.size() != ntime_pts)
-    {
-      boost::format err_msg("error retrieving time series for geoarray '%1%', attribute '%2%': number of expected values was '%3%', found '%4%'!");
-      throw tws::core::http_request_error() << tws::error_description((err_msg % cv.name % attr_name % ntime_pts % values.size()).str());
-    }
+    //if(values.size() != ntime_pts)
+    //{
+    //  boost::format err_msg("error retrieving time series for geoarray '%1%', attribute '%2%': number of expected values was '%3%', found '%4%'!");
+    //  throw tws::core::http_request_error() << tws::error_description((err_msg % cv.name % attr_name % ntime_pts % values.size()).str());
+   // }
 
     rapidjson::Value jattribute(rapidjson::kObjectType);
 
@@ -378,10 +379,10 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
   jresult.AddMember("attributes", jattributes, allocator);
 
 // add timeline in the response
-  rapidjson::Value jtimeline(rapidjson::kArrayType);
-  tws::core::copy_string_array(std::begin(tl.time_points()) + start_time_idx,  std::begin(tl.time_points()) + (start_time_idx + ntime_pts),
-                               jtimeline, allocator);
-  jresult.AddMember("timeline", jtimeline, allocator);
+  //rapidjson::Value jtimeline(rapidjson::kArrayType);
+  //tws::core::copy_string_array(std::begin(tl.time_points()) + start_time_idx,  std::begin(tl.time_points()) + (start_time_idx + ntime_pts),
+                               //jtimeline, allocator);
+  //jresult.AddMember("timeline", jtimeline, allocator);
 
 // add the pixel center location in response
   rapidjson::Value jcenter(rapidjson::kObjectType);
@@ -473,28 +474,28 @@ tws::wtss::register_operations()
 void
 tws::wtss::initialize_operations()
 {
-  std::string timelines = tws::core::find_in_app_path("share/tws/config/timelines.json");
+//  std::string timelines = tws::core::find_in_app_path("share/tws/config/timelines.json");
 
-  if(timelines.empty())
-    throw  tws::file_exists_error() << tws::error_description("could not locate file: 'share/tws/config/wtss_timelines.json'.");
+//  if(timelines.empty())
+//    throw  tws::file_exists_error() << tws::error_description("could not locate file: 'share/tws/config/wtss_timelines.json'.");
 
-  std::vector<std::pair<std::string, std::string> > timelines_files = tws::wtss::read_timelines_file_name(timelines);
+//  std::vector<std::pair<std::string, std::string> > timelines_files = tws::wtss::read_timelines_file_name(timelines);
 
-  for(const auto& tf : timelines_files)
-  {
-    std::string input_file = tws::core::find_in_app_path("share/tws/config/" + tf.second);
+//  for(const auto& tf : timelines_files)
+//  {
+//    std::string input_file = tws::core::find_in_app_path("share/tws/config/" + tf.second);
 
-    if(input_file.empty())
-    {
-      boost::format err_msg("timeline file: '%1%', not found for array '%2%'.");
+//    if(input_file.empty())
+//    {
+//      boost::format err_msg("timeline file: '%1%', not found for array '%2%'.");
 
-      throw tws::file_exists_error() << tws::error_description((err_msg % tf.second % tf.first).str());
-    }
+//      throw tws::file_exists_error() << tws::error_description((err_msg % tf.second % tf.first).str());
+//    }
 
-    std::vector<std::string> str_timeline = tws::wtss::read_timeline(input_file);
+//    std::vector<std::string> str_timeline = tws::wtss::read_timeline(input_file);
 
-    timeline t(str_timeline);
+//    timeline t(str_timeline);
 
-    tws::wtss::timeline_manager::instance().insert(tf.first, t);
-  }
+//    timeline_manager::instance().insert(tf.first, t);
+  //}
 }
