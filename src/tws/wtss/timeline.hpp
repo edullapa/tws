@@ -59,7 +59,10 @@ namespace tws
         std::size_t index(const std::string& time_point) const;
 
 
-        const std::vector<std::string>& time_points() const;
+        const std::vector<std::string>& time_points() const
+        {
+          return time_points_;
+        }
 
       private:
 
