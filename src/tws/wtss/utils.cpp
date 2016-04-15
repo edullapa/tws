@@ -41,7 +41,7 @@
 
 // TerraLib
 //#include <terralib/srs/SpatialReferenceSystemManager.h>
-/*
+
 std::vector<std::pair<std::string, std::string> >
 tws::wtss::read_timelines_file_name(const std::string& input_file)
 {
@@ -207,7 +207,7 @@ tws::wtss::read_timeline(const std::string& input_file)
 
   return timeline;
 }
-
+/*
 std::vector<tws::wtss::coverage_t>
 tws::wtss::read_coverages(const std::string& input_file)
 {

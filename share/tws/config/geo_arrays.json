@@ -1,6 +1,5 @@
 {
   "arrays": [
-
     { "name": "MOD13Q1",
       "description": "Vegetation Indices 16-Day L3 Global 250m",
       "detail": "https://lpdaac.usgs.gov/products/modis_products_table/mod13q1",
@@ -225,7 +224,7 @@
         { "name": "time_idx",
           "description": "time index",
           "min_idx": 1,
-          "max_idx": 1000
+          "max_idx": 1000,
           "pos": 2
         }
       ],
