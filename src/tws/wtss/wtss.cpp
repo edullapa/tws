@@ -345,7 +345,7 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 
     std::shared_ptr< ::scidb::ConstArrayIterator > array_it = qresult->array->getConstIterator(attr.getId());
 
-    //tws::scidb::fill(values, array_it.get(), attr.getType());
+    tws::scidb::fill(values, array_it.get(), attr.getType());
 
     //end = std::chrono::steady_clock::now();
 
@@ -473,28 +473,28 @@ tws::wtss::register_operations()
 void
 tws::wtss::initialize_operations()
 {
-//  std::string timelines = tws::core::find_in_app_path("share/tws/config/timelines.json");
+  std::string timelines = tws::core::find_in_app_path("share/tws/config/timelines.json");
 
-//  if(timelines.empty())
-//    throw  tws::file_exists_error() << tws::error_description("could not locate file: 'share/tws/config/wtss_timelines.json'.");
+  if(timelines.empty())
+    throw  tws::file_exists_error() << tws::error_description("could not locate file: 'share/tws/config/wtss_timelines.json'.");
 
-//  std::vector<std::pair<std::string, std::string> > timelines_files = tws::wtss::read_timelines_file_name(timelines);
+  std::vector<std::pair<std::string, std::string> > timelines_files = tws::wtss::read_timelines_file_name(timelines);
 
-//  for(const auto& tf : timelines_files)
-//  {
-//    std::string input_file = tws::core::find_in_app_path("share/tws/config/" + tf.second);
+  for(const auto& tf : timelines_files)
+  {
+    std::string input_file = tws::core::find_in_app_path("share/tws/config/" + tf.second);
 
-//    if(input_file.empty())
-//    {
-//      boost::format err_msg("timeline file: '%1%', not found for array '%2%'.");
+    if(input_file.empty())
+    {
+      boost::format err_msg("timeline file: '%1%', not found for array '%2%'.");
 
-//      throw tws::file_exists_error() << tws::error_description((err_msg % tf.second % tf.first).str());
-//    }
+      throw tws::file_exists_error() << tws::error_description((err_msg % tf.second % tf.first).str());
+    }
 
-//    std::vector<std::string> str_timeline = tws::wtss::read_timeline(input_file);
+    std::vector<std::string> str_timeline = tws::wtss::read_timeline(input_file);
 
-//    timeline t(str_timeline);
+    timeline t(str_timeline);
 
-//    timeline_manager::instance().insert(tf.first, t);
-  //}
+    timeline_manager::instance().insert(tf.first, t);
+  }
 }
