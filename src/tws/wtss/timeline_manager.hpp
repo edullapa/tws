@@ -27,6 +27,8 @@
 #ifndef __TWS_WTSS_TIMELINE_MANAGER_HPP__
 #define __TWS_WTSS_TIMELINE_MANAGER_HPP__
 
+#include "timeline.hpp"
+
 // STL
 #include <string>
 #include <vector>
@@ -39,7 +41,6 @@ namespace tws
 {
   namespace wtss
   {
-    class timeline;
 
     //! A singleton for managing the timeline of arrays.
     class timeline_manager : public boost::noncopyable
