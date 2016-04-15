@@ -35,8 +35,8 @@
 // Boost
 #include <boost/format.hpp>
 
-tws::wtss::timeline::timeline(const std::vector<std::string>& time_points)
-  : time_points_(time_points)
+tws::wtss::timeline::timeline(const std::vector<std::string>& tp)
+  : time_points_(tp)
 {
   std::insert_iterator< std::map<std::string, std::size_t> > iit(time_point_idx_, time_point_idx_.begin());
 
@@ -44,11 +44,7 @@ tws::wtss::timeline::timeline(const std::vector<std::string>& time_points)
 
   std::transform(std::begin(time_points_), std::end(time_points_),
                  iit,
-                 [&pos](const std::string& time_point) {
-      return std::make_pair(time_point, pos++);
-    } );
-
-  return;
+                 [&pos](const std::string& time_point) { return std::make_pair(time_point, pos++); } );
 }
 
 const std::string&

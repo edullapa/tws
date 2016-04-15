@@ -42,9 +42,9 @@ namespace tws
     {
       public:
 
-      timeline() {}
+        timeline() {}
 
-        timeline(const std::vector<std::string>& time_points);
+        timeline(const std::vector<std::string>& tp);
 
         ~timeline() {}
 
