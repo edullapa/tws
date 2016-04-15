@@ -42,11 +42,11 @@ namespace tws
     {
       public:
 
-        timeline() = default;
+      timeline() {}
 
         timeline(const std::vector<std::string>& time_points);
 
-        ~timeline() = default;
+        ~timeline() {}
 
         /*!
           \exception tws::outof_bounds_error If pos is invalid.
@@ -58,6 +58,8 @@ namespace tws
          */
         std::size_t index(const std::string& time_point) const;
 
+
+        const std::vector<std::string>& time_points() const;
 
       private:
 

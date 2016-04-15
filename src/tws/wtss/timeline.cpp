@@ -38,13 +38,17 @@
 tws::wtss::timeline::timeline(const std::vector<std::string>& time_points)
   : time_points_(time_points)
 {
-  std::insert_iterator< std::map<std::string, std::size_t> > iit(time_point_idx_, std::begin(time_point_idx_));
+  std::insert_iterator< std::map<std::string, std::size_t> > iit(time_point_idx_, time_point_idx_.begin());
 
   std::size_t pos = 0;
 
   std::transform(std::begin(time_points_), std::end(time_points_),
                  iit,
-                 [&pos](const std::string& time_point) { return std::make_pair(time_point, pos++); } );
+                 [&pos](const std::string& time_point) {
+      return std::make_pair(time_point, pos++);
+    } );
+
+  return;
 }
 
 const std::string&
@@ -75,3 +79,8 @@ tws::wtss::timeline::index(const std::string& time_point) const
   return it->second;
 }
 
+const std::vector<std::string>&
+tws::wtss::timeline::time_points() const
+{
+  return time_points_;
+}
