@@ -75,8 +75,8 @@ tws::wtss::timeline::index(const std::string& time_point) const
   return it->second;
 }
 
-//const std::vector<std::string>&
-//tws::wtss::timeline::time_points() const
-//{
-//  return time_points_;
-//}
+const std::vector<std::string>&
+tws::wtss::timeline::time_points() const
+{
+  return time_points_;
+}
