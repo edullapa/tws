@@ -1,6 +1,6 @@
 {
   "timelines": [
-    { "array": "fire_risk_montlhy", "timeline": "fire_risk_montlhy_timeline.json" },
+    { "array": "fire_risk_monthly", "timeline": "fire_risk_monthly_timeline.json" },
     { "array": "mcd43a4", "timeline": "mcd43a4_timeline.json" },
     { "array": "mod09q1", "timeline": "mod09q1_timeline.json" },
     { "array": "mod13q1", "timeline": "mod13q1_timeline.json" }
