@@ -305,8 +305,8 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
   {
 // TODO: fix the query string when we have the time range
     std::string str_afl = "project( between(" + cv.name + ", "
-                        + std::to_string(pixel_col) + "," + std::to_string(pixel_row) + "," + std::to_string(start_time_idx) + ","
-                        + std::to_string(pixel_col) + "," + std::to_string(pixel_row) + "," + std::to_string(end_time_idx) + "), "
+                        + std::to_string(pixel_col) + "," + std::to_string(pixel_row) + "," + std::to_string(start_time_idx + cv.dimensions[2].min_idx) + ","
+                        + std::to_string(pixel_col) + "," + std::to_string(pixel_row) + "," + std::to_string(end_time_idx + cv.dimensions[2].min_idx) + "), "
                         + attr_name + ")";
 
     //start = std::chrono::steady_clock::now();

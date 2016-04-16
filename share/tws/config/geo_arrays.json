@@ -224,7 +224,7 @@
         { "name": "time_idx",
           "description": "time index",
           "min_idx": 1,
-          "max_idx": 1000,
+          "max_idx": 180,
           "pos": 2
         }
       ],
@@ -249,7 +249,7 @@
             "x": 0.05,
             "y": 0.05
           },
-          "crs": "+proj=... ",
+          "crs": "+proj=longlat +datum=WGS84 +no_defs ",
           "srid": 4326
         },
         "temporal": {
