@@ -2,6 +2,13 @@
 
 **Web Time Series Service**, or **WTSS** for short, is a lightweight web service for handling time series data from remote sensing imagery.
 
+In WTSS a coverage is a three dimensional array with spatial and temporal dimensions.
+
+WTSS is based on three operations:
+- **```list_coverages```:** returns the list of all available coverages in the service.
+- **```describe_coverage```:** returns the metadata of a given coverage.
+- **```time_series```:** query the database for the list of values for a given location and time interval.
+
 ```
 http://www.dpi.inpe.br/wtss/list_coverages
 ```
