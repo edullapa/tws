@@ -27,181 +27,86 @@ It will return a JSON document such as:
 
 If you need the metadata of a given coverage you can use the ```describe_coverage``` operation as follow:
 ```
-http://www.dpi.inpe.br/wtss/describe_coverage?name=mod13q1
+http://www.dpi.inpe.br/wtss/describe_coverage?name=mod09q1
 ```
 
 The result of ```describe_coverage``` operation is a JSON document such as:
 ```
 {
-  "name": "mod13q1",
-  "description": "Vegetation Indices 16-Day L3 Global 250m",
-  "detail": "https://lpdaac.usgs.gov/products/modis_products_table/mod13q1",
+  "name": "mod09q1",
+  "description": "Surface Reflectance 8-Day L3 Global 250m",
+  "detail": "https://lpdaac.usgs.gov/dataset_discovery/modis/modis_products_table/mod09q1",
   "dimensions": [
     {
       "name": "col_id",
       "description": "column",
-      "min_idx": ​0,
-      "max_idx": ​0
+      "min_idx": 0,
+      "max_idx": 172799,
+      "pos": 0
     },
     {
       "name": "row_id",
       "description": "row",
-      "min_idx": ​0,
-      "max_idx": ​0
+      "min_idx": 0,
+      "max_idx": 86399,
+      "pos": 1
     },
     {
       "name": "time_id",
       "description": "time",
-      "min_idx": ​0,
-      "max_idx": ​0
+      "min_idx": 0,
+      "max_idx": 1024,
+      "pos": 2
     }
   ],
   "attributes": [
     {
-      "name": "ndvi",
-      "description": "250m 16 days NDVI",
-      "datatype": "16-bit signed integer",
-      "valid_range": {
-          "min": ​-2000,
-          "max": ​10000
-      },
-      "scale_factor": ​0.0001,
-      "missing_value": ​-3000
-    },
-    {
-      "name": "evi",
-      "description": "250m 16 days EVI",
-      "datatype": "16-bit signed integer",
-      "valid_range": {
-          "min": ​-2000,
-          "max": ​10000
-      },
-      "scale_factor": ​0.0001,
-      "missing_value": ​-3000
-    },
-    {
-      "name": "quality",
-      "description": "250m 16 days VI Quality detailed QA",
-      "datatype": "16-bit unsigned integer",
-      "valid_range": {
-          "min": ​0,
-          "max": ​65534
-      },
-      "scale_factor": ​1,
-      "missing_value": ​65535
-    },
-    {
       "name": "red",
-      "description": "250m 16 days red reflectance (Band 1)",
+      "description": "250m Surface Reflectance Band 1 (620–670 nm)",
       "datatype": "16-bit signed integer",
-      "valid_range": {
-          "min": ​0,
-          "max": ​10000
-      },
-      "scale_factor": ​0.0001,
-      "missing_value": ​-1000
+      "valid_range": { "min": -100, "max": 16000 },
+      "scale_factor": 0.0001,
+      "missing_value": -28672
     },
     {
       "name": "nir",
-      "description": "250m 16 days NIR reflectance (Band 2)",
+      "description": "250m Surface Reflectance Band 2 (841–876 nm)",
       "datatype": "16-bit signed integer",
-      "valid_range": {
-          "min": ​0,
-          "max": ​10000
-      },
-      "scale_factor": ​0.0001,
-      "missing_value": ​-1000
+      "valid_range": { "min": -100, "max": 16000 },
+      "scale_factor": 0.0001,
+      "missing_value": -28672
     },
     {
-      "name": "blue",
-      "description": "250m 16 days blue reflectance (Band 3)",
-      "datatype": "16-bit signed integer",
-      "valid_range": {
-          "min": ​0,
-          "max": ​10000
-      },
-      "scale_factor": ​0.0001,
-      "missing_value": ​-1000
-    },
-    {
-      "name": "mir",
-      "description": "250m 16 days MIR reflectance (Band 7)",
-      "datatype": "16-bit signed integer",
-      "valid_range": {
-          "min": ​0,
-          "max": ​10000
-      },
-      "scale_factor": ​0.0001,
-      "missing_value": ​-1000
-    },
-    {
-      "name": "view_zenith",
-      "description": "250m 16 days view zenith angle",
-      "datatype": "16-bit signed integer",
-      "valid_range": {
-        "min": ​-9000,
-        "max": ​9000
-      },
-      "scale_factor": ​0.01,
-      "missing_value": ​-10000
-    },
-    {
-      "name": "sun_zenith",
-      "description": "250m 16 days sun zenith angle",
-      "datatype": "16-bit signed integer",
-      "valid_range": {
-        "min": ​-9000,
-        "max": ​9000
-      },
-      "scale_factor": ​0.01,
-      "missing_value": ​-10000
-    },
-    {
-      "name": "azimuth",
-      "description": "250m 16 days relative azimuth angle', , , 0.1, -4000",
-      "datatype": "16-bit signed integer",
-      "valid_range": {
-        "min": ​-3600,
-        "max": ​3600
-      },
-      "scale_factor": ​0.10000000000000001,
-      "missing_value": ​-4000
-    },
-    {
-      "name": "day",
-      "description": "250m 16 days composite day of the year",
-      "datatype": "16-bit signed integer",
-      "valid_range": {
-        "min": ​1,
-        "max": ​366
-      },
-      "scale_factor": ​1,
-      "missing_value": ​-1
-    },
-    {
-      "name": "reliability",
-      "description": "250m 16 days pixel reliability summary QA",
-      "datatype": "8-bit signed integer",
-      "valid_range": {
-            "min": ​0,
-            "max": ​3
-      },
-      "scale_factor": ​1,
-      "missing_value": ​-1
+      "name": "quality",
+      "description": "250m Reflectance Band Quality",
+      "datatype": "16-bit unsigned integer",
+      "valid_range": { "min": 0, "max": 32767 },
+      "scale_factor": 1,
+      "missing_value": 65535
     }
   ],
   "geo_extent": {
     "spatial": {
-      "xmin": ​-20015109.354005989,
-      "xmax": ​20015109.354005989,
-      "ymin": ​-10007554.676994,
-      "ymax": ​10007554.676994
+      "extent": {
+        "xmin": -20015109.35400599,
+        "ymin": -10007554.676994,
+        "xmax": 20015109.35400599,
+        "ymax": 10007554.676994
+      },
+      "resolution": {
+        "x": 231.65635826395825,
+        "y": 231.65635826374995
+      },
+      "crs": "+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs ",
+      "srid": 100002
     },
     "temporal": {
-            "start": "2000-02-18",
-            "end": "2014-08-13",
-            "resolution": ​16,
-            "unit": "day"
+      "interval": {
+        "start": "2000-02-18",
+        "end": "2014-08-13"
+      },
+      "resolution": 8,
+      "unit": "day"
     }
   }
 }
@@ -209,7 +114,7 @@ The result of ```describe_coverage``` operation is a JSON document such as:
 
 You can retrieve the time series for a given location through the  ```time_series```:
 ```
-http://www.dpi.inpe.br/wtss/time_series?coverage=mod09q1&attributes=red,nir&longitude=-54.0&latitude=-12.0&start=2001-01-01&end=2001-01-17
+http://www.dpi.inpe.br/wtss/time_series?coverage=mod09q1&attributes=red,nir&longitude=-54.0&latitude=-5.0&start=2000-02-18&end=2000-03-21
 ```
 The result of ```time_series``` is a JSON document such as:
 ```
@@ -218,21 +123,24 @@ The result of ```time_series``` is a JSON document such as:
     "attributes": [
       {
         "attribute": "red",
-        "values":[0,0,0]
+        "values": [ 3726, 2834, 4886, 231, 1264 ]
       },
       {
         "attribute": "nir",
-        "values":[0,0,0]
+        "values": [ 4646, 4580, 5443, 3955, 2987 ]
       }
     ],
-    "timeline":["2000-01-01","2001-01-09","2000-01-17"],
-    "center_coordinates":{"latitude":-11.999999999999996,"longitude":-54}
+    "timeline": [ "2000-02-18", "2000-02-26", "2000-03-05", "2000-03-13", "2000-03-21" ],
+    "center_coordinates": {
+      "latitude": -4.9989583328814176,
+      "longitude": -54.000193143463676
+    }
   },
   "query": {
     "coverage": "mod09q1",
-    "attributes": ["red", "nir"],
-    "latitude": -12,
-    "longitude":-54
+    "attributes": [ "red", "nir" ],
+    "latitude": ​-5,
+    "longitude": ​-54
   }
 }
 ```
