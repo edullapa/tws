@@ -186,7 +186,7 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
     throw tws::core::http_request_error() << tws::error_description((err_ms % cv.name).str());
   }
 
-  // check if attributes are valid
+// check if attributes are valid
   for(const std::string& attr_name : queried_attributes)
   {
       std::vector<tws::geoarray::attribute_t>::const_iterator it = std::find_if(cv.attributes.begin(),

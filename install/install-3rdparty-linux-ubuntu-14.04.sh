@@ -269,6 +269,19 @@ else
   echo "libkml-dev already installed!"
 fi
 
+#
+# libgd
+#
+libgd_test=`dpkg -s libgd-dev | grep Status`
+
+if [ "$libgd_test" != "Status: install ok installed" ]; then
+  sudo apt-get -y install libgd-dev
+  valid $? "Error: could not install libgd-dev! Please, install libgd-dev: sudo apt-get -y install libgd-dev"
+  echo "libgd-dev installed!"
+else
+  echo "libgd-dev already installed!"
+fi
+
 
 #
 # Check for tws-3rdparty-linux-ubuntu-14.04.tar.gz

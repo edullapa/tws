@@ -175,6 +175,8 @@ find_package(RapidJSON REQUIRED)
 
 find_package(RapidXml)
 
+find_package(LibGD)
+
 
 #
 # add include targets
@@ -194,7 +196,7 @@ CMAKE_DEPENDENT_OPTION(TWS_MOD_GEOARRAY_ENABLED "Build Geo-Array metadata suppor
 
 CMAKE_DEPENDENT_OPTION(TWS_MOD_SCIDB_ENABLED "Build SciDB support for web services?" ON "TWS_MOD_CORE_ENABLED" OFF)
 
-CMAKE_DEPENDENT_OPTION(TWS_MOD_WMS_ENABLED "Build Application Web Map Service?" ON "TWS_MOD_GEOARRAY_ENABLED;RAPIDXML_FOUND" OFF)
+CMAKE_DEPENDENT_OPTION(TWS_MOD_WMS_ENABLED "Build Application Web Map Service?" ON "TWS_MOD_GEOARRAY_ENABLED;RAPIDXML_FOUND;LIBGD_FOUND" OFF)
 
 CMAKE_DEPENDENT_OPTION(TWS_MOD_WTSS_ENABLED "Build Application Web Time Series Data Service?" ON "TWS_MOD_GEOARRAY_ENABLED" OFF)
 
@@ -301,5 +303,4 @@ cpack_add_component(devel
                     DESCRIPTION "Install header files, cmake stuffs and additional shared libraries"
                     GROUP devel_group
                     INSTALL_TYPES full minimalistic)
-
 

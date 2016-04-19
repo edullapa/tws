@@ -139,14 +139,14 @@ rapidjson::Document* tws::core::open_json_file(const std::string &path)
     {
       boost::format err_msg("error parsing input file '%1%': %2%.");
 
-      throw tws::parser_error() << tws::error_description((err_msg % path % doc->GetParseError()).str());
+      throw tws::parse_error() << tws::error_description((err_msg % path % doc->GetParseError()).str());
     }
 
     if(!doc->IsObject() || doc->IsNull())
     {
       boost::format err_msg("error parsing input file '%1%': unexpected file format.");
 
-      throw tws::parser_error() << tws::error_description((err_msg % path).str());
+      throw tws::parse_error() << tws::error_description((err_msg % path).str());
     }
 
     fclose(pfile);

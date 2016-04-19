@@ -62,8 +62,8 @@ namespace tws
   //! An exception indicating that a given file could not be opened.
   struct file_open_error: virtual exception { };
 
-  //! An exception indicating an error during parser operations.
-  struct parser_error: virtual tws::exception { };
+  //! An exception indicating an error during parse.
+  struct parse_error: virtual tws::exception { };
 
   //! An exception indicating a data type conversion error.
   struct conversion_error: virtual tws::exception { };

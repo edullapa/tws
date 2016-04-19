@@ -29,19 +29,22 @@
 include_directories(${RAPIDJSON_INCLUDE_DIR})
 include_directories(${RAPIDXML_INCLUDE_DIR})
 include_directories(${terralib_INCLUDE_DIRS})
+include_directories(${LIBGD_INCLUDE_DIR})
 
 file(GLOB TWS_SRC_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/wms/*.cpp)
 file(GLOB TWS_HDR_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/wms/*.hpp)
 
 add_library(tws_mod_wms SHARED ${TWS_SRC_FILES} ${TWS_HDR_FILES})
 
-target_link_libraries(tws_mod_wms tws_mod_geoarray
+target_link_libraries(tws_mod_wms tws_mod_scidb
+                                  tws_mod_geoarray
                                   tws_mod_core
                                   terralib_mod_plugin
                                   terralib_mod_raster
                                   terralib_mod_srs
                                   ${Boost_FILESYSTEM_LIBRARY}
-                                  ${Boost_SYSTEM_LIBRARY})
+                                  ${Boost_SYSTEM_LIBRARY}
+                                  ${LIBGD_LIBRARY})
 
 set_target_properties(tws_mod_wms
                       PROPERTIES VERSION ${TWS_VERSION_MAJOR}.${TWS_VERSION_MINOR}

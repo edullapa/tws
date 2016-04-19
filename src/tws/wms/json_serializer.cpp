@@ -33,7 +33,7 @@ tws::wms::capabilities_t
 tws::wms::read_capabilities(const rapidjson::Value& jcapabilities)
 {
   if(!jcapabilities.IsObject())
-    throw tws::parser_error() << tws::error_description("error parsing wms_capabilities metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing wms_capabilities metadata.");
 
   const rapidjson::Value& jservice = jcapabilities["service"];
   const rapidjson::Value& jcapability = jcapabilities["capability"];
@@ -53,19 +53,19 @@ tws::wms::read_service(const rapidjson::Value& jservice)
   service_t service;
 
   if (!jservice.IsObject())
-    throw tws::parser_error() << tws::error_description("error parsing service metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing service metadata.");
 
   service.name = "WMS";
 
   const rapidjson::Value& jtitle = jservice["title"];
   if (!jtitle.IsString())
-    throw tws::parser_error() << tws::error_description("error parsing service title metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing service title metadata.");
 
   service.title = jtitle.GetString();
 
   const rapidjson::Value& jabstract = jservice["abstract"];
   if (!jabstract.IsString())
-    throw tws::parser_error() << tws::error_description("error parsing service abstract metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing service abstract metadata.");
 
   service.abstract = jabstract.GetString();
 
@@ -83,31 +83,31 @@ tws::wms::read_service(const rapidjson::Value& jservice)
 
   const rapidjson::Value& jfees = jservice["fees"];
   if (!jfees.IsString())
-    throw tws::parser_error() << tws::error_description("error parsing service fees metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing service fees metadata.");
 
   service.fees = jfees.GetString();
 
   const rapidjson::Value& jaccess_constraints = jservice["access_constraints"];
   if (!jaccess_constraints.IsString())
-    throw tws::parser_error() << tws::error_description("error parsing service access constraints metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing service access constraints metadata.");
 
   service.access_constraints = jaccess_constraints.GetString();
 
   const rapidjson::Value& jlayer_limit = jservice["layer_limit"];
   if (!jlayer_limit.IsInt())
-    throw tws::parser_error() << tws::error_description("error parsing service layer limit metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing service layer limit metadata.");
 
   service.layer_limit = jlayer_limit.GetInt();
 
   const rapidjson::Value& jmax_width = jservice["max_width"];
   if (!jmax_width.IsInt())
-    throw tws::parser_error() << tws::error_description("error parsing service max width metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing service max width metadata.");
 
   service.max_width = jmax_width.GetInt();
 
   const rapidjson::Value& jmax_height = jservice["max_height"];
   if (!jmax_height.IsInt())
-    throw tws::parser_error() << tws::error_description("error parsing service max height metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing service max height metadata.");
 
   service.max_height = jmax_height.GetInt();
 
@@ -118,7 +118,7 @@ tws::wms::contact_information_t
 tws::wms::read_contact_information(const rapidjson::Value& jcontact_information)
 {
   if (!jcontact_information.IsObject())
-    throw tws::parser_error() << tws::error_description("error parsing contact information metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing contact information metadata.");
 
   contact_information_t contact_information;
 
@@ -128,7 +128,7 @@ tws::wms::read_contact_information(const rapidjson::Value& jcontact_information)
 
   const rapidjson::Value& jcontact_position = jcontact_information["contact_position"];
   if (!jcontact_position.IsString())
-    throw tws::parser_error() << tws::error_description("error parsing contact position metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing contact position metadata.");
 
   contact_information.contact_position = jcontact_position.GetString();
 
@@ -138,13 +138,13 @@ tws::wms::read_contact_information(const rapidjson::Value& jcontact_information)
 
   const rapidjson::Value& jcontact_voice_telephone = jcontact_information["contact_voice_telephone"];
   if (!jcontact_voice_telephone.IsString())
-    throw tws::parser_error() << tws::error_description("error parsing contact voice telephone metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing contact voice telephone metadata.");
 
   contact_information.contact_voice_telephone = jcontact_voice_telephone.GetString();
 
   const rapidjson::Value& jcontact_electronic_mail_address = jcontact_information["contact_electronic_mail_address"];
   if (!jcontact_electronic_mail_address.IsString())
-    throw tws::parser_error() << tws::error_description("error parsing contact electronic mail address metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing contact electronic mail address metadata.");
 
   contact_information.contact_electronic_mail_address = jcontact_electronic_mail_address.GetString();
 
@@ -155,19 +155,19 @@ tws::wms::contact_person_primary_t
 tws::wms::read_contact_person_primary(const rapidjson::Value& jcontact_person_primary)
 {
   if (!jcontact_person_primary.IsObject())
-    throw tws::parser_error() << tws::error_description("error parsing contact person primary metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing contact person primary metadata.");
 
   contact_person_primary_t contact_person_primary;
 
   const rapidjson::Value& jcontact_person = jcontact_person_primary["contact_person"];
   if (!jcontact_person.IsString())
-    throw tws::parser_error() << tws::error_description("error parsing contact person metadata. ");
+    throw tws::parse_error() << tws::error_description("error parsing contact person metadata. ");
 
   contact_person_primary.contact_person = jcontact_person.GetString();
 
   const rapidjson::Value& jcontact_organization = jcontact_person_primary["contact_organization"];
   if (!jcontact_organization.IsString())
-    throw tws::parser_error() << tws::error_description("error parsing contact organization metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing contact organization metadata.");
 
   contact_person_primary.contact_organization = jcontact_organization.GetString();
 
@@ -178,43 +178,43 @@ tws::wms::contact_address_t
 tws::wms::read_contact_address(const rapidjson::Value& jcontact_address)
 {
   if (!jcontact_address.IsObject())
-    throw tws::parser_error() << tws::error_description("error parsing contact address metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing contact address metadata.");
 
   contact_address_t contact_address;
 
   const rapidjson::Value& jaddress_type = jcontact_address["address_type"];
   if (!jaddress_type.IsString())
-    throw tws::parser_error() << tws::error_description("error parsing contact address type metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing contact address type metadata.");
 
   contact_address.address_type = jaddress_type.GetString();
 
   const rapidjson::Value& jaddress = jcontact_address["address"];
   if (!jaddress.IsString())
-    throw tws::parser_error() << tws::error_description("error parsing contact address metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing contact address metadata.");
 
   contact_address.address = jaddress.GetString();
 
   const rapidjson::Value& jcity = jcontact_address["city"];
   if (!jcity.IsString())
-    throw tws::parser_error() << tws::error_description("error parsing contact city metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing contact city metadata.");
 
   contact_address.city = jcity.GetString();
 
   const rapidjson::Value& jstate_or_province = jcontact_address["state_or_province"];
   if (!jstate_or_province.IsString())
-    throw tws::parser_error() << tws::error_description("error parsing contact state or province metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing contact state or province metadata.");
 
   contact_address.state_or_province = jstate_or_province.GetString();
 
   const rapidjson::Value& jpost_code = jcontact_address["post_code"];
   if (!jpost_code.IsString())
-    throw tws::parser_error() << tws::error_description("error parsing contact post code metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing contact post code metadata.");
 
   contact_address.post_code = jpost_code.GetString();
 
   const rapidjson::Value& jcountry = jcontact_address["country"];
   if (!jcountry.IsString())
-    throw tws::parser_error() << tws::error_description("error parsing contact country metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing contact country metadata.");
 
   contact_address.country = jcountry.GetString();
 
@@ -225,7 +225,7 @@ tws::wms::capability_t
 tws::wms::read_capability(const rapidjson::Value& jcapability)
 {
   if (!jcapability.IsObject())
-    throw tws::parser_error() << tws::error_description("error parsing capability metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing capability metadata.");
 
   capability_t capability;
 
@@ -248,7 +248,7 @@ tws::wms::request_t
 tws::wms::read_request(const rapidjson::Value& jrequest)
 {
   if (!jrequest.IsObject())
-    throw tws::parser_error() << tws::error_description("error parsing request metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing request metadata.");
 
   request_t request;
 
@@ -271,7 +271,7 @@ tws::wms::operation_t
 tws::wms::read_operation(const rapidjson::Value& joperation)
 {
   if (!joperation.IsObject())
-    throw tws::parser_error() << tws::error_description("error parsing operation metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing operation metadata.");
 
   operation_t operation;
 
@@ -290,7 +290,7 @@ tws::wms::dcp_type_t
 tws::wms::read_dcp_type(const rapidjson::Value& jdcp_type)
 {
   if (!jdcp_type.IsObject())
-    throw tws::parser_error() << tws::error_description("error parsing dcp type metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing dcp type metadata.");
 
   dcp_type_t dcp_type;
 
@@ -305,7 +305,7 @@ tws::wms::http_t
 tws::wms::read_http(const rapidjson::Value& jhttp)
 {
   if (!jhttp.IsObject())
-    throw tws::parser_error() << tws::error_description("error parsing http metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing http metadata.");
 
   http_t http;
 
@@ -331,7 +331,7 @@ std::vector<tws::wms::keyword_t>
 tws::wms::read_keyword_list(const rapidjson::Value& jkeyword_list)
 {
   if (!jkeyword_list.IsArray())
-    throw tws::parser_error() << tws::error_description("error parsing keyword list metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing keyword list metadata.");
 
   keyword_t keyword;
   std::vector<keyword_t> keyword_list;
@@ -349,7 +349,7 @@ std::vector<std::string>
 tws::wms::read_formats(const rapidjson::Value& jformats)
 {
   if (!jformats.IsArray())
-    throw tws::parser_error() << tws::error_description("error parsing exception formats metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing exception formats metadata.");
 
   std::vector<std::string> formats;
 
@@ -365,7 +365,7 @@ tws::wms::online_resource_t
 tws::wms::read_online_resource(const rapidjson::Value& jonline_resource)
 {
   if (!jonline_resource.IsString())
-    throw tws::parser_error() << tws::error_description("error parsing online resource metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing online resource metadata.");
 
   online_resource_t online_resource;
 
@@ -380,19 +380,19 @@ tws::wms::layer_t
 tws::wms::read_layer(const rapidjson::Value& jlayer)
 {
   if (!jlayer.IsObject())
-    throw tws::parser_error() << tws::error_description("error parsing layer metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing layer metadata.");
 
   layer_t layer;
 
   const rapidjson::Value& jname = jlayer["name"];
   if (!jname.IsString())
-    throw tws::parser_error() << tws::error_description("error parsing layer name metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing layer name metadata.");
 
   layer.name = jname.GetString();
 
   const rapidjson::Value& jsub_layers = jlayer["layers"];
   if (!jsub_layers.IsArray())
-    throw tws::parser_error() << tws::error_description("error parsing layers list metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing layers list metadata.");
 
   layer_t sub_layer;
   for (unsigned int i = 0; i < jsub_layers.Size(); ++i)
