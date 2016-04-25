@@ -81,7 +81,7 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
   const char* qstring = request.query_string();
 
   if(qstring == nullptr)
-    throw tws::core::http_request_error() << tws::error_description("time_series operation requires the following parameters: \"coverage\", \"attributes\", \"latitude\", \"longitude\", \"start\", \"end\".");
+    throw tws::core::http_request_error() << tws::error_description("GetMap operation requires the following parameters: \"LAYERS\", \"BBOX\", \"WIDTH\", \"HEIGHT\".");
 
 // parse plain text query string to a std::map
   tws::core::query_string_t qstr = tws::core::expand(qstring);

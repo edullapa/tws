@@ -40,6 +40,22 @@ namespace tws
 
     void write(const capabilities_t& capabilities, rapidxml::xml_document<>& xml_capabilities);
 
+    rapidxml::xml_node<>* write_service(const service_t service, rapidxml::xml_document<>& xml_capabilities);
+
+    rapidxml::xml_node<>* write_contact_information(const contact_information_t contact_information, rapidxml::xml_document<>& xml_capabilities);
+
+    rapidxml::xml_node<>* write_capability(const capability_t capability, rapidxml::xml_document<>& xml_capabilities);
+
+    rapidxml::xml_node<>* write_request(const request_t request, rapidxml::xml_document<>& xml_capabilities);
+
+    rapidxml::xml_node<>* write_operation(const operation_t operation, rapidxml::xml_node<>* operation_node, rapidxml::xml_document<>& xml_capabilities);
+
+    rapidxml::xml_node<>* write_layer(const layer_t layer, rapidxml::xml_document<>& xml_capabilities);
+
+    rapidxml::xml_node<>* write_keyword_list(const std::vector<keyword_t> keyword_list, rapidxml::xml_document<>& xml_capabilities);
+
+    rapidxml::xml_node<>* write_online_resource(const online_resource_t online_resource, rapidxml::xml_document<>& xml_capabilities);
+
   }  // end namespace wms
 }    // end namespace tws
 
