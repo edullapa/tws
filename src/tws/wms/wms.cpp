@@ -119,6 +119,9 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
 // retrieve bounding box
   it = qstr.find("BBOX");
 
+  if(it == it_end || it->second.empty())
+    throw tws::core::http_request_error() << tws::error_description("check GetMap operation: \"BBOX\" parameter is missing!");
+
   std::vector<std::string> str_bbox;
 
   boost::split(str_bbox, it->second, boost::is_any_of(","));
