@@ -81,14 +81,28 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
   const char* qstring = request.query_string();
 
   if(qstring == nullptr)
-    throw tws::core::http_request_error() << tws::error_description("GetMap operation requires the following parameters: \"LAYERS\", \"BBOX\", \"WIDTH\", \"HEIGHT\".");
+    throw tws::core::http_request_error() << tws::error_description("GetMap operation requires the following parameters: \"VERSION\", \"LAYERS\", \"BBOX\", \"WIDTH\", \"HEIGHT\".");
 
 // parse plain text query string to a std::map
   tws::core::query_string_t qstr = tws::core::expand(qstring);
 
-// which layers?
-  tws::core::query_string_t::const_iterator it = qstr.find("LAYERS");
+// valid service version
+  tws::core::query_string_t::const_iterator it = qstr.find("VERSION");
   tws::core::query_string_t::const_iterator it_end = qstr.end();
+
+  if(it == it_end || it->second.empty())
+    throw tws::core::http_request_error() << tws::error_description("check GetMap operation: \"VERSION\" parameter is missing!");
+
+  const std::string version = it->second;
+
+  if(version != "1.3.0")
+  {
+    boost::format err_ms("Invalid service version: '%1%'.");
+    throw tws::core::http_request_error() << tws::error_description((err_ms % it->second).str());
+  }
+
+// which layers?
+  it = qstr.find("LAYERS");
 
   if(it == it_end)
     throw tws::core::http_request_error() << tws::error_description("GetMap error: \"LAYERS\" parameter is missing!");
