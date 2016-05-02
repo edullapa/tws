@@ -28,6 +28,19 @@
 #define __TWS_WMS_XML_SERIALIZER_HPP__
 
 // TWS
-#include "config.hpp"
+#include "data_types.hpp"
+
+// RapidXml
+#include <rapidxml/rapidxml.hpp>
+
+namespace tws
+{
+  namespace wms
+  {
+
+    void write(const capabilities_t& capabilities, rapidxml::xml_document<>& xml_capabilities);
+
+  }  // end namespace wms
+}    // end namespace tws
 
 #endif  // __TWS_WMS_XML_SERIALIZER_HPP__

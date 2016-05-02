@@ -35,6 +35,9 @@
 #include <string>
 #include <vector>
 
+// RapidXml
+#include <rapidxml/rapidxml.hpp>
+
 namespace tws
 {
   namespace wms
@@ -52,9 +55,12 @@ namespace tws
 
         /*!
           \brief It makes a capabilities object with wms metadata
+
           \return A tws::wms::capabilities_t struct containing wms configuration
         */
-        capabilities_t capabilities();
+        const capabilities_t& capabilities() const;
+
+        const rapidxml::xml_document<>& xml_capabilities() const;
 
       private:
 

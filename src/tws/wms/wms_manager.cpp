@@ -29,6 +29,7 @@
 #include "../core/utils.hpp"
 #include "data_types.hpp"
 #include "json_serializer.hpp"
+#include "xml_serializer.hpp"
 
 // Rapidjson
 #include <rapidjson/document.h>
@@ -36,36 +37,11 @@
 // STL
 #include <memory>
 
-
 struct tws::wms::wms_manager::impl
 {
-  impl()
-    : json_file(nullptr)
-  {
-
-  }
-
-  ~impl()
-  {
-  }
-
-  std::unique_ptr<rapidjson::Document> json_file;
   tws::wms::capabilities_t capabilities;
+  rapidxml::xml_document<> xml_doc;
 };
-
-tws::wms::wms_manager::wms_manager()
-  : pimpl_(nullptr)
-{
-  pimpl_ = new impl;
-
-  std::string wms_file = tws::core::find_in_app_path("share/tws/config/wms.json");
-  pimpl_->json_file.reset(tws::core::open_json_file(wms_file));
-}
-
-tws::wms::wms_manager::~wms_manager()
-{
-  delete pimpl_;
-}
 
 tws::wms::wms_manager&
 tws::wms::wms_manager::instance()
@@ -75,12 +51,41 @@ tws::wms::wms_manager::instance()
   return instance;
 }
 
-tws::wms::capabilities_t
-tws::wms::wms_manager::capabilities()
+const tws::wms::capabilities_t&
+tws::wms::wms_manager::capabilities() const
 {
-  const rapidjson::Value& jcapabilities = (*pimpl_->json_file)["wms_capabilities"];
+  return pimpl_->capabilities;
+}
+
+const rapidxml::xml_document<>&
+tws::wms::wms_manager::xml_capabilities() const
+{
+  return pimpl_->xml_doc;
+}
+
+tws::wms::wms_manager::wms_manager()
+  : pimpl_(nullptr)
+{
+  pimpl_ = new impl;
+
+  std::string wms_file = tws::core::find_in_app_path("share/tws/config/wms.json");
+
+  if(wms_file.empty())
+    throw tws::file_exists_error() << tws::error_description("Could not locate file 'share/tws/config/wms.json'.");
+
+  std::unique_ptr<rapidjson::Document> jdocument(tws::core::open_json_file(wms_file));
+
+  if(!jdocument->HasMember("wms_capabilities"))
+    throw tws::parse_error() << tws::error_description("Could not locate wms_capabilities key in file 'share/tws/config/wms.json'.");
+
+  const rapidjson::Value& jcapabilities = (*jdocument)["wms_capabilities"];
 
   pimpl_->capabilities = read_capabilities(jcapabilities);
 
-  return pimpl_->capabilities;
+  write(pimpl_->capabilities, pimpl_->xml_doc);
+}
+
+tws::wms::wms_manager::~wms_manager()
+{
+  delete pimpl_;
 }

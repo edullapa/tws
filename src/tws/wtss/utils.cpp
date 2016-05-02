@@ -41,7 +41,7 @@
 
 // TerraLib
 //#include <terralib/srs/SpatialReferenceSystemManager.h>
-/*
+
 std::vector<std::pair<std::string, std::string> >
 tws::wtss::read_timelines_file_name(const std::string& input_file)
 {
@@ -72,13 +72,13 @@ tws::wtss::read_timelines_file_name(const std::string& input_file)
     if(doc.HasParseError())
     {
       boost::format err_msg("error parsing input file '%1%': %2%.");
-      throw tws::parser_error() << tws::error_description((err_msg % input_file % doc.GetParseError()).str());
+      throw tws::parse_error() << tws::error_description((err_msg % input_file % doc.GetParseError()).str());
     }
 
     if(!doc.IsObject() || doc.IsNull())
     {
       boost::format err_msg("error parsing input file '%1%': unexpected file format.");
-      throw tws::parser_error() << tws::error_description((err_msg % input_file).str());
+      throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
     }
 
     const rapidjson::Value& jtimelines = doc["timelines"];
@@ -86,7 +86,7 @@ tws::wtss::read_timelines_file_name(const std::string& input_file)
     if(!jtimelines.IsArray())
     {
       boost::format err_msg("error parsing input file '%1%': expected a vector of array with time values.");
-      throw tws::parser_error() << tws::error_description((err_msg % input_file).str());
+      throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
     }
 
     const rapidjson::SizeType nelements = jtimelines.Size();
@@ -101,20 +101,20 @@ tws::wtss::read_timelines_file_name(const std::string& input_file)
       if(!jtimeline.IsObject())
       {
         boost::format err_msg("error parsing input file '%1%': expected an object description for array timeline.");
-        throw tws::parser_error() << tws::error_description((err_msg % input_file).str());
+        throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
       }
 
       const rapidjson::Value& jarray_name = jtimeline["array"];
 
       if(!jarray_name.IsString() || jarray_name.IsNull())
-        throw tws::parser_error() << tws::error_description("error in array timeline entry name in timelines metadata file.");
+        throw tws::parse_error() << tws::error_description("error in array timeline entry name in timelines metadata file.");
 
       std::string array_name = jarray_name.GetString();
 
       const rapidjson::Value& jarray_timeline = jtimeline["timeline"];
 
       if(!jarray_timeline.IsString() || jarray_timeline.IsNull())
-        throw tws::parser_error() << tws::error_description("error in array timeline entry in timelines metadata file.");
+        throw tws::parse_error() << tws::error_description("error in array timeline entry in timelines metadata file.");
 
       std::string timeline_file = jarray_timeline.GetString();
 
@@ -162,13 +162,13 @@ tws::wtss::read_timeline(const std::string& input_file)
     if(doc.HasParseError())
     {
       boost::format err_msg("error parsing input file '%1%': %2%.");
-      throw tws::parser_error() << tws::error_description((err_msg % input_file % doc.GetParseError()).str());
+      throw tws::parse_error() << tws::error_description((err_msg % input_file % doc.GetParseError()).str());
     }
 
     if(!doc.IsObject() || doc.IsNull())
     {
       boost::format err_msg("error parsing input file '%1%': unexpected file format.");
-      throw tws::parser_error() << tws::error_description((err_msg % input_file).str());
+      throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
     }
 
     const rapidjson::Value& jtimes = doc["timeline"];
@@ -176,7 +176,7 @@ tws::wtss::read_timeline(const std::string& input_file)
     if(!jtimes.IsArray())
     {
       boost::format err_msg("error parsing input file '%1%': expected a vector of array with time values.");
-      throw tws::parser_error() << tws::error_description((err_msg % input_file).str());
+      throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
     }
 
     const rapidjson::SizeType nelements = jtimes.Size();
@@ -191,7 +191,7 @@ tws::wtss::read_timeline(const std::string& input_file)
       if(!jtime.IsString())
       {
         boost::format err_msg("error parsing input file '%1%': expected a string description for date.");
-        throw tws::parser_error() << tws::error_description((err_msg % input_file).str());
+        throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
       }
       
       timeline.push_back(jtime.GetString());
@@ -207,7 +207,7 @@ tws::wtss::read_timeline(const std::string& input_file)
 
   return timeline;
 }
-
+/*
 std::vector<tws::wtss::coverage_t>
 tws::wtss::read_coverages(const std::string& input_file)
 {
@@ -238,13 +238,13 @@ tws::wtss::read_coverages(const std::string& input_file)
     if(doc.HasParseError())
     {
       boost::format err_msg("error parsing input file '%1%': %2%.");
-      throw tws::parser_error() << tws::error_description((err_msg % input_file % doc.GetParseError()).str());
+      throw tws::parse_error() << tws::error_description((err_msg % input_file % doc.GetParseError()).str());
     }
 
     if(!doc.IsObject() || doc.IsNull())
     {
       boost::format err_msg("error parsing input file '%1%': unexpected file format.");
-      throw tws::parser_error() << tws::error_description((err_msg % input_file).str());
+      throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
     }
 
     const rapidjson::Value& jcoverages = doc["coverages"];
@@ -252,7 +252,7 @@ tws::wtss::read_coverages(const std::string& input_file)
     if(!jcoverages.IsArray())
     {
       boost::format err_msg("error parsing input file '%1%': expected a vector of coverages.");
-      throw tws::parser_error() << tws::error_description((err_msg % input_file).str());
+      throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
     }
 
     const rapidjson::SizeType nelements = jcoverages.Size();
@@ -269,7 +269,7 @@ tws::wtss::read_coverages(const std::string& input_file)
       if(!jcoverage.IsObject())
       {
         boost::format err_msg("error parsing input file '%1%': expected an object description for coverage.");
-        throw tws::parser_error() << tws::error_description((err_msg % input_file).str());
+        throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
       }
 
       coverage_t coverage = read_coverage(jcoverage);
@@ -292,19 +292,19 @@ tws::wtss::coverage_t
 tws::wtss::read_coverage(const rapidjson::Value& jcoverage)
 {
   if(!jcoverage.IsObject())
-    throw tws::parser_error() << tws::error_description("error parsing views input file: expected an object description for coverage.");
+    throw tws::parse_error() << tws::error_description("error parsing views input file: expected an object description for coverage.");
 
   coverage_t coverage;
 
   const rapidjson::Value& jcoverage_name = jcoverage["name"];
 
   if(!jcoverage_name.IsString() || jcoverage_name.IsNull())
-    throw tws::parser_error() << tws::error_description("error in coverage entry name in coverages metadata.");
+    throw tws::parse_error() << tws::error_description("error in coverage entry name in coverages metadata.");
 
   coverage.name = jcoverage_name.GetString();
 
   if(coverage.name.empty())
-    throw tws::parser_error() << tws::error_description("coverage name can not be empty in coverages metadata.");
+    throw tws::parse_error() << tws::error_description("coverage name can not be empty in coverages metadata.");
 
   const rapidjson::Value& jcoverage_dsc = jcoverage["description"];
 
@@ -345,7 +345,7 @@ std::vector<tws::wtss::coverage_attribute_t>
 tws::wtss::read_coverage_attributes(const rapidjson::Value& jattributes)
 {
   if(!jattributes.IsArray() || jattributes.IsNull())
-    throw tws::parser_error() << tws::error_description("error parsing coverage attributes in metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing coverage attributes in metadata.");
 
   std::vector<coverage_attribute_t> attributes;
 
@@ -368,7 +368,7 @@ tws::wtss::coverage_attribute_t
 tws::wtss::read_coverage_attribute(const rapidjson::Value& jattribute)
 {
   if(!jattribute.IsObject() || jattribute.IsNull())
-    throw tws::parser_error() << tws::error_description("error parsing coverage attribute in metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing coverage attribute in metadata.");
 
   coverage_attribute_t cv_attr;
 
@@ -379,7 +379,7 @@ tws::wtss::read_coverage_attribute(const rapidjson::Value& jattribute)
   const rapidjson::Value& jexp = jattribute["expression"];
 
   if(!jexp.IsString() || jexp.IsNull())
-    throw tws::parser_error() << tws::error_description("error in attribute expression entry in metadata.");
+    throw tws::parse_error() << tws::error_description("error in attribute expression entry in metadata.");
 
   cv_attr.expression = jexp.GetString();
 

@@ -34,12 +34,8 @@
           "format": ["text/xml"],
           "dcptype": {
             "http": {
-              "get": {
-                "online_resource": "http://localhost/wms/GetCapabilities?"
-              },
-              "post": {
-                "online_resource": "http://localhost/wms/GetCapabilities?"
-              }
+              "get": { "online_resource": "http://localhost/wms/GetCapabilities?" },
+              "post": { "online_resource": "http://localhost/wms/GetCapabilities?" }
             }
           }
         },
@@ -47,9 +43,7 @@
           "format": [ "image/png", "image/gif", "image/jpeg" ],
           "dcptype": {
             "http": {
-              "get": {
-                "online_resource": "http://localhost/wms/GetMap?"
-              }
+              "get": { "online_resource": "http://localhost/wms/GetMap?" }
             }
           }
         },
@@ -57,9 +51,7 @@
           "format": [ "text/xml", "text/plain", "text/html" ],
           "dcptype": {
             "http": {
-              "get": {
-                "online_resource":"http://localhost/wms/GetFeatureInfo?"
-              }
+              "get": { "online_resource":"http://localhost/wms/GetFeatureInfo?" }
             }
           }
         }
@@ -67,7 +59,7 @@
       "exception": [ "xml", "inimage", "blank" ],
       "layer": {
         "name": "eodb",
-        "layers": [ "mod13q1", "mod09q1" ]
+        "layers": [ "mod13q1", "mod09q1", "fire_risk_montlhy" ]
       }
     }    
   }

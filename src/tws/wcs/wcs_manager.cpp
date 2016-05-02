@@ -65,13 +65,13 @@ tws::wcs::service_provider_t tws::wcs::wcs_manager::provider()
     const rapidjson::Value& provider_object = (*pimpl_->json_file)["provider"];
     if (!provider_object.IsObject())
     {
-      throw tws::parser_error() << tws::error_description("Could not find provider in wcs config file");
+      throw tws::parse_error() << tws::error_description("Could not find provider in wcs config file");
     }
 
     const rapidjson::Value& name = provider_object["name"];
     if (!name.IsString())
     {
-      throw tws::parser_error() << tws::error_description("Could not find provider name in wcs config file");
+      throw tws::parse_error() << tws::error_description("Could not find provider name in wcs config file");
     }
     provider.name = name.GetString();
 
@@ -84,14 +84,14 @@ tws::wcs::service_provider_t tws::wcs::wcs_manager::provider()
     const rapidjson::Value& contact_object = provider_object["contact"];
     if (!contact_object.IsObject())
     {
-      throw tws::parser_error() << tws::error_description("Could not find contact in wcs config file");
+      throw tws::parse_error() << tws::error_description("Could not find contact in wcs config file");
     }
 
     contact_metadata_t contact;
     const rapidjson::Value& person = contact_object["person"];
     if (!person.IsString())
     {
-      throw tws::parser_error() << tws::error_description("Could not find contact person in wcs config file");
+      throw tws::parse_error() << tws::error_description("Could not find contact person in wcs config file");
     }
 
     contact.person = person.GetString();
@@ -114,7 +114,7 @@ tws::wcs::service_identification_t tws::wcs::wcs_manager::identification()
     const rapidjson::Value& title = (*pimpl_->json_file)["title"];
     if (!title.IsString())
     {
-      throw tws::parser_error() << tws::error_description("Could not find title in wcs config file");
+      throw tws::parse_error() << tws::error_description("Could not find title in wcs config file");
     }
 
     identification.title = title.GetString();
@@ -122,7 +122,7 @@ tws::wcs::service_identification_t tws::wcs::wcs_manager::identification()
     const rapidjson::Value& abstract = (*pimpl_->json_file)["abstract"];
     if (!abstract.IsString())
     {
-      throw tws::parser_error() << tws::error_description("Could not find abstract in wcs config file");
+      throw tws::parse_error() << tws::error_description("Could not find abstract in wcs config file");
     }
 
     identification.abstract = abstract.GetString();
@@ -131,7 +131,7 @@ tws::wcs::service_identification_t tws::wcs::wcs_manager::identification()
 
     if (!profiles.IsArray())
     {
-      throw tws::parser_error() << tws::error_description("Could not find profiles in wcs config file");
+      throw tws::parse_error() << tws::error_description("Could not find profiles in wcs config file");
     }
 
     for (unsigned int i = 0; i < profiles.Size(); ++i)
@@ -157,7 +157,7 @@ tws::wcs::service_metadata_t tws::wcs::wcs_manager::metadata()
     const rapidjson::Value& formats = (*pimpl_->json_file)["formats_supported"];
     if (!formats.IsArray())
     {
-      throw tws::parser_error() << tws::error_description("Could not find formats supported in wcs config file");
+      throw tws::parse_error() << tws::error_description("Could not find formats supported in wcs config file");
     }
 
     for (unsigned int i = 0; i < formats.Size(); ++i)

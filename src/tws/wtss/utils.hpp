@@ -45,8 +45,8 @@ namespace tws
       \exception tws::file_open_error   If the file can not be opened.
       \exception tws::parser_error      If the file has any syntax error.
      */
-    //std::vector<std::pair<std::string, std::string> >
-    //read_timelines_file_name(const std::string& input_file);
+    std::vector<std::pair<std::string, std::string> >
+    read_timelines_file_name(const std::string& input_file);
 
     //! Read the timeline from informed file.
     /*!
@@ -54,7 +54,7 @@ namespace tws
       \exception tws::file_open_error   If the file can not be opened.
       \exception tws::parser_error      If the file has any syntax error.
      */
-    //std::vector<std::string> read_timeline(const std::string& input_file);
+    std::vector<std::string> read_timeline(const std::string& input_file);
 
     //! Read the list of coverages from informed file.
     /*!

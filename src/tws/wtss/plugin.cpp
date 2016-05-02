@@ -63,9 +63,7 @@ class Plugin : public te::plugin::Plugin
     {
       if(!m_initialized)
         return;
-      
-      //tws::core::http_server_builder::instance().remove("mongoose");
-      
+
       m_initialized = false;
     }
 };

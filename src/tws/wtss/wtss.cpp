@@ -33,17 +33,23 @@
 #include "../geoarray/geoarray_manager.hpp"
 #include "../scidb/connection.hpp"
 #include "../scidb/connection_pool.hpp"
+#include "../scidb/utils.hpp"
+#include "timeline.hpp"
+#include "timeline_manager.hpp"
 #include "utils.hpp"
-
 
 // STL
 #include <algorithm>
+//#include <chrono>
+//#include <iostream>
+#include <iterator>
 #include <memory>
 #include <string>
 
 // Boost
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -187,7 +193,7 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
     throw tws::core::http_request_error() << tws::error_description((err_ms % cv.name).str());
   }
 
-  // check if attributes are valid
+// check if attributes are valid
   for(const std::string& attr_name : queried_attributes)
   {
       std::vector<tws::geoarray::attribute_t>::const_iterator it = std::find_if(cv.attributes.begin(),
@@ -218,18 +224,34 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 
   const double latitude = boost::lexical_cast<double>(it->second);
 
-  // extract start and end times if any
+// extract start and end times if any
   it = qstr.find("start");
 
   const std::string start_time = (it != it_end) ? it->second : std::string("");
+
+  const timeline& tl = timeline_manager::instance().get(cv.name);
+
+  std::size_t start_time_idx = start_time.empty() ? tl.index(tl.time_points().front()) : tl.index(start_time);
 
   it = qstr.find("end");
 
   const std::string end_time = (it != it_end) ? it->second : std::string("");
 
+  std::size_t end_time_idx = end_time.empty() ? tl.index(tl.time_points().back()) : tl.index(end_time);
+
+  if(end_time_idx < start_time_idx)
+    throw tws::core::http_request_error() << tws::error_description("invalid time range!");
+
+  std::size_t ntime_pts = end_time_idx - start_time_idx + 1;
+
+// benchmark
+  //std::chrono::time_point<std::chrono::steady_clock> start, end;
+
+  //start = std::chrono::steady_clock::now();
+
 // TODO: check time interval and get a valid time range
 
-  // prepare SRS conversor that allows to go from lat/long to array projection system and then come back to lat/long
+// prepare SRS conversor that allows to go from lat/long to array projection system and then come back to lat/long
   te::srs::Converter srs_conv(4326, cv.geo_extent.spatial.crs_code);
 
   double x = 0.0;
@@ -243,7 +265,7 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
      throw tws::core::http_request_error() << tws::error_description("\"latitude\" and \"longitude\" parameters are not within the coverage boundary!");
 
 
-  // compute pixel location from input Lat/Long WGS84 coordinate
+// compute pixel location from input Lat/Long WGS84 coordinate
   te::rst::Grid array_grid(cv.dimensions[0].max_idx - cv.dimensions[0].min_idx + 1,
                            cv.dimensions[1].max_idx - cv.dimensions[1].min_idx + 1,
                            cv.geo_extent.spatial.resolution.x, cv.geo_extent.spatial.resolution.y,
@@ -270,8 +292,22 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
   // get back from sinu to lat/long
   srs_conv.invert(x, y, x, y);
 
+  //end = std::chrono::steady_clock::now();
+
+  //std::chrono::duration<double> elapsed_time = end - start;
+
+  //std::cout << "\n\tSRS conversion time: " << elapsed_time.count() << "s" << std::endl;
+
+  //start = std::chrono::steady_clock::now();
+
   // get a connection from the pool in order to retrieve the time series data
   std::unique_ptr<tws::scidb::connection> conn(tws::scidb::connection_pool::instance().get());
+
+  //end = std::chrono::steady_clock::now();
+
+  //elapsed_time = end - start;
+
+  //std::cout << "\tRetrieving a database connection: " << elapsed_time.count() << "s" << std::endl;
 
   // prepare the JSON root document
   rapidjson::Document::AllocatorType allocator;
@@ -284,6 +320,7 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 
 // TODO: fix the query string when we have the time range
     std::string str_afl = "project( between(" + cv.name + ", "
+<<<<<<< HEAD
                         + std::to_string(pixel_col) + "," + std::to_string(pixel_row) + ", 0,"
                         + std::to_string(pixel_col) + "," + std::to_string(pixel_row) + ", "+end_time+"), "
                         + attr_name + ")";
@@ -298,6 +335,23 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
     double elapsed_sec = 1000*double(end - begin) / CLOCKS_PER_SEC;
 
     clock_t begin2 = clock();
+=======
+                        + std::to_string(pixel_col) + "," + std::to_string(pixel_row) + "," + std::to_string(start_time_idx + cv.dimensions[2].min_idx) + ","
+                        + std::to_string(pixel_col) + "," + std::to_string(pixel_row) + "," + std::to_string(end_time_idx + cv.dimensions[2].min_idx) + "), "
+                        + attr_name + ")";
+
+    //start = std::chrono::steady_clock::now();
+
+    boost::shared_ptr< ::scidb::QueryResult > qresult = conn->execute(str_afl, true);
+
+    //end = std::chrono::steady_clock::now();
+
+    //elapsed_time = end - start;
+
+    //std::cout << "\tQuery: " << str_afl << "; executed in " << elapsed_time.count() << "s" << std::endl;
+
+    //start = std::chrono::steady_clock::now();
+>>>>>>> upstream/master
 
     if((qresult.get() == nullptr) || (qresult->array.get() == nullptr))
     {
@@ -315,16 +369,15 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
     }
 
     std::vector<double> values;
+    values.reserve(ntime_pts);
 
-// TODO: reserve size for all values in the time series
-
-// TODO: check attribute data type and perform the right conversion for the double output vector
     const ::scidb::ArrayDesc& array_desc = qresult->array->getArrayDesc();
     const ::scidb::Attributes& array_attributes = array_desc.getAttributes(true);
     const ::scidb::AttributeDesc& attr = array_attributes.front();
 
     std::shared_ptr< ::scidb::ConstArrayIterator > array_it = qresult->array->getConstIterator(attr.getId());
 
+<<<<<<< HEAD
     while(!array_it->end())
     {
       const ::scidb::ConstChunk& chunk = array_it->getChunk();
@@ -366,14 +419,23 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
                                    else
                                       if(!type.compare("uint64"))
                                          values.push_back(v.getUint64());
+=======
+    tws::scidb::fill(values, array_it.get(), attr.getType());
 
-        ++(*chunk_it);
-      }
+    //end = std::chrono::steady_clock::now();
+>>>>>>> upstream/master
 
-      ++(*array_it);
+    //elapsed_time = end - start;
 
+    //std::cout << "\tTraversing array in " << elapsed_time.count() << "s" << std::endl;
+
+    if(values.size() != ntime_pts)
+    {
+      boost::format err_msg("error retrieving time series for geoarray '%1%', attribute '%2%': number of expected values was '%3%', found '%4%'!");
+      throw tws::core::http_request_error() << tws::error_description((err_msg % cv.name % attr_name % ntime_pts % values.size()).str());
     }
 
+<<<<<<< HEAD
     clock_t end2 = clock();
 
     double elapsed_secs2 = 1000*double(end2 - begin2) / CLOCKS_PER_SEC;
@@ -385,6 +447,8 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 
 // TODO: check (values.size() == ntime_pts)
 
+=======
+>>>>>>> upstream/master
     rapidjson::Value jattribute(rapidjson::kObjectType);
 
     jattribute.AddMember("attribute", attr_name.c_str(), allocator);
@@ -398,23 +462,24 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
     jattributes.PushBack(jattribute, allocator);
   }
 
-  // prepare result part in response
+// prepare result part in response
   rapidjson::Value jresult(rapidjson::kObjectType);
 
   jresult.AddMember("attributes", jattributes, allocator);
 
-  // add timeline in the response
-  //rapidjson::Value jtimeline(rapidjson::kArrayType);
-  //tws::json::copy_string_array(timeline.begin() + start_time_pos, timeline.begin() + end_time_pos + 1, jtimeline, allocator);
-  //jresult.AddMember("timeline", jtimeline, allocator);
+// add timeline in the response
+  rapidjson::Value jtimeline(rapidjson::kArrayType);
+  tws::core::copy_string_array(std::begin(tl.time_points()) + start_time_idx,  std::begin(tl.time_points()) + (start_time_idx + ntime_pts),
+                               jtimeline, allocator);
+  jresult.AddMember("timeline", jtimeline, allocator);
 
-  // add the pixel center location in response
+// add the pixel center location in response
   rapidjson::Value jcenter(rapidjson::kObjectType);
   jcenter.AddMember("latitude", y, allocator);
   jcenter.AddMember("longitude", x, allocator);
   jresult.AddMember("center_coordinates", jcenter, allocator);
 
-  // prepare the query part in response
+// prepare the query part in response
   rapidjson::Value jquery(rapidjson::kObjectType);
 
   jquery.AddMember("coverage", cv.name.c_str(), allocator);
@@ -429,7 +494,7 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 
   jquery.AddMember("longitude", longitude, allocator);
 
-  // form the final response
+// form the final response
   rapidjson::Document doc;
 
   doc.SetObject();
@@ -437,7 +502,7 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
   doc.AddMember("result", jresult, allocator);
   doc.AddMember("query", jquery, allocator);
 
-  // send response
+// send response
   rapidjson::StringBuffer str_buff;
 
   rapidjson::Writer<rapidjson::StringBuffer> writer(str_buff);
@@ -450,7 +515,6 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
   response.add_header("Content-Type", "application/json");
   response.add_header("Access-Control-Allow-Origin", "*");
   response.set_content(p_str_buff, str_buff.Size());
-
 }
 
 void
@@ -499,5 +563,28 @@ tws::wtss::register_operations()
 void
 tws::wtss::initialize_operations()
 {
+  std::string timelines = tws::core::find_in_app_path("share/tws/config/timelines.json");
 
+  if(timelines.empty())
+    throw  tws::file_exists_error() << tws::error_description("could not locate file: 'share/tws/config/wtss_timelines.json'.");
+
+  std::vector<std::pair<std::string, std::string> > timelines_files = tws::wtss::read_timelines_file_name(timelines);
+
+  for(const auto& tf : timelines_files)
+  {
+    std::string input_file = tws::core::find_in_app_path("share/tws/config/" + tf.second);
+
+    if(input_file.empty())
+    {
+      boost::format err_msg("timeline file: '%1%', not found for array '%2%'.");
+
+      throw tws::file_exists_error() << tws::error_description((err_msg % tf.second % tf.first).str());
+    }
+
+    std::vector<std::string> str_timeline = tws::wtss::read_timeline(input_file);
+
+    timeline t(str_timeline);
+
+    timeline_manager::instance().insert(tf.first, t);
+  }
 }
