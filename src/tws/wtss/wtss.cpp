@@ -64,15 +64,9 @@
 
 // TerraLib
 #include <terralib/geometry/Envelope.h>
+#include <terralib/geometry/Point.h>
 #include <terralib/raster/Grid.h>
 #include <terralib/srs/Converter.h>
-
-// Time performance
-#include <ctime>
-#include <iostream>
-#include <fstream>
-
-
 
 void
 tws::wtss::list_coverages_functor::operator()(const tws::core::http_request& request,
@@ -208,7 +202,7 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 
   }
 
-  // extract longitude
+// extract longitude
   it = qstr.find("longitude");
 
   if(it == it_end || it->second.empty())
@@ -216,7 +210,7 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 
   const double longitude = boost::lexical_cast<double>(it->second);
 
-  // extract latitude
+// extract latitude
   it = qstr.find("latitude");
 
   if(it == it_end || it->second.empty())
@@ -259,10 +253,11 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 
   srs_conv.convert(longitude, latitude, x, y); // degrees to radians
 
-  // check if x and y values are within coverage boundary
-  if (!(x > cv.geo_extent.spatial.extent.xmin && x < cv.geo_extent.spatial.extent.xmax &&
-          y > cv.geo_extent.spatial.extent.ymin && y < cv.geo_extent.spatial.extent.ymax))
-     throw tws::core::http_request_error() << tws::error_description("\"latitude\" and \"longitude\" parameters are not within the coverage boundary!");
+// check if x and y values are within coverage boundary
+  if (!(te::gm::Envelope(x,y,x,y).within(te::gm::Envelope(cv.geo_extent.spatial.extent.xmin,
+         cv.geo_extent.spatial.extent.ymin, cv.geo_extent.spatial.extent.xmax,
+         cv.geo_extent.spatial.extent.ymax))))
+       throw tws::core::http_request_error() << tws::error_description("\"latitude\" and \"longitude\" parameters are not within the coverage boundary!");
 
 
 // compute pixel location from input Lat/Long WGS84 coordinate
@@ -281,35 +276,35 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
   int64_t pixel_col = static_cast<int64_t>(dpixel_col);
   int64_t pixel_row = static_cast<int64_t>(dpixel_row);
 
-  // check if row and col are within array dimension ranges!
+// check if row and col are within array dimension ranges!
   if (!(pixel_col > cv.dimensions[0].min_idx  && pixel_col < cv.dimensions[0].max_idx &&
-          pixel_row > cv.dimensions[1].min_idx && pixel_row < cv.dimensions[1].max_idx))
-     throw tws::core::http_request_error() << tws::error_description("\"pixelrow\" and \"pixelcol\" are not within the array dimension ranges!");
+            pixel_row > cv.dimensions[1].min_idx && pixel_row < cv.dimensions[1].max_idx))
+       throw tws::core::http_request_error() << tws::error_description("\"pixelrow\" and \"pixelcol\" are not within the array dimension ranges!");
 
-  // then compute the location of the center of the pixel
+// then compute the location of the center of the pixel
   array_grid.gridToGeo(pixel_col, pixel_row, x, y);
 
-  // get back from sinu to lat/long
+// get back from sinu to lat/long
   srs_conv.invert(x, y, x, y);
 
-  //end = std::chrono::steady_clock::now();
+//end = std::chrono::steady_clock::now();
 
-  //std::chrono::duration<double> elapsed_time = end - start;
+//std::chrono::duration<double> elapsed_time = end - start;
 
-  //std::cout << "\n\tSRS conversion time: " << elapsed_time.count() << "s" << std::endl;
+//std::cout << "\n\tSRS conversion time: " << elapsed_time.count() << "s" << std::endl;
 
-  //start = std::chrono::steady_clock::now();
+//start = std::chrono::steady_clock::now();
 
-  // get a connection from the pool in order to retrieve the time series data
+// get a connection from the pool in order to retrieve the time series data
   std::unique_ptr<tws::scidb::connection> conn(tws::scidb::connection_pool::instance().get());
 
-  //end = std::chrono::steady_clock::now();
+//end = std::chrono::steady_clock::now();
 
-  //elapsed_time = end - start;
+//elapsed_time = end - start;
 
-  //std::cout << "\tRetrieving a database connection: " << elapsed_time.count() << "s" << std::endl;
+//std::cout << "\tRetrieving a database connection: " << elapsed_time.count() << "s" << std::endl;
 
-  // prepare the JSON root document
+// prepare the JSON root document
   rapidjson::Document::AllocatorType allocator;
 
   rapidjson::Value jattributes(rapidjson::kArrayType);
@@ -317,25 +312,8 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 // iterate through each queried attribute
   for(const auto& attr_name : queried_attributes)
   {
-
-// TODO: fix the query string when we have the time range
+// the scidb query string
     std::string str_afl = "project( between(" + cv.name + ", "
-<<<<<<< HEAD
-                        + std::to_string(pixel_col) + "," + std::to_string(pixel_row) + ", 0,"
-                        + std::to_string(pixel_col) + "," + std::to_string(pixel_row) + ", "+end_time+"), "
-                        + attr_name + ")";
-
-
-    clock_t begin = clock();
-
-    boost::shared_ptr< ::scidb::QueryResult > qresult = conn->execute(str_afl, true);
-
-    clock_t end = clock();
-
-    double elapsed_sec = 1000*double(end - begin) / CLOCKS_PER_SEC;
-
-    clock_t begin2 = clock();
-=======
                         + std::to_string(pixel_col) + "," + std::to_string(pixel_row) + "," + std::to_string(start_time_idx + cv.dimensions[2].min_idx) + ","
                         + std::to_string(pixel_col) + "," + std::to_string(pixel_row) + "," + std::to_string(end_time_idx + cv.dimensions[2].min_idx) + "), "
                         + attr_name + ")";
@@ -351,7 +329,6 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
     //std::cout << "\tQuery: " << str_afl << "; executed in " << elapsed_time.count() << "s" << std::endl;
 
     //start = std::chrono::steady_clock::now();
->>>>>>> upstream/master
 
     if((qresult.get() == nullptr) || (qresult->array.get() == nullptr))
     {
@@ -377,53 +354,9 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 
     std::shared_ptr< ::scidb::ConstArrayIterator > array_it = qresult->array->getConstIterator(attr.getId());
 
-<<<<<<< HEAD
-    while(!array_it->end())
-    {
-      const ::scidb::ConstChunk& chunk = array_it->getChunk();
-
-      std::shared_ptr< ::scidb::ConstChunkIterator > chunk_it = chunk.getConstIterator();
-
-      std::string type = chunk.getAttributeDesc().getType();
-
-      while(!chunk_it->end())
-      {
-        const ::scidb::Value& v = chunk_it->getItem();
-
-        if(!type.compare("int8"))
-             values.push_back(v.getInt8());
-        else
-            if(!type.compare("int16"))
-                values.push_back(v.getInt16());
-            else
-                if(!type.compare("double"))
-                    values.push_back(v.getDouble());
-                else
-                    if(!type.compare("float"))
-                          values.push_back(v.getFloat());
-                    else
-                       if(!type.compare("int32"))
-                             values.push_back(v.getInt32());
-                       else
-                          if(!type.compare("int64"))
-                                values.push_back(v.getInt64());
-                          else
-                             if(!type.compare("uint8"))
-                                   values.push_back(v.getUint8());
-                             else
-                                if(!type.compare("uint16"))
-                                      values.push_back(v.getUint16());
-                                else
-                                   if(!type.compare("uint32"))
-                                         values.push_back(v.getUint32());
-                                   else
-                                      if(!type.compare("uint64"))
-                                         values.push_back(v.getUint64());
-=======
     tws::scidb::fill(values, array_it.get(), attr.getType());
 
     //end = std::chrono::steady_clock::now();
->>>>>>> upstream/master
 
     //elapsed_time = end - start;
 
@@ -435,20 +368,6 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
       throw tws::core::http_request_error() << tws::error_description((err_msg % cv.name % attr_name % ntime_pts % values.size()).str());
     }
 
-<<<<<<< HEAD
-    clock_t end2 = clock();
-
-    double elapsed_secs2 = 1000*double(end2 - begin2) / CLOCKS_PER_SEC;
-
-    std::ofstream myfile;
-    myfile.open ("performance.txt", std::ios::app);
-    myfile << "Attribute: " << attr_name.c_str() << " Connection Time: "<< std::setprecision(5) << boost::lexical_cast<std::string>(elapsed_sec) + " ms Processing Time: " << std::setprecision(5) << boost::lexical_cast<std::string>(elapsed_secs2) + " ms End Time:" << end_time << std::endl;
-    myfile.close();
-
-// TODO: check (values.size() == ntime_pts)
-
-=======
->>>>>>> upstream/master
     rapidjson::Value jattribute(rapidjson::kObjectType);
 
     jattribute.AddMember("attribute", attr_name.c_str(), allocator);
