@@ -84,7 +84,7 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
   const char* qstring = request.query_string();
 
   if(qstring == nullptr)
-    throw tws::core::http_request_error() << tws::error_description("GetMap operation requires the following parameters: \"VERSION\", \"LAYERS\", \"BBOX\", \"WIDTH\", \"HEIGHT\".");
+    throw tws::core::http_request_error() << tws::error_description("GetMap operation requires the following parameters: \"VERSION\", \"LAYERS\", \"BBOX\", \"WIDTH\", \"HEIGHT\", \"FORMAT\".");
 
 // parse plain text query string to a std::map
   tws::core::query_string_t qstr = tws::core::expand(qstring);
@@ -170,11 +170,29 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
 
   const uint32_t height = std::stoul(it->second);
 
+// output image format
+  it = qstr.find("FORMAT");
+
+  if(it == it_end || it->second.empty())
+    throw tws::core::http_request_error() << tws::error_description("check GetMap operation: \"FORMAT\" parameter is missing!");
+
+  const std::string format = it->second;
+
+  std::vector<std::string>::const_iterator it_format = std::find_if(capabilities.capability.request.get_map.format.begin(),
+                                                                    capabilities.capability.request.get_map.format.end(),
+                                                                    [&format](const std::string& f){ return (f == format); });
+
+  if(it_format == capabilities.capability.request.get_map.format.end())
+  {
+    boost::format err_ms("Format '%1%' is not valid in GetMap!");
+    throw tws::core::http_request_error() << tws::error_description((err_ms % format).str());
+  }
+
   const uint32_t regrid_width = 100/width;
 
   const uint32_t regrid_height = 100/height;
 
-// get a connection from the pool in order to retrieve the time series data
+// get a connection from the pool in order to retrieve the image data
   std::unique_ptr<tws::scidb::connection> conn(tws::scidb::connection_pool::instance().get());
 
   std::string str_afl = "project(regrid( " + layers[0] + ", " + std::to_string(regrid_width) + ", " + std::to_string(regrid_height) + ", avg(val) as val), val)";
