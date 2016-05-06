@@ -29,6 +29,7 @@
 include_directories(${RAPIDJSON_INCLUDE_DIR})
 include_directories(${RAPIDXML_INCLUDE_DIR})
 include_directories(${terralib_INCLUDE_DIRS})
+include_directories(${SCIDB_INCLUDE_DIR})
 include_directories(${LIBGD_INCLUDE_DIR})
 
 file(GLOB TWS_SRC_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/wms/*.cpp)
@@ -42,6 +43,7 @@ target_link_libraries(tws_mod_wms tws_mod_scidb
                                   terralib_mod_plugin
                                   terralib_mod_raster
                                   terralib_mod_srs
+                                  ${SCIDB_CLIENT_LIBRARY}
                                   ${Boost_FILESYSTEM_LIBRARY}
                                   ${Boost_SYSTEM_LIBRARY}
                                   ${LIBGD_LIBRARY})

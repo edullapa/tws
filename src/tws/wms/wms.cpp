@@ -31,6 +31,9 @@
 #include "../core/service_operations_manager.hpp"
 #include "../core/utils.hpp"
 #include "../geoarray/geoarray_manager.hpp"
+#include "../scidb/connection.hpp"
+#include "../scidb/connection_pool.hpp"
+#include "../scidb/utils.hpp"
 #include "data_types.hpp"
 #include "wms_manager.hpp"
 #include "xml_serializer.hpp"
@@ -46,7 +49,7 @@
 #include <boost/lexical_cast.hpp>
 
 // SciDB
-//#include <SciDBAPI.h>
+#include <SciDBAPI.h>
 
 // RapidXml
 #include <rapidxml/rapidxml.hpp>
@@ -167,14 +170,41 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
 
   const uint32_t height = std::stoul(it->second);
 
+  const uint32_t regrid_width = 100/width;
+
+  const uint32_t regrid_height = 100/height;
+
+// get a connection from the pool in order to retrieve the time series data
+  std::unique_ptr<tws::scidb::connection> conn(tws::scidb::connection_pool::instance().get());
+
+  std::string str_afl = "project(regrid( " + layers[0] + ", " + std::to_string(regrid_width) + ", " + std::to_string(regrid_height) + ", avg(val) as val), val)";
+
+  boost::shared_ptr< ::scidb::QueryResult > qresult = conn->execute(str_afl, true);
+
+  std::vector<double> values;
+  values.reserve(100);
+
+  const ::scidb::ArrayDesc& array_desc = qresult->array->getArrayDesc();
+  const ::scidb::Attributes& array_attributes = array_desc.getAttributes(true);
+  const ::scidb::AttributeDesc& attr = array_attributes.front();
+
+  std::shared_ptr< ::scidb::ConstArrayIterator > array_it = qresult->array->getConstIterator(attr.getId());
+
+  tws::scidb::fill(values, array_it.get(), attr.getType());
+
 // create a GD Image
   gdImagePtr img =  gdImageCreateTrueColor(width, height);
 
   int red = gdTrueColorAlpha(255, 0, 0, 0);
 
+  int blue = gdTrueColorAlpha(0, 0, 255, 0);
+
   for(uint32_t i = 0; i != height; ++i)
     for(uint32_t j = 0; j != width; ++j)
-      gdImageSetPixel(img, j, i, red);
+//      if(boost::lexical_cast<int>(values[i+j]) % 2 == 0)
+//        gdImageSetPixel(img, j, i, red);
+//      else
+        gdImageSetPixel(img, j, i, blue);
 
   int png_size = 0;
 
