@@ -201,9 +201,9 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
 
   for(uint32_t i = 0; i != height; ++i)
     for(uint32_t j = 0; j != width; ++j)
-//      if(boost::lexical_cast<int>(values[i+j]) % 2 == 0)
-//        gdImageSetPixel(img, j, i, red);
-//      else
+      if(static_cast<int>(values[i+j]) % 2 == 0)
+        gdImageSetPixel(img, j, i, red);
+      else
         gdImageSetPixel(img, j, i, blue);
 
   int png_size = 0;
