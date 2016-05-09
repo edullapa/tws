@@ -188,9 +188,9 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
     throw tws::core::http_request_error() << tws::error_description((err_ms % format).str());
   }
 
-  const uint32_t regrid_width = 100/width;
+  const uint32_t regrid_width = 1000/width;
 
-  const uint32_t regrid_height = 100/height;
+  const uint32_t regrid_height = 1000/height;
 
 // get a connection from the pool in order to retrieve the image data
   std::unique_ptr<tws::scidb::connection> conn(tws::scidb::connection_pool::instance().get());
@@ -200,7 +200,6 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
   boost::shared_ptr< ::scidb::QueryResult > qresult = conn->execute(str_afl, true);
 
   std::vector<double> values;
-  values.reserve(100);
 
   const ::scidb::ArrayDesc& array_desc = qresult->array->getArrayDesc();
   const ::scidb::Attributes& array_attributes = array_desc.getAttributes(true);
@@ -211,16 +210,21 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
   tws::scidb::fill(values, array_it.get(), attr.getType());
 
 // create a GD Image
+
   gdImagePtr img =  gdImageCreateTrueColor(width, height);
 
   int red = gdTrueColorAlpha(255, 0, 0, 0);
+
+  int green = gdTrueColorAlpha(0, 255, 0, 0);
 
   int blue = gdTrueColorAlpha(0, 0, 255, 0);
 
   for(uint32_t i = 0; i != height; ++i)
     for(uint32_t j = 0; j != width; ++j)
-      if(static_cast<int>(values[i+j]) % 2 == 0)
+      if(values[i*100+j] == 0)
         gdImageSetPixel(img, j, i, red);
+      else if(values[i*100+j] == 1)
+        gdImageSetPixel(img, j, i, green);
       else
         gdImageSetPixel(img, j, i, blue);
 
