@@ -31,6 +31,9 @@
 #include "../core/service_operations_manager.hpp"
 #include "../core/utils.hpp"
 #include "../geoarray/geoarray_manager.hpp"
+#include "../scidb/connection.hpp"
+#include "../scidb/connection_pool.hpp"
+#include "../scidb/utils.hpp"
 #include "data_types.hpp"
 #include "wms_manager.hpp"
 #include "xml_serializer.hpp"
@@ -46,7 +49,7 @@
 #include <boost/lexical_cast.hpp>
 
 // SciDB
-//#include <SciDBAPI.h>
+#include <SciDBAPI.h>
 
 // RapidXml
 #include <rapidxml/rapidxml.hpp>
@@ -81,14 +84,28 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
   const char* qstring = request.query_string();
 
   if(qstring == nullptr)
-    throw tws::core::http_request_error() << tws::error_description("time_series operation requires the following parameters: \"coverage\", \"attributes\", \"latitude\", \"longitude\", \"start\", \"end\".");
+    throw tws::core::http_request_error() << tws::error_description("GetMap operation requires the following parameters: \"VERSION\", \"LAYERS\", \"BBOX\", \"WIDTH\", \"HEIGHT\", \"FORMAT\".");
 
 // parse plain text query string to a std::map
   tws::core::query_string_t qstr = tws::core::expand(qstring);
 
-// which layers?
-  tws::core::query_string_t::const_iterator it = qstr.find("LAYERS");
+// valid service version
+  tws::core::query_string_t::const_iterator it = qstr.find("VERSION");
   tws::core::query_string_t::const_iterator it_end = qstr.end();
+
+  if(it == it_end || it->second.empty())
+    throw tws::core::http_request_error() << tws::error_description("check GetMap operation: \"VERSION\" parameter is missing!");
+
+  const std::string version = it->second;
+
+  if(version != "1.3.0")
+  {
+    boost::format err_ms("Invalid service version: '%1%'.");
+    throw tws::core::http_request_error() << tws::error_description((err_ms % it->second).str());
+  }
+
+// which layers?
+  it = qstr.find("LAYERS");
 
   if(it == it_end)
     throw tws::core::http_request_error() << tws::error_description("GetMap error: \"LAYERS\" parameter is missing!");
@@ -118,6 +135,9 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
 
 // retrieve bounding box
   it = qstr.find("BBOX");
+
+  if(it == it_end || it->second.empty())
+    throw tws::core::http_request_error() << tws::error_description("check GetMap operation: \"BBOX\" parameter is missing!");
 
   std::vector<std::string> str_bbox;
 
@@ -150,14 +170,63 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
 
   const uint32_t height = std::stoul(it->second);
 
+// output image format
+  it = qstr.find("FORMAT");
+
+  if(it == it_end || it->second.empty())
+    throw tws::core::http_request_error() << tws::error_description("check GetMap operation: \"FORMAT\" parameter is missing!");
+
+  const std::string format = it->second;
+
+  std::vector<std::string>::const_iterator it_format = std::find_if(capabilities.capability.request.get_map.format.begin(),
+                                                                    capabilities.capability.request.get_map.format.end(),
+                                                                    [&format](const std::string& f){ return (f == format); });
+
+  if(it_format == capabilities.capability.request.get_map.format.end())
+  {
+    boost::format err_ms("Format '%1%' is not valid in GetMap!");
+    throw tws::core::http_request_error() << tws::error_description((err_ms % format).str());
+  }
+
+  const uint32_t regrid_width = 1000/width;
+
+  const uint32_t regrid_height = 1000/height;
+
+// get a connection from the pool in order to retrieve the image data
+  std::unique_ptr<tws::scidb::connection> conn(tws::scidb::connection_pool::instance().get());
+
+  std::string str_afl = "project(regrid( " + layers[0] + ", " + std::to_string(regrid_width) + ", " + std::to_string(regrid_height) + ", avg(val) as val), val)";
+
+  boost::shared_ptr< ::scidb::QueryResult > qresult = conn->execute(str_afl, true);
+
+  std::vector<double> values;
+
+  const ::scidb::ArrayDesc& array_desc = qresult->array->getArrayDesc();
+  const ::scidb::Attributes& array_attributes = array_desc.getAttributes(true);
+  const ::scidb::AttributeDesc& attr = array_attributes.front();
+
+  std::shared_ptr< ::scidb::ConstArrayIterator > array_it = qresult->array->getConstIterator(attr.getId());
+
+  tws::scidb::fill(values, array_it.get(), attr.getType());
+
 // create a GD Image
+
   gdImagePtr img =  gdImageCreateTrueColor(width, height);
 
   int red = gdTrueColorAlpha(255, 0, 0, 0);
 
+  int green = gdTrueColorAlpha(0, 255, 0, 0);
+
+  int blue = gdTrueColorAlpha(0, 0, 255, 0);
+
   for(uint32_t i = 0; i != height; ++i)
     for(uint32_t j = 0; j != width; ++j)
-      gdImageSetPixel(img, j, i, red);
+      if(values[i*100+j] == 0)
+        gdImageSetPixel(img, j, i, red);
+      else if(values[i*100+j] == 1)
+        gdImageSetPixel(img, j, i, green);
+      else
+        gdImageSetPixel(img, j, i, blue);
 
   int png_size = 0;
 
