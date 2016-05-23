@@ -155,6 +155,12 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
   bbox.max_x = std::stod(str_bbox[2]);
   bbox.max_y = std::stod(str_bbox[3]);
 
+
+// 1. transform bounding box to array coordinate reference system
+// 2. check if query is in range
+// 3. find the array range: first_column, last_column, first_row, last_row
+// 4. check if columns and rows fit in the array dimension
+
 // output image size
   it = qstr.find("WIDTH");
 
@@ -188,6 +194,7 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
     throw tws::core::http_request_error() << tws::error_description((err_ms % format).str());
   }
 
+// prepare to render
   const uint32_t regrid_width = 1000/width;
 
   const uint32_t regrid_height = 1000/height;
