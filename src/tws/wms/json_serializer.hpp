@@ -65,6 +65,8 @@ namespace tws
 
     online_resource_t read_online_resource(const rapidjson::Value& jonline_resource);
 
+    std::vector<std::string> read_crs(const rapidjson::Value& jcrs_list);
+
     layer_t read_layer(const rapidjson::Value& jlayer);
 
   }  // end namespace wms

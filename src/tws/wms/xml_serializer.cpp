@@ -247,6 +247,9 @@ tws::wms::write_layer(const layer_t layer, rapidxml::xml_document<>& xml_capabil
 
   layer_node->append_node(node);
 
+  for(auto crs: layer.crs)
+    layer_node->append_node(xml_capabilities.allocate_node(rapidxml::node_element, "CRS", crs.c_str()));
+
   for(auto sublayer: layer.layers)
     layer_node->append_node(write_layer(sublayer, xml_capabilities));
 
