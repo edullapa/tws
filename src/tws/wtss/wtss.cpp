@@ -64,6 +64,7 @@
 
 // TerraLib
 #include <terralib/geometry/Envelope.h>
+#include <terralib/geometry/Point.h>
 #include <terralib/raster/Grid.h>
 #include <terralib/srs/Converter.h>
 
@@ -201,7 +202,7 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 
   }
 
-  // extract longitude
+// extract longitude
   it = qstr.find("longitude");
 
   if(it == it_end || it->second.empty())
@@ -209,7 +210,7 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 
   const double longitude = boost::lexical_cast<double>(it->second);
 
-  // extract latitude
+// extract latitude
   it = qstr.find("latitude");
 
   if(it == it_end || it->second.empty())
@@ -252,7 +253,12 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 
   srs_conv.convert(longitude, latitude, x, y); // degrees to radians
 
-// TODO: check if x and y values are within coverage boundary
+// check if x and y values are within coverage boundary
+  if (!(te::gm::Envelope(x,y,x,y).within(te::gm::Envelope(cv.geo_extent.spatial.extent.xmin,
+         cv.geo_extent.spatial.extent.ymin, cv.geo_extent.spatial.extent.xmax,
+         cv.geo_extent.spatial.extent.ymax))))
+       throw tws::core::http_request_error() << tws::error_description("\"latitude\" and \"longitude\" parameters are not within the coverage boundary!");
+
 
 // compute pixel location from input Lat/Long WGS84 coordinate
   te::rst::Grid array_grid(cv.dimensions[0].max_idx - cv.dimensions[0].min_idx + 1,
@@ -270,32 +276,35 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
   int64_t pixel_col = static_cast<int64_t>(dpixel_col);
   int64_t pixel_row = static_cast<int64_t>(dpixel_row);
 
-// TODO: check if row and col are within array dimension ranges!
+// check if row and col are within array dimension ranges!
+  if (!(pixel_col > cv.dimensions[0].min_idx  && pixel_col < cv.dimensions[0].max_idx &&
+            pixel_row > cv.dimensions[1].min_idx && pixel_row < cv.dimensions[1].max_idx))
+       throw tws::core::http_request_error() << tws::error_description("\"pixelrow\" and \"pixelcol\" are not within the array dimension ranges!");
 
-  // then compute the location of the center of the pixel
+// then compute the location of the center of the pixel
   array_grid.gridToGeo(pixel_col, pixel_row, x, y);
 
-  // get back from sinu to lat/long
+// get back from sinu to lat/long
   srs_conv.invert(x, y, x, y);
 
-  //end = std::chrono::steady_clock::now();
+//end = std::chrono::steady_clock::now();
 
-  //std::chrono::duration<double> elapsed_time = end - start;
+//std::chrono::duration<double> elapsed_time = end - start;
 
-  //std::cout << "\n\tSRS conversion time: " << elapsed_time.count() << "s" << std::endl;
+//std::cout << "\n\tSRS conversion time: " << elapsed_time.count() << "s" << std::endl;
 
-  //start = std::chrono::steady_clock::now();
+//start = std::chrono::steady_clock::now();
 
-  // get a connection from the pool in order to retrieve the time series data
+// get a connection from the pool in order to retrieve the time series data
   std::unique_ptr<tws::scidb::connection> conn(tws::scidb::connection_pool::instance().get());
 
-  //end = std::chrono::steady_clock::now();
+//end = std::chrono::steady_clock::now();
 
-  //elapsed_time = end - start;
+//elapsed_time = end - start;
 
-  //std::cout << "\tRetrieving a database connection: " << elapsed_time.count() << "s" << std::endl;
+//std::cout << "\tRetrieving a database connection: " << elapsed_time.count() << "s" << std::endl;
 
-  // prepare the JSON root document
+// prepare the JSON root document
   rapidjson::Document::AllocatorType allocator;
 
   rapidjson::Value jattributes(rapidjson::kArrayType);
@@ -303,7 +312,7 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 // iterate through each queried attribute
   for(const auto& attr_name : queried_attributes)
   {
-// TODO: fix the query string when we have the time range
+// the scidb query string
     std::string str_afl = "project( between(" + cv.name + ", "
                         + std::to_string(pixel_col) + "," + std::to_string(pixel_row) + "," + std::to_string(start_time_idx + cv.dimensions[2].min_idx) + ","
                         + std::to_string(pixel_col) + "," + std::to_string(pixel_row) + "," + std::to_string(end_time_idx + cv.dimensions[2].min_idx) + "), "
