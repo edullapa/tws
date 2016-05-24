@@ -376,6 +376,22 @@ tws::wms::read_online_resource(const rapidjson::Value& jonline_resource)
   return online_resource;
 }
 
+std::vector<std::string>
+tws::wms::read_crs(const rapidjson::Value& jcrs_list)
+{
+  if (!jcrs_list.IsArray())
+    throw tws::parse_error() << tws::error_description("error parsing crs metadata.");
+
+  std::vector<std::string> crs_list;
+
+  for (unsigned int i = 0; i < jcrs_list.Size(); ++i)
+  {
+    crs_list.push_back(jcrs_list[i].GetString());
+  }
+
+  return crs_list;
+}
+
 tws::wms::layer_t
 tws::wms::read_layer(const rapidjson::Value& jlayer)
 {
@@ -390,16 +406,17 @@ tws::wms::read_layer(const rapidjson::Value& jlayer)
 
   layer.name = jname.GetString();
 
+  const rapidjson::Value& jcrs_list = jlayer["crs"];
+
+  layer.crs = read_crs(jcrs_list);
+
   const rapidjson::Value& jsub_layers = jlayer["layers"];
   if (!jsub_layers.IsArray())
     throw tws::parse_error() << tws::error_description("error parsing layers list metadata.");
 
-  layer_t sub_layer;
   for (unsigned int i = 0; i < jsub_layers.Size(); ++i)
   {
-    sub_layer.name = jsub_layers[i].GetString();
-
-    layer.layers.push_back(sub_layer);
+    layer.layers.push_back(read_layer(jsub_layers[i]));
   }
 
   return layer;

@@ -59,7 +59,21 @@
       "exception": [ "xml", "inimage", "blank" ],
       "layer": {
         "name": "eodb",
-        "layers": [ "mod13q1", "mod09q1", "fire_risk_montlhy" ]
+        "crs": [],
+        "layers": [
+          { "name": "mod13q1",
+            "crs": ["100002"],
+            "layers": []
+          },
+          { "name": "mod09q1",
+            "crs": ["100002"],
+            "layers": []
+          },
+          { "name": "fire_risk_montlhy",
+            "crs": ["4326"],
+            "layers": []
+          }
+        ]
       }
     }    
   }

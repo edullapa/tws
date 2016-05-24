@@ -58,6 +58,11 @@
 // GD
 #include <gd.h>
 
+// TerraLib
+#include <terralib/geometry/Envelope.h>
+#include <terralib/raster/Grid.h>
+#include <terralib/srs/Converter.h>
+
 void
 tws::wms::get_capabilities_functor::operator()(const tws::core::http_request& request,
                                                tws::core::http_response& response)
@@ -83,8 +88,10 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
 // get client query string
   const char* qstring = request.query_string();
 
+// http://localhost:7654/wms/GetMap?VERSION=1.3.0&LAYERS=mod13q1&BBOX=-60.9256,-10.0000,-49.9917,0.0&WIDTH=800&HEIGHT=640&FORMAT=image/png&TIME=2000-02-18
+
   if(qstring == nullptr)
-    throw tws::core::http_request_error() << tws::error_description("GetMap operation requires the following parameters: \"VERSION\", \"LAYERS\", \"BBOX\", \"WIDTH\", \"HEIGHT\", \"FORMAT\".");
+    throw tws::core::http_request_error() << tws::error_description("GetMap operation requires the following parameters: \"VERSION\", \"LAYERS\", \"BBOX\", \"WIDTH\", \"HEIGHT\", \"FORMAT\", \"TIME\".");
 
 // parse plain text query string to a std::map
   tws::core::query_string_t qstr = tws::core::expand(qstring);
@@ -155,8 +162,16 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
   bbox.max_x = std::stod(str_bbox[2]);
   bbox.max_y = std::stod(str_bbox[3]);
 
-
 // 1. transform bounding box to array coordinate reference system
+
+// prepare SRS conversor that allows to go from lat/long to array projection system and then come back to lat/long
+  te::srs::Converter srs_conv(4326, std::stoi(bbox.crs));
+
+  double x = 0.0;
+  double y = 0.0;
+
+  // srs_conv.convert(longitude, latitude, x, y); // degrees to radians
+
 // 2. check if query is in range
 // 3. find the array range: first_column, last_column, first_row, last_row
 // 4. check if columns and rows fit in the array dimension
@@ -193,6 +208,14 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
     boost::format err_ms("Format '%1%' is not valid in GetMap!");
     throw tws::core::http_request_error() << tws::error_description((err_ms % format).str());
   }
+
+// time interval
+  it = qstr.find("TIME");
+
+  if(it == it_end || it->second.empty())
+    throw tws::core::http_request_error() << tws::error_description("check GetMap operation: \"TIME\" parameter is missing!");
+
+  const std::string time = it->second;
 
 // prepare to render
   const uint32_t regrid_width = 1000/width;
