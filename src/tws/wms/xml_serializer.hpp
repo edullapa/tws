@@ -56,6 +56,8 @@ namespace tws
 
     rapidxml::xml_node<>* write_online_resource(const online_resource_t online_resource, rapidxml::xml_document<>& xml_capabilities);
 
+    rapidxml::xml_node<>* write_bounding_box(const bounding_box_t bounding_box, rapidxml::xml_document<>& xml_capabilities);
+
   }  // end namespace wms
 }    // end namespace tws
 

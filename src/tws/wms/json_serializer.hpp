@@ -67,6 +67,8 @@ namespace tws
 
     std::vector<std::string> read_crs(const rapidjson::Value& jcrs_list);
 
+    std::vector<bounding_box_t> read_bounding_box(const rapidjson::Value& jbounding_box_list);
+
     layer_t read_layer(const rapidjson::Value& jlayer);
 
   }  // end namespace wms
