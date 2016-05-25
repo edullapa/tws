@@ -287,13 +287,13 @@ tws::wms::write_online_resource(const online_resource_t online_resource, rapidxm
   return online_resource_node;
 }
 
-//rapidxml::xml_node<>*
-//tws::wms::write_bounding_box(const bounding_box_t bounding_box, rapidxml::xml_document<>& xml_capabilities)
-//{
-//  rapidxml::xml_node<>* bounding_box_node = xml_capabilities.allocate_node(rapidxml::node_element, "BoundingBox");
+rapidxml::xml_node<>*
+tws::wms::write_bounding_box(const bounding_box_t bounding_box, rapidxml::xml_document<>& xml_capabilities)
+{
+  rapidxml::xml_node<>* bounding_box_node = xml_capabilities.allocate_node(rapidxml::node_element, "BoundingBox");
 
-//  rapidxml::xml_attribute<>* attr = xml_capabilities.allocate_attribute("CRS", bounding_box.crs.c_str());
-//  bounding_box_node->append_attribute(attr);
+  rapidxml::xml_attribute<>* attr = xml_capabilities.allocate_attribute("CRS", bounding_box.crs.c_str());
+  bounding_box_node->append_attribute(attr);
 
 // TODO: fix the conversion of double to string
 
@@ -315,5 +315,5 @@ tws::wms::write_online_resource(const online_resource_t online_resource, rapidxm
 //  attr = xml_capabilities.allocate_attribute("resy", std::to_string(bounding_box.res_y).c_str());
 //  bounding_box_node->append_attribute(attr);
 
-//  return bounding_box_node;
-//}
+  return bounding_box_node;
+}

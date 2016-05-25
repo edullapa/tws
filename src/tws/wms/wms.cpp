@@ -163,12 +163,12 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
 // 1. transform bounding box to array coordinate reference system
 
 // prepare SRS conversor that allows to go from lat/long to array projection system and then come back to lat/long
-  te::srs::Converter srs_conv(4326, std::stoi(bbox.crs));
+//  te::srs::Converter srs_conv(4326, std::stoi(bbox.crs));
 
-  double x = 0.0;
-  double y = 0.0;
+//  double x = 0.0;
+//  double y = 0.0;
 
-  // srs_conv.convert(longitude, latitude, x, y); // degrees to radians
+//  srs_conv.convert(longitude, latitude, x, y); // degrees to radians
 
 // 2. check if query is in range
 // 3. find the array range: first_column, last_column, first_row, last_row
