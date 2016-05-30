@@ -247,8 +247,15 @@ tws::wms::write_layer(const layer_t layer, rapidxml::xml_document<>& xml_capabil
 
   layer_node->append_node(node);
 
+  node = xml_capabilities.allocate_node(rapidxml::node_element, "Abstract", layer.abstract.c_str());
+
+  layer_node->append_node(node);
+
   for(auto crs: layer.crs)
     layer_node->append_node(xml_capabilities.allocate_node(rapidxml::node_element, "CRS", crs.c_str()));
+
+  for(auto bounding_box: layer.bounding_box)
+    layer_node->append_node(write_bounding_box(bounding_box, xml_capabilities));
 
   for(auto sublayer: layer.layers)
     layer_node->append_node(write_layer(sublayer, xml_capabilities));
@@ -282,4 +289,35 @@ tws::wms::write_online_resource(const online_resource_t online_resource, rapidxm
   online_resource_node->append_attribute(attr);
 
   return online_resource_node;
+}
+
+rapidxml::xml_node<>*
+tws::wms::write_bounding_box(const bounding_box_t bounding_box, rapidxml::xml_document<>& xml_capabilities)
+{
+  rapidxml::xml_node<>* bounding_box_node = xml_capabilities.allocate_node(rapidxml::node_element, "BoundingBox");
+
+  rapidxml::xml_attribute<>* attr = xml_capabilities.allocate_attribute("CRS", bounding_box.crs.c_str());
+  bounding_box_node->append_attribute(attr);
+
+// TODO: fix the conversion of double to string
+
+//  attr = xml_capabilities.allocate_attribute("minx", std::to_string(bounding_box.min_x).c_str());
+//  bounding_box_node->append_attribute(attr);
+
+//  attr = xml_capabilities.allocate_attribute("miny", std::to_string(bounding_box.min_y).c_str());
+//  bounding_box_node->append_attribute(attr);
+
+//  attr = xml_capabilities.allocate_attribute("maxx", std::to_string(bounding_box.max_x).c_str());
+//  bounding_box_node->append_attribute(attr);
+
+//  attr = xml_capabilities.allocate_attribute("maxy", std::to_string(bounding_box.max_y).c_str());
+//  bounding_box_node->append_attribute(attr);
+
+//  attr = xml_capabilities.allocate_attribute("resx", std::to_string(bounding_box.res_x).c_str());
+//  bounding_box_node->append_attribute(attr);
+
+//  attr = xml_capabilities.allocate_attribute("resy", std::to_string(bounding_box.res_y).c_str());
+//  bounding_box_node->append_attribute(attr);
+
+  return bounding_box_node;
 }

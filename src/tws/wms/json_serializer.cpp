@@ -392,6 +392,66 @@ tws::wms::read_crs(const rapidjson::Value& jcrs_list)
   return crs_list;
 }
 
+std::vector<tws::wms::bounding_box_t>
+tws::wms::read_bounding_box(const rapidjson::Value& jbounding_box_list)
+{
+  if (!jbounding_box_list.IsArray())
+    throw tws::parse_error() << tws::error_description("error parsing layer bounding box metadata.");
+
+  std::vector<bounding_box_t> bounding_box_list;
+
+  bounding_box_t bounding_box;
+
+  for (unsigned int i = 0; i < jbounding_box_list.Size(); ++i)
+  {
+    const rapidjson::Value& jcrs = jbounding_box_list[i]["crs"];
+    if (!jcrs.IsString())
+      throw tws::parse_error() << tws::error_description("error parsing layer bounding box crs metadata.");
+
+    bounding_box.crs = jcrs.GetString();
+
+    const rapidjson::Value& jmin_x = jbounding_box_list[i]["min_x"];
+    if (!jmin_x.IsNumber() || jmin_x.IsNull())
+      throw tws::parse_error() << tws::error_description("error parsing layer bounding box min_x metadata.");
+
+    bounding_box.min_x = jmin_x.GetDouble();
+
+    const rapidjson::Value& jmin_y = jbounding_box_list[i]["min_y"];
+    if (!jmin_y.IsNumber() || jmin_y.IsNull())
+      throw tws::parse_error() << tws::error_description("error parsing layer bounding box min_y metadata.");
+
+    bounding_box.min_y = jmin_y.GetDouble();
+
+    const rapidjson::Value& jmax_x = jbounding_box_list[i]["max_x"];
+    if (!jmax_x.IsNumber() || jmax_x.IsNull())
+      throw tws::parse_error() << tws::error_description("error parsing layer bounding box max_x metadata.");
+
+    bounding_box.max_x = jmax_x.GetDouble();
+
+    const rapidjson::Value& jmax_y = jbounding_box_list[i]["max_y"];
+    if (!jmax_y.IsNumber() || jmax_y.IsNull())
+      throw tws::parse_error() << tws::error_description("error parsing layer bounding box max_y metadata.");
+
+    bounding_box.max_y = jmax_y.GetDouble();
+
+    const rapidjson::Value& jres_x = jbounding_box_list[i]["res_x"];
+    if (!jres_x.IsNumber() || jres_x.IsNull())
+      throw tws::parse_error() << tws::error_description("error parsing layer bounding box res_x metadata.");
+
+    bounding_box.res_x = jres_x.GetDouble();
+
+    const rapidjson::Value& jres_y = jbounding_box_list[i]["res_y"];
+    if (!jres_y.IsNumber() || jres_y.IsNull())
+      throw tws::parse_error() << tws::error_description("error parsing layer bounding box res_y metadata.");
+
+    bounding_box.res_y = jres_y.GetDouble();
+
+    bounding_box_list.push_back(bounding_box);
+  }
+
+  return bounding_box_list;
+}
+
 tws::wms::layer_t
 tws::wms::read_layer(const rapidjson::Value& jlayer)
 {
@@ -406,9 +466,19 @@ tws::wms::read_layer(const rapidjson::Value& jlayer)
 
   layer.name = jname.GetString();
 
+  const rapidjson::Value& jabstract = jlayer["abstract"];
+  if (!jabstract.IsString())
+    throw tws::parse_error() << tws::error_description("error parsing layer abstract metadata.");
+
+  layer.abstract = jabstract.GetString();
+
   const rapidjson::Value& jcrs_list = jlayer["crs"];
 
   layer.crs = read_crs(jcrs_list);
+
+  const rapidjson::Value& jbounding_box_list = jlayer["bounding_box"];
+
+  layer.bounding_box = read_bounding_box(jbounding_box_list);
 
   const rapidjson::Value& jsub_layers = jlayer["layers"];
   if (!jsub_layers.IsArray())

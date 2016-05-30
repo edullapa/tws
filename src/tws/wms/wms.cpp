@@ -88,8 +88,6 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
 // get client query string
   const char* qstring = request.query_string();
 
-// http://localhost:7654/wms/GetMap?VERSION=1.3.0&LAYERS=mod13q1&BBOX=-60.9256,-10.0000,-49.9917,0.0&WIDTH=800&HEIGHT=640&FORMAT=image/png&TIME=2000-02-18
-
   if(qstring == nullptr)
     throw tws::core::http_request_error() << tws::error_description("GetMap operation requires the following parameters: \"VERSION\", \"LAYERS\", \"BBOX\", \"WIDTH\", \"HEIGHT\", \"FORMAT\", \"TIME\".");
 
@@ -165,12 +163,12 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
 // 1. transform bounding box to array coordinate reference system
 
 // prepare SRS conversor that allows to go from lat/long to array projection system and then come back to lat/long
-  te::srs::Converter srs_conv(4326, std::stoi(bbox.crs));
+//  te::srs::Converter srs_conv(4326, std::stoi(bbox.crs));
 
-  double x = 0.0;
-  double y = 0.0;
+//  double x = 0.0;
+//  double y = 0.0;
 
-  // srs_conv.convert(longitude, latitude, x, y); // degrees to radians
+//  srs_conv.convert(longitude, latitude, x, y); // degrees to radians
 
 // 2. check if query is in range
 // 3. find the array range: first_column, last_column, first_row, last_row

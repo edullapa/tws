@@ -59,18 +59,62 @@
       "exception": [ "xml", "inimage", "blank" ],
       "layer": {
         "name": "eodb",
+        "abstract": "Earth Observation Data Base",
         "crs": [],
+        "bounding_box": [
+          { "crs": "",
+            "min_x": 0.0,
+            "min_y": 0.0,
+            "max_x": 0.0,
+            "max_y": 0.0,
+            "res_x": 0.0,
+            "res_y": 0.0
+          }
+        ],
         "layers": [
           { "name": "mod13q1",
+            "abstract": "Vegetation Indices 16-Day L3 Global 250m",
             "crs": ["100002"],
+            "bounding_box": [
+              { "crs": "100002",
+                "min_x": -20015109.35400599,
+                "min_y": -10007554.676994,
+                "max_x": 20015109.35400599,
+                "max_y": 10007554.676994,
+                "res_x": 231.65635826395825,
+                "res_y": 231.65635826374995
+              }
+            ],
             "layers": []
           },
           { "name": "mod09q1",
+            "abstract": "Surface Reflectance 8-Day L3 Global 250m",
             "crs": ["100002"],
+            "bounding_box": [
+              { "crs": "100002",
+                "min_x": -20015109.35400599,
+                "min_y": -10007554.676994,
+                "max_x": 20015109.35400599,
+                "max_y": 10007554.676994,
+                "res_x": 231.65635826395825,
+                "res_y": 231.65635826374995
+              }
+            ],
             "layers": []
           },
           { "name": "fire_risk_montlhy",
+            "abstract": "Fire risk monthly aggregate data",
             "crs": ["4326"],
+            "bounding_box": [
+              { "crs": "4326",
+                "min_x": -82.025,
+                "min_y": -56.025,
+                "max_x": -30.975,
+                "max_y": 13.025,
+                "res_x": 0.05,
+                "res_y": 0.05
+              }
+            ],
             "layers": []
           }
         ]
