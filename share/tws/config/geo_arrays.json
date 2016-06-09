@@ -205,8 +205,8 @@
         }
       }
     },
-    { "name": "fire_risk_montlhy",
-      "description": "Fire risk monthly aggregate data",
+    { "name": "hotspot_monthly",
+      "description": "Monthly aggregated hotspot data",
       "detail": "www.inpe.br/queimadas",
       "dimensions": [
         { "name": "col",
@@ -229,8 +229,8 @@
         }
       ],
       "attributes": [
-        { "name": "value",
-          "description": "Value",
+        { "name": "measure",
+          "description": "measure",
           "datatype": "8-bit unsigned integer",
           "valid_range": { "min": 0, "max": 255 },
           "scale_factor": 1.0,
@@ -259,6 +259,191 @@
           },
           "resolution": 1,
           "unit": "month"
+        }
+      }
+    },
+    { "name": "hotspot_daily",
+      "description": "Daily hotspot data",
+      "detail": "www.inpe.br/queimadas",
+      "dimensions": [
+        { "name": "col",
+          "description": "column",
+          "min_idx": 0,
+          "max_idx": 1020,
+          "pos": 0
+        },
+        { "name": "row",
+          "description": "row",
+          "min_idx": 0,
+          "max_idx": 1380,
+          "pos": 1
+        },
+        { "name": "time_idx",
+          "description": "time index",
+          "min_idx": 1,
+          "max_idx": 366,
+          "pos": 2
+        }
+      ],
+      "attributes": [
+        { "name": "measure",
+          "description": "measure",
+          "datatype": "8-bit unsigned integer",
+          "valid_range": { "min": 0, "max": 255 },
+          "scale_factor": 1.0,
+          "missing_value": 0
+        }
+      ],
+      "geo_extent": {
+        "spatial": {
+          "extent": {
+            "xmin": -82.025,
+            "ymin": -56.025,
+            "xmax": -30.975,
+            "ymax": 13.025
+          },
+          "resolution": {
+            "x": 0.05,
+            "y": 0.05
+          },
+          "crs": "+proj=longlat +datum=WGS84 +no_defs ",
+          "srid": 4326
+        },
+        "temporal": {
+          "interval": {
+            "start": "2014-01-01",
+            "end": "2014-12-31"
+          },
+          "resolution": 1,
+          "unit": "day"
+        }
+      }
+    },
+    { "name": "hotspot_risk_daily",
+      "description": "Fire risk daily data",
+      "detail": "www.inpe.br/queimadas",
+      "dimensions": [
+        { "name": "col",
+          "description": "column",
+          "min_idx": 0,
+          "max_idx": 5156,
+          "pos": 0
+        },
+        { "name": "row",
+          "description": "row",
+          "min_idx": 0,
+          "max_idx": 5795,
+          "pos": 1
+        },
+        { "name": "time_idx",
+          "description": "time index",
+          "min_idx": 1,
+          "max_idx": 31,
+          "pos": 2
+        }
+      ],
+      "attributes": [
+        { "name": "measure",
+          "description": "measure",
+          "datatype": "8-bit unsigned integer",
+          "valid_range": { "min": 0, "max": 255 },
+          "scale_factor": 1.0,
+          "missing_value": 0
+        }
+      ],
+      "geo_extent": {
+        "spatial": {
+          "extent": {
+            "xmin": -82.005,
+            "ymin": -44.955,
+            "xmax": -30.435,
+            "ymax": 13.005
+          },
+          "resolution": {
+            "x": 0.01,
+            "y": 0.01
+          },
+          "crs": "+proj=longlat +datum=WGS84 +no_defs ",
+          "srid": 4326
+        },
+        "temporal": {
+          "interval": {
+            "start": "2015-12-01",
+            "end": "2015-12-31"
+          },
+          "resolution": 1,
+          "unit": "day"
+        }
+      }
+    },
+    { "name": "hotspot_risk_monthly",
+      "description": "Fire risk monthly data",
+      "detail": "www.inpe.br/queimadas",
+      "dimensions": [
+        { "name": "col",
+          "description": "column",
+          "min_idx": 0,
+          "max_idx": 5299,
+          "pos": 0
+        },
+        { "name": "row",
+          "description": "row",
+          "min_idx": 0,
+          "max_idx": 6599,
+          "pos": 1
+        },
+        { "name": "time_idx",
+          "description": "time index",
+          "min_idx": 1,
+          "max_idx": 12,
+          "pos": 2
+        }
+      ],
+      "attributes": [
+        { "name": "high_risk",
+          "description": "measure",
+          "datatype": "8-bit unsigned integer",
+          "valid_range": { "min": 0, "max": 255 },
+          "scale_factor": 1.0,
+          "missing_value": 0
+        },
+        { "name": "medium_risk",
+          "description": "measure",
+          "datatype": "8-bit unsigned integer",
+          "valid_range": { "min": 0, "max": 255 },
+          "scale_factor": 1.0,
+          "missing_value": 0
+        },
+        { "name": "low_risk",
+          "description": "measure",
+          "datatype": "8-bit unsigned integer",
+          "valid_range": { "min": 0, "max": 255 },
+          "scale_factor": 1.0,
+          "missing_value": 0
+        }
+      ],
+      "geo_extent": {
+        "spatial": {
+          "extent": {
+            "xmin": -85.995,
+            "ymin": -55.985,
+            "xmax": -32.995,
+            "ymax": 10.015
+          },
+          "resolution": {
+            "x": 0.01,
+            "y": 0.01
+          },
+          "crs": "+proj=longlat +datum=WGS84 +no_defs ",
+          "srid": 4326
+        },
+        "temporal": {
+          "interval": {
+            "start": "2015-01",
+            "end": "2015-12"
+          },
+          "resolution": 1,
+          "unit": "day"
         }
       }
     }
