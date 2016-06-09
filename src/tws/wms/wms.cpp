@@ -89,7 +89,7 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
   const char* qstring = request.query_string();
 
   if(qstring == nullptr)
-    throw tws::core::http_request_error() << tws::error_description("GetMap operation requires the following parameters: \"VERSION\", \"LAYERS\", \"BBOX\", \"WIDTH\", \"HEIGHT\", \"FORMAT\", \"TIME\".");
+    throw tws::core::http_request_error() << tws::error_description("GetMap operation requires the following parameters: \"VERSION\", \"LAYERS\", \"CRS\", \"BBOX\", \"WIDTH\", \"HEIGHT\", \"FORMAT\", \"TIME\".");
 
 // parse plain text query string to a std::map
   tws::core::query_string_t qstr = tws::core::expand(qstring);
@@ -138,6 +138,17 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
     }
   }
 
+// retrieve crs
+  it = qstr.find("CRS");
+
+  if(it == it_end || it->second.empty())
+    throw tws::core::http_request_error() << tws::error_description("check GetMap operation: \"CRS\" parameter is missing!");
+
+  const std::string crs = it->second;
+
+  bounding_box_t bbox;
+  bbox.crs = crs;
+
 // retrieve bounding box
   it = qstr.find("BBOX");
 
@@ -154,7 +165,6 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
     throw tws::core::http_request_error() << tws::error_description((err_ms % it->second).str());
   }
 
-  bounding_box_t bbox;
   bbox.min_x = std::stod(str_bbox[0]);
   bbox.min_y = std::stod(str_bbox[1]);
   bbox.max_x = std::stod(str_bbox[2]);
@@ -207,7 +217,7 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
     throw tws::core::http_request_error() << tws::error_description((err_ms % format).str());
   }
 
-// time interval
+// retrieve time interval
   it = qstr.find("TIME");
 
   if(it == it_end || it->second.empty())
