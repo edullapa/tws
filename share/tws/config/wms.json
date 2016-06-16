@@ -63,10 +63,10 @@
         "crs": [],
         "bounding_box": [
           { "crs": "",
-            "min_x": 0.0,
-            "min_y": 0.0,
-            "max_x": 0.0,
-            "max_y": 0.0,
+            "min_x": -180.0,
+            "min_y": -90.0,
+            "max_x": 180.0,
+            "max_y": 90.0,
             "res_x": 0.0,
             "res_y": 0.0
           }
