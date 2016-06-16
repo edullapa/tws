@@ -30,7 +30,6 @@
 //#include "../plugin.hpp"
 #include "http_server_builder.hpp"
 #include "service_operations_manager.hpp"
-#include "logger.hpp"
 
 // Boost
 #include <boost/filesystem.hpp>
@@ -158,21 +157,5 @@ rapidjson::Document* tws::core::open_json_file(const std::string &path)
     fclose(pfile);
     throw;
   }
-}
-
-void tws::core::initialize_logger(const std::string &path_file)
-{
-  tws::core::logger::instance().add_stream(path_file);
-  tws::core::logger::instance().initialize();
-}
-
-void tws::core::disable_logger()
-{
-  tws::core::logger::instance().disable_log();
-}
-
-void tws::core::enable_logger()
-{
-  tws::core::logger::instance().enable_log();
 }
 

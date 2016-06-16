@@ -28,10 +28,11 @@
 #include "../core/http_server.hpp"
 #include "../core/http_server_builder.hpp"
 #include "../core/utils.hpp"
-#include "../core/logger.hpp"
 
 // TerraLib
 #include <terralib/common/TerraLib.h>
+#include <terralib/core/logger/Logger.h>
+#include <terralib/core/translator/Translator.h>
 #include <terralib/plugin/PluginManager.h>
 #include <terralib/plugin/Utils.h>
 
@@ -39,6 +40,9 @@
 #include <cstdlib>
 #include <iostream>
 #include <memory>
+
+// Boost
+#include <boost/format.hpp>
 
 //#ifdef TWS_MOD_CPPNETLIB_ENABLED
 //  #define TWS_DEFAULT_WEB_SERVER "cppnetlib"
@@ -75,51 +79,85 @@ void UnloadModules()
 
 int main(int argc, char *argv[])
 {
-  tws::core::initialize_logger("tws.log");
+// look for tws_app_server config file
+  std::string config_file_name = tws::core::find_in_app_path("share/tws/config/tws_app_server.json");
 
-  TWS_LOG_INFO() << "Starting TerraLib GeoWeb Services...\n" << std::endl;
-  
-  TerraLib::getInstance().initialize();
-  
+  if(config_file_name.empty())
+  {
+    std::cerr << TE_TR("Could not find tws_app_server configuration file: 'tws_app_server.json'.");
+
+    return EXIT_FAILURE;
+  }
+
   try
   {
+// read config file
+    std::unique_ptr<rapidjson::Document> config_doc(tws::core::open_json_file(config_file_name));
+
+    if(!config_doc->IsObject() || config_doc->IsNull())
+      throw tws::parse_error() << tws::error_description(TE_TR("error in array entry name in metadata."));
+
+// get log file information
+    const rapidjson::Value& jlog_file = (*config_doc)["log_file"];
+
+    std::string log_file = jlog_file.GetString();
+
+// init logger
+    TE_INIT_LOGGER(log_file);
+
+// init TerraLib and TWS frameworks
+    TE_LOG_CORE_INFO(TE_TR("Starting TerraLib GeoWeb Services..."));
+
+    TerraLib::getInstance().initialize();
+
     tws::core::init_terralib_web_services();
     
     LoadModules();
 
-    //std::unique_ptr<tws::core::http_server> server = tws::core::http_server_builder::instance().build(TWS_DEFAULT_WEB_SERVER);
-    std::unique_ptr<tws::core::http_server> server = tws::core::http_server_builder::instance().build("mongoose");
+// start default htp server
+    const rapidjson::Value& jhttp_server = (*config_doc)["http_server"];
+
+    std::string http_server = jhttp_server.GetString();
+
+    std::unique_ptr<tws::core::http_server> server = tws::core::http_server_builder::instance().build(http_server);
 
     server->start();
 
     UnloadModules();
+
+    TerraLib::getInstance().finalize();
+
+    TE_LOG_CORE_INFO(TE_TR("Finished TerraLib GeoWeb Services!"));
   }
   catch(const boost::exception& e)
   {
     if(const std::string* d = boost::get_error_info<tws::error_description>(e))
-      TWS_LOG_ERROR() << "\n\nthe following error has occurred: " << *d << std::endl;
+    {
+      boost::format err_msg(TE_TR("the following error has occurred: %1%."));
+
+      TE_LOG_CORE_ERROR((err_msg % *d).str());
+    }
     else
-      TWS_LOG_ERROR() << "\n\nan unknown error has occurred" << std::endl;
+    {
+      TE_LOG_CORE_ERROR(TE_TR("an unknown error has occurred"));
+    }
 
     return EXIT_FAILURE;
   }
   catch(const std::exception& e)
   {
-    std::cout << "\n\nthe following error has occurred: " << e.what() << std::endl;
+    boost::format err_msg(TE_TR("the following error has occurred: %1%."));
+
+    TE_LOG_CORE_ERROR((err_msg % e.what()).str());
 
     return EXIT_FAILURE;
   }
   catch(...)
   {
-    TWS_LOG_ERROR()  << "\n\nan unknown error has occurred." << std::endl;
+    TE_LOG_CORE_ERROR(TE_TR("an unknown error has occurred."));
 
     return EXIT_FAILURE;
   }
-  
-  
-  TerraLib::getInstance().finalize();
-
-  TWS_LOG_INFO()  << "\nFinished TerraLib GeoWeb Services!\n" << std::endl;
 
   return EXIT_SUCCESS;
 }

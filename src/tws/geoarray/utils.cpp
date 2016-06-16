@@ -61,7 +61,7 @@ tws::geoarray::load_geoarrays(std::map<std::string, geoarray_t>& arrays,
 
   try
   {
-    rapidjson::Document* doc = tws::core::open_json_file(input_file);
+    std::unique_ptr<rapidjson::Document> doc(tws::core::open_json_file(input_file));
 
     const rapidjson::Value& jarrays = (*doc)["arrays"];
 
