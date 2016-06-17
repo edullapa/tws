@@ -310,8 +310,10 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
   rapidjson::Value jattributes(rapidjson::kArrayType);
 
 // iterate through each queried attribute
-  for(const auto& attr_name : queried_attributes)
+  for(std::size_t i = 0; i != queried_attributes.size(); ++i)
   {
+    const auto& attr_name = queried_attributes[i];
+
 // the scidb query string
     std::string str_afl = "project( between(" + cv.name + ", "
                         + std::to_string(pixel_col) + "," + std::to_string(pixel_row) + "," + std::to_string(start_time_idx + cv.dimensions[2].min_idx) + ","
@@ -345,8 +347,7 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
       continue; // no query result returned after querying database.
     }
 
-    std::vector<double> values;
-    values.reserve(ntime_pts);
+    std::vector<double> values(ntime_pts, cv.attributes[i].missing_value);
 
     const ::scidb::ArrayDesc& array_desc = qresult->array->getArrayDesc();
     const ::scidb::Attributes& array_attributes = array_desc.getAttributes(true);
@@ -354,7 +355,7 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 
     std::shared_ptr< ::scidb::ConstArrayIterator > array_it = qresult->array->getConstIterator(attr.getId());
 
-    tws::scidb::fill(values, array_it.get(), attr.getType());
+    fill_time_series(values, ntime_pts, array_it.get(), attr.getType(), 2, -(start_time_idx + cv.dimensions[2].min_idx));
 
     //end = std::chrono::steady_clock::now();
 
@@ -362,11 +363,11 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 
     //std::cout << "\tTraversing array in " << elapsed_time.count() << "s" << std::endl;
 
-    if(values.size() != ntime_pts)
-    {
-      boost::format err_msg("error retrieving time series for geoarray '%1%', attribute '%2%': number of expected values was '%3%', found '%4%'!");
-      throw tws::core::http_request_error() << tws::error_description((err_msg % cv.name % attr_name % ntime_pts % values.size()).str());
-    }
+    assert(values.size() == ntime_pts);
+    //{
+    //  boost::format err_msg("error retrieving time series for geoarray '%1%', attribute '%2%': number of expected values was '%3%', found '%4%'!");
+    //  throw tws::core::http_request_error() << tws::error_description((err_msg % cv.name % attr_name % ntime_pts % values.size()).str());
+    //}
 
     rapidjson::Value jattribute(rapidjson::kObjectType);
 

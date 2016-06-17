@@ -30,6 +30,7 @@
 
 
 // STL
+#include <cassert>
 #include <cstdio>
 
 // Boost
@@ -534,3 +535,149 @@ tws::wtss::write(const tws::geoarray::dimension_t& dim,
   //jdim.AddMember("pos", dim.pos, allocator);
 }
 
+#define TWS_FILL_VECTOR(values, array_it, get_name) \
+  while(!array_it->end()) \
+  { \
+    const ::scidb::ConstChunk& chunk = array_it->getChunk(); \
+  \
+    std::shared_ptr< ::scidb::ConstChunkIterator > chunk_it = chunk.getConstIterator(); \
+  \
+    while(!chunk_it->end()) \
+    { \
+      const ::scidb::Value& v = chunk_it->getItem(); \
+  \
+      values.push_back(v.get_name()); \
+  \
+      ++(*chunk_it); \
+    } \
+  \
+    ++(*array_it); \
+ \
+  }
+
+inline void
+tws_scidb_fill_int8(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
+{
+  TWS_FILL_VECTOR(values, it, getInt8)
+}
+
+inline void
+tws_scidb_fill_uint8(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* array_it, ::scidb::Coordinate time_idx, int64_t offset)
+{
+  //TWS_FILL_VECTOR(values, it, getUint8)
+
+  std::size_t npts = 0;
+
+  while(!array_it->end())
+  {
+    ++npts;
+
+    if(npts > nvalues)
+      throw tws::outof_bounds_error() << tws::error_description("Invalid timeseries range.");
+
+    const ::scidb::ConstChunk& chunk = array_it->getChunk();
+
+    std::shared_ptr< ::scidb::ConstChunkIterator > chunk_it = chunk.getConstIterator();
+
+    while(!chunk_it->end())
+    {
+      const ::scidb::Value& v = chunk_it->getItem();
+
+      const ::scidb::Coordinates& coords = chunk_it->getPosition();
+
+      ::scidb::Coordinate cell_idx = coords[time_idx] + offset;
+
+      values[cell_idx] = v.getUint8();
+
+      ++(*chunk_it);
+    }
+
+    ++(*array_it);
+
+  }
+
+  if(npts != nvalues)
+    throw tws::outof_bounds_error() << tws::error_description("Invalid timeseries range.");
+}
+
+inline void
+tws_scidb_fill_int16(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
+{
+  TWS_FILL_VECTOR(values, it, getInt16)
+}
+
+inline void
+tws_scidb_fill_uint16(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
+{
+  TWS_FILL_VECTOR(values, it, getUint16)
+}
+
+inline void
+tws_scidb_fill_int32(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
+{
+  TWS_FILL_VECTOR(values, it, getInt32)
+}
+
+inline void
+tws_scidb_fill_uint32(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
+{
+  TWS_FILL_VECTOR(values, it, getUint32)
+}
+
+inline void
+tws_scidb_fill_int64(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
+{
+  TWS_FILL_VECTOR(values, it, getInt64)
+}
+
+inline void
+tws_scidb_fill_uint64(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
+{
+  TWS_FILL_VECTOR(values, it, getUint64)
+}
+
+inline void
+tws_scidb_fill_float(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
+{
+  TWS_FILL_VECTOR(values, it, getFloat)
+}
+
+inline void
+tws_scidb_fill_double(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
+{
+  TWS_FILL_VECTOR(values, it, getDouble)
+}
+
+void
+tws::wtss::fill_time_series(std::vector<double>& values,
+                            std::size_t nvalues,
+                            ::scidb::ConstArrayIterator* it,
+                            const ::scidb::TypeId& id,
+                            ::scidb::Coordinate time_idx,
+                            int64_t offset)
+{
+  assert(values.size() == nvalues);
+
+  if(id == ::scidb::TID_INT8)
+    tws_scidb_fill_int8(values, nvalues, it, time_idx, offset);
+  else if(id == ::scidb::TID_UINT8)
+    tws_scidb_fill_uint8(values, nvalues, it, time_idx, offset);
+  else if(id == ::scidb::TID_INT16)
+    tws_scidb_fill_int16(values, nvalues, it, time_idx, offset);
+  else if(id == ::scidb::TID_UINT16)
+    tws_scidb_fill_uint16(values, nvalues, it, time_idx, offset);
+  else if(id == ::scidb::TID_INT32)
+    tws_scidb_fill_int32(values, nvalues, it, time_idx, offset);
+  else if(id == ::scidb::TID_UINT32)
+    tws_scidb_fill_uint32(values, nvalues, it, time_idx, offset);
+  else if(id == ::scidb::TID_INT64)
+      tws_scidb_fill_int64(values, nvalues, it, time_idx, offset);
+    else if(id == ::scidb::TID_UINT64)
+      tws_scidb_fill_uint64(values, nvalues, it, time_idx, offset);
+  else if(id == ::scidb::TID_FLOAT)
+    tws_scidb_fill_float(values, nvalues, it, time_idx, offset);
+  else if(id == ::scidb::TID_DOUBLE)
+    tws_scidb_fill_double(values, nvalues, it, time_idx, offset);
+  else
+    throw tws::conversion_error() << tws::error_description("Could not fill values vector with iterator items: data type not supported.");
+}

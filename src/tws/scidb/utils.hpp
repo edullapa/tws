@@ -30,35 +30,14 @@
 // TWS
 #include "config.hpp"
 
-// SciDB
-#include <SciDBAPI.h>
+
 
 namespace tws
 {
   namespace scidb
   {
 
-    void fill(std::vector<double>& values, ::scidb::ConstArrayIterator* it, const ::scidb::TypeId& id);
 
-//    void fill_int8(std::vector<double>& values, ::scidb::ConstItemIterator& it);
-//
-//    void fill_uint8(std::vector<double>& values, ::scidb::ConstItemIterator& it);
-//
-//    void fill_int16(std::vector<double>& values, ::scidb::ConstItemIterator& it);
-//
-//    void fill_uint16(std::vector<double>& values, ::scidb::ConstItemIterator& it);
-//
-//    void fill_int32(std::vector<double>& values, ::scidb::ConstItemIterator& it);
-//
-//    void fill_uint32(std::vector<double>& values, ::scidb::ConstItemIterator& it);
-//
-//    void fill_int64(std::vector<double>& values, ::scidb::ConstItemIterator& it);
-//
-//    void fill_uint64(std::vector<double>& values, ::scidb::ConstItemIterator& it);
-//
-//    void fill_float(std::vector<double>& values, ::scidb::ConstItemIterator& it);
-//
-//    void fill_double(std::vector<double>& values, ::scidb::ConstItemIterator& it);
 
   }   // end namespace scidb
 }     // end namespace tws

@@ -245,7 +245,7 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
 
   std::shared_ptr< ::scidb::ConstArrayIterator > array_it = qresult->array->getConstIterator(attr.getId());
 
-  tws::scidb::fill(values, array_it.get(), attr.getType());
+  //tws::scidb::fill(values, array_it.get(), attr.getType());
 
 // create a GD Image
 
