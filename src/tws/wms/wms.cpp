@@ -217,27 +217,32 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
     throw tws::core::http_request_error() << tws::error_description((err_ms % format).str());
   }
 
-// retrieve time interval
-  it = qstr.find("TIME");
+// retrieve time instant
+//  it = qstr.find("TIME");
 
-  if(it == it_end || it->second.empty())
-    throw tws::core::http_request_error() << tws::error_description("check GetMap operation: \"TIME\" parameter is missing!");
+//  const std::string queried_time = (it != it_end) ? it->second : std::string("");
 
-  const std::string time = it->second;
+//  const timeline& tl = timeline_manager::instance().get(layers.front());
 
-// prepare to render
-  const uint32_t regrid_width = 1000/width;
+//  std::size_t time_idx = queried_time.empty() ? tl.index(tl.time_points().front()) : tl.index(queried_time);
 
-  const uint32_t regrid_height = 1000/height;
+// prepare the query string
+  std::string str_afl = "project( between(" + layers.front() + ", "
+                      + std::to_string(0) + "," + std::to_string(0) + "," + std::to_string(1) + ","
+                      + std::to_string(1020) + "," + std::to_string(1380) + "," + std::to_string(1) + "), "
+                      + "measure)";
 
-// get a connection from the pool in order to retrieve the image data
+// get connection
   std::unique_ptr<tws::scidb::connection> conn(tws::scidb::connection_pool::instance().get());
 
-  std::string str_afl = "project(regrid( " + layers[0] + ", " + std::to_string(regrid_width) + ", " + std::to_string(regrid_height) + ", avg(val) as val), val)";
-
+// execute query
   boost::shared_ptr< ::scidb::QueryResult > qresult = conn->execute(str_afl, true);
 
-  std::vector<double> values;
+  if((qresult.get() == nullptr) || (qresult->array.get() == nullptr))
+  {
+    boost::format err_msg("Error querying layer: '%1%'!");
+    throw tws::core::http_request_error() << tws::error_description((err_msg % layers.front()).str());
+  }
 
   const ::scidb::ArrayDesc& array_desc = qresult->array->getArrayDesc();
   const ::scidb::Attributes& array_attributes = array_desc.getAttributes(true);
@@ -245,26 +250,94 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
 
   std::shared_ptr< ::scidb::ConstArrayIterator > array_it = qresult->array->getConstIterator(attr.getId());
 
+  // width x height
+  gdImagePtr img =  gdImageCreateTrueColor(1021, 1381);
+
+  float max_value = 15.0;
+
+  float factor = max_value / 255.0;
+
+  float min_value = 0.0;
+
+  while(!array_it->end())
+  {
+
+    const ::scidb::ConstChunk& chunk = array_it->getChunk();
+
+    std::shared_ptr< ::scidb::ConstChunkIterator > chunk_it = chunk.getConstIterator();
+
+    while(!chunk_it->end())
+    {
+      const ::scidb::Value& v = chunk_it->getItem();
+
+      const ::scidb::Coordinates& coords = chunk_it->getPosition();
+
+      float cell_value = v.getUint8();
+
+      int color = (cell_value - min_value) / factor;
+
+      int gray = gdTrueColorAlpha(color, color, color, 0);
+
+      int col = coords[0];
+      int row = coords[1];
+      int t = coords[2];
+
+      gdImageSetPixel(img, col, row, gray);
+
+      ++(*chunk_it);
+    }
+
+    ++(*array_it);
+
+  }
+
+// traverse array data
+
+
+// prepare to render
+  //double red_factor = red_max_value / 255.0;
+  //double green_factor = green_max_value / 255.0;
+  //double blue_factor = blue_max_value / 255.0;
+  //
+
+  //const uint32_t regrid_width = 1000/width;
+  //const uint32_t regrid_height = 1000/height;
+
+// get a connection from the pool in order to retrieve the image data
+
+
+  //std::string str_afl = "project(regrid( " + layers[0] + ", " + std::to_string(regrid_width) + ", " + std::to_string(regrid_height) + ", avg(val) as val), val)";
+
+  //boost::shared_ptr< ::scidb::QueryResult > qresult = conn->execute(str_afl, true);
+
+//  std::vector<double> values;
+
+//  const ::scidb::ArrayDesc& array_desc = qresult->array->getArrayDesc();
+//  const ::scidb::Attributes& array_attributes = array_desc.getAttributes(true);
+//  const ::scidb::AttributeDesc& attr = array_attributes.front();
+
+//  std::shared_ptr< ::scidb::ConstArrayIterator > array_it = qresult->array->getConstIterator(attr.getId());
+
   //tws::scidb::fill(values, array_it.get(), attr.getType());
 
 // create a GD Image
 
-  gdImagePtr img =  gdImageCreateTrueColor(width, height);
+  //gdImagePtr img =  gdImageCreateTrueColor(width, height);
 
-  int red = gdTrueColorAlpha(255, 0, 0, 0);
+  //int red = gdTrueColorAlpha(255, 0, 0, 0);
 
-  int green = gdTrueColorAlpha(0, 255, 0, 0);
+  //int green = gdTrueColorAlpha(0, 255, 0, 0);
 
-  int blue = gdTrueColorAlpha(0, 0, 255, 0);
+  //int blue = gdTrueColorAlpha(0, 0, 255, 0);
 
-  for(uint32_t i = 0; i != height; ++i)
-    for(uint32_t j = 0; j != width; ++j)
-      if(values[i*100+j] == 0)
-        gdImageSetPixel(img, j, i, red);
-      else if(values[i*100+j] == 1)
-        gdImageSetPixel(img, j, i, green);
-      else
-        gdImageSetPixel(img, j, i, blue);
+//  for(uint32_t i = 0; i != height; ++i)
+//    for(uint32_t j = 0; j != width; ++j)
+//      if(values[i*100+j] == 0)
+//        gdImageSetPixel(img, j, i, red);
+//      else if(values[i*100+j] == 1)
+//        gdImageSetPixel(img, j, i, green);
+//      else
+//        gdImageSetPixel(img, j, i, blue);
 
   int png_size = 0;
 

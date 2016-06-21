@@ -535,117 +535,98 @@ tws::wtss::write(const tws::geoarray::dimension_t& dim,
   //jdim.AddMember("pos", dim.pos, allocator);
 }
 
-#define TWS_FILL_VECTOR(values, array_it, get_name) \
+#define TWS_FILL_VECTOR(values, nvalues, array_it, time_idx, offset, get_name) \
+  std::size_t npts = 0; \
+  \
   while(!array_it->end()) \
   { \
+  \
     const ::scidb::ConstChunk& chunk = array_it->getChunk(); \
   \
     std::shared_ptr< ::scidb::ConstChunkIterator > chunk_it = chunk.getConstIterator(); \
   \
     while(!chunk_it->end()) \
     { \
+      ++npts; \
+  \
+      if(npts > nvalues) \
+        throw tws::outof_bounds_error() << tws::error_description("Invalid timeseries range: found too many values."); \
+  \
       const ::scidb::Value& v = chunk_it->getItem(); \
   \
-      values.push_back(v.get_name()); \
+      const ::scidb::Coordinates& coords = chunk_it->getPosition(); \
+  \
+      ::scidb::Coordinate cell_idx = coords[time_idx] + offset; \
+  \
+      values[cell_idx] = v.get_name(); \
   \
       ++(*chunk_it); \
     } \
   \
     ++(*array_it); \
  \
-  }
+  } \
+  if(npts != nvalues) \
+      throw tws::outof_bounds_error() << tws::error_description("Invalid timeseries range: missing some values.");
 
 inline void
 tws_scidb_fill_int8(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
 {
-  TWS_FILL_VECTOR(values, it, getInt8)
+  TWS_FILL_VECTOR(values, nvalues, it, time_idx, offset, getInt8)
 }
 
 inline void
-tws_scidb_fill_uint8(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* array_it, ::scidb::Coordinate time_idx, int64_t offset)
+tws_scidb_fill_uint8(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
 {
-  //TWS_FILL_VECTOR(values, it, getUint8)
-
-  std::size_t npts = 0;
-
-  while(!array_it->end())
-  {
-    ++npts;
-
-    if(npts > nvalues)
-      throw tws::outof_bounds_error() << tws::error_description("Invalid timeseries range.");
-
-    const ::scidb::ConstChunk& chunk = array_it->getChunk();
-
-    std::shared_ptr< ::scidb::ConstChunkIterator > chunk_it = chunk.getConstIterator();
-
-    while(!chunk_it->end())
-    {
-      const ::scidb::Value& v = chunk_it->getItem();
-
-      const ::scidb::Coordinates& coords = chunk_it->getPosition();
-
-      ::scidb::Coordinate cell_idx = coords[time_idx] + offset;
-
-      values[cell_idx] = v.getUint8();
-
-      ++(*chunk_it);
-    }
-
-    ++(*array_it);
-
-  }
-
-  if(npts != nvalues)
-    throw tws::outof_bounds_error() << tws::error_description("Invalid timeseries range.");
+  TWS_FILL_VECTOR(values, nvalues, it, time_idx, offset, getUint8)
 }
 
 inline void
 tws_scidb_fill_int16(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
 {
-  TWS_FILL_VECTOR(values, it, getInt16)
+  TWS_FILL_VECTOR(values, nvalues, it, time_idx, offset, getInt16)
 }
 
 inline void
 tws_scidb_fill_uint16(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
 {
-  TWS_FILL_VECTOR(values, it, getUint16)
+  TWS_FILL_VECTOR(values, nvalues, it, time_idx, offset, getUint16)
 }
 
 inline void
 tws_scidb_fill_int32(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
 {
-  TWS_FILL_VECTOR(values, it, getInt32)
+  TWS_FILL_VECTOR(values, nvalues, it, time_idx, offset, getInt32)
 }
 
 inline void
 tws_scidb_fill_uint32(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
 {
-  TWS_FILL_VECTOR(values, it, getUint32)
+  TWS_FILL_VECTOR(values, nvalues, it, time_idx, offset, getUint32)
 }
 
 inline void
 tws_scidb_fill_int64(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
 {
-  TWS_FILL_VECTOR(values, it, getInt64)
+  TWS_FILL_VECTOR(values, nvalues, it, time_idx, offset, getInt64)
 }
 
 inline void
 tws_scidb_fill_uint64(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
 {
-  TWS_FILL_VECTOR(values, it, getUint64)
+  TWS_FILL_VECTOR(values, nvalues, it, time_idx, offset, getUint64)
 }
 
 inline void
 tws_scidb_fill_float(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
 {
-  TWS_FILL_VECTOR(values, it, getFloat)
+  TWS_FILL_VECTOR(values, nvalues, it, time_idx, offset, getFloat)
 }
 
 inline void
 tws_scidb_fill_double(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
 {
-  TWS_FILL_VECTOR(values, it, getDouble)
+  TWS_FILL_VECTOR(values, nvalues, it, time_idx, offset, getDouble)
 }
 
 void

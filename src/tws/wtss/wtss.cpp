@@ -363,12 +363,6 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 
     //std::cout << "\tTraversing array in " << elapsed_time.count() << "s" << std::endl;
 
-    assert(values.size() == ntime_pts);
-    //{
-    //  boost::format err_msg("error retrieving time series for geoarray '%1%', attribute '%2%': number of expected values was '%3%', found '%4%'!");
-    //  throw tws::core::http_request_error() << tws::error_description((err_msg % cv.name % attr_name % ntime_pts % values.size()).str());
-    //}
-
     rapidjson::Value jattribute(rapidjson::kObjectType);
 
     jattribute.AddMember("attribute", attr_name.c_str(), allocator);

@@ -102,8 +102,8 @@
             ],
             "layers": []
           },
-          { "name": "fire_risk_montlhy",
-            "abstract": "Fire risk monthly aggregate data",
+          { "name": "hotspot_monthly",
+            "abstract": "Monthly aggregated hotspot data",
             "crs": ["4326"],
             "bounding_box": [
               { "crs": "4326",
@@ -113,6 +113,15 @@
                 "max_y": 13.025,
                 "res_x": 0.05,
                 "res_y": 0.05
+              }
+            ],
+            "styles": [
+              {
+                "type": "single band - gray",
+                "band": "measure",
+                "min": 0,
+                "max": 15,
+                "contrast_enhancement": "stretch to min-max"
               }
             ],
             "layers": []
