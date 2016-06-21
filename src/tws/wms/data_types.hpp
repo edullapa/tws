@@ -193,6 +193,8 @@ namespace tws
       std::vector<legend_url_t> legend_url;
       style_sheet_url_t style_sheet_url;
       style_url_t style_url;
+      std::string style_type;
+      std::vector<std::string> colors;
     };
    
     //! Nested list of zero or more map Layers offered by this server.
@@ -212,7 +214,7 @@ namespace tws
       std::vector<metadata_url_t> metadata_url;
       std::vector<data_url_t> data_url;
       std::vector<feature_list_url_t> feature_list_url;
-      std::vector<style_t> style;
+      std::vector<style_t> styles;
       double min_scale_denominator;
       double max_scale_denominator;
       std::vector<layer_t> layers;

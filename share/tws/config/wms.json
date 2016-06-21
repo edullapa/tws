@@ -25,8 +25,8 @@
       "fees": "none",
       "access_constraints": "none",
       "layer_limit": 1,
-      "max_width": 2048,
-      "max_height": 2048
+      "max_width": 4800,
+      "max_height": 4800
     },
     "capability": {
       "request": {
@@ -100,6 +100,13 @@
                 "res_y": 231.65635826374995
               }
             ],
+            "styles": [
+              {
+                "name": "rgb",
+                "type": "rgb",
+                "colors": ["uint8((nir + 100) / 63.137254902)", "uint8((nir + 100) / 63.137254902)", "uint8((red + 100) / 63.137254902)"]
+              }
+            ],
             "layers": []
           },
           { "name": "hotspot_monthly",
@@ -117,11 +124,9 @@
             ],
             "styles": [
               {
-                "type": "single band - gray",
-                "band": "measure",
-                "min": 0,
-                "max": 15,
-                "contrast_enhancement": "stretch to min-max"
+                "name": "gray",
+                "type": "single band gray",
+                "colors": ["uint8(measure/0.058823529)"]
               }
             ],
             "layers": []

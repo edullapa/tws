@@ -17,7 +17,7 @@
  */
 
 /*!
-  \file tws/wtss/timeline_manager.cpp
+  \file tws/geoarray/timeline_manager.cpp
 
   \brief A singleton for managing the timeline of arrays.
 
@@ -26,8 +26,10 @@
 
 // TWS
 #include "timeline_manager.hpp"
+#include "../core/utils.hpp"
 #include "exception.hpp"
 #include "timeline.hpp"
+#include "utils.hpp"
 
 // STL
 #include <map>
@@ -35,14 +37,14 @@
 // Boost
 #include <boost/format.hpp>
 
-struct tws::wtss::timeline_manager::impl
+struct tws::geoarray::timeline_manager::impl
 {
   std::map<std::string, timeline > timelines;
 };
 
 void
-tws::wtss::timeline_manager::insert(const std::string& geoarray_name,
-                                    const timeline& t)
+tws::geoarray::timeline_manager::insert(const std::string& geoarray_name,
+                                        const timeline& t)
 {
   if(pimpl_->timelines.find(geoarray_name) != pimpl_->timelines.end())
   {
@@ -54,8 +56,8 @@ tws::wtss::timeline_manager::insert(const std::string& geoarray_name,
   pimpl_->timelines[geoarray_name] = t;
 }
 
-const tws::wtss::timeline&
-tws::wtss::timeline_manager::get(const std::string& geoarray_name) const
+const tws::geoarray::timeline&
+tws::geoarray::timeline_manager::get(const std::string& geoarray_name) const
 {
   std::map<std::string, timeline >::iterator it = pimpl_->timelines.find(geoarray_name);
 
@@ -69,21 +71,46 @@ tws::wtss::timeline_manager::get(const std::string& geoarray_name) const
   return it->second;
 }
 
-tws::wtss::timeline_manager&
-tws::wtss::timeline_manager::instance()
+tws::geoarray::timeline_manager&
+tws::geoarray::timeline_manager::instance()
 {
   static timeline_manager inst;
 
   return inst;
 }
 
-tws::wtss::timeline_manager::timeline_manager()
+tws::geoarray::timeline_manager::timeline_manager()
   : pimpl_(nullptr)
 {
   pimpl_ = new impl;
+
+  std::string timelines = tws::core::find_in_app_path("share/tws/config/timelines.json");
+
+  if(timelines.empty())
+    throw  tws::file_exists_error() << tws::error_description("could not locate file: 'share/tws/config/wtss_timelines.json'.");
+
+  std::vector<std::pair<std::string, std::string> > timelines_files = read_timelines_file_name(timelines);
+
+  for(const auto& tf : timelines_files)
+  {
+    std::string input_file = tws::core::find_in_app_path("share/tws/config/" + tf.second);
+
+    if(input_file.empty())
+    {
+      boost::format err_msg("timeline file: '%1%', not found for array '%2%'.");
+
+      throw tws::file_exists_error() << tws::error_description((err_msg % tf.second % tf.first).str());
+    }
+
+    std::vector<std::string> str_timeline = read_timeline(input_file);
+
+    timeline t(str_timeline);
+
+    insert(tf.first, t);
+  }
 }
 
-tws::wtss::timeline_manager::~timeline_manager()
+tws::geoarray::timeline_manager::~timeline_manager()
 {
   delete pimpl_;
 }

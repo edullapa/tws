@@ -31,11 +31,11 @@
 #include "../core/service_operations_manager.hpp"
 #include "../core/utils.hpp"
 #include "../geoarray/geoarray_manager.hpp"
+#include "../geoarray/timeline.hpp"
+#include "../geoarray/timeline_manager.hpp"
 #include "../scidb/connection.hpp"
 #include "../scidb/connection_pool.hpp"
 #include "../scidb/utils.hpp"
-#include "timeline.hpp"
-#include "timeline_manager.hpp"
 #include "utils.hpp"
 
 // STL
@@ -105,7 +105,6 @@ void
 tws::wtss::describe_coverage_functor::operator()(const tws::core::http_request& request,
                                                  tws::core::http_response& response)
 {
-
   const char* qstring = request.query_string();
 
   if(qstring == nullptr)
@@ -223,7 +222,7 @@ tws::wtss::time_series_functor::operator()(const tws::core::http_request& reques
 
   const std::string start_time = (it != it_end) ? it->second : std::string("");
 
-  const timeline& tl = timeline_manager::instance().get(cv.name);
+  const tws::geoarray::timeline& tl = tws::geoarray::timeline_manager::instance().get(cv.name);
 
   std::size_t start_time_idx = start_time.empty() ? tl.index(tl.time_points().front()) : tl.index(start_time);
 
@@ -477,28 +476,5 @@ tws::wtss::register_operations()
 void
 tws::wtss::initialize_operations()
 {
-  std::string timelines = tws::core::find_in_app_path("share/tws/config/timelines.json");
-
-  if(timelines.empty())
-    throw  tws::file_exists_error() << tws::error_description("could not locate file: 'share/tws/config/wtss_timelines.json'.");
-
-  std::vector<std::pair<std::string, std::string> > timelines_files = tws::wtss::read_timelines_file_name(timelines);
-
-  for(const auto& tf : timelines_files)
-  {
-    std::string input_file = tws::core::find_in_app_path("share/tws/config/" + tf.second);
-
-    if(input_file.empty())
-    {
-      boost::format err_msg("timeline file: '%1%', not found for array '%2%'.");
-
-      throw tws::file_exists_error() << tws::error_description((err_msg % tf.second % tf.first).str());
-    }
-
-    std::vector<std::string> str_timeline = tws::wtss::read_timeline(input_file);
-
-    timeline t(str_timeline);
-
-    timeline_manager::instance().insert(tf.first, t);
-  }
+  tws::geoarray::timeline_manager::instance();
 }

@@ -17,7 +17,7 @@
  */
 
 /*!
-  \file tws/wtss/timeline.cpp
+  \file tws/geoarray/timeline.cpp
 
   \brief A class for handling the timeline of a geo-array.
 
@@ -35,7 +35,7 @@
 // Boost
 #include <boost/format.hpp>
 
-tws::wtss::timeline::timeline(const std::vector<std::string>& tp)
+tws::geoarray::timeline::timeline(const std::vector<std::string>& tp)
   : time_points_(tp)
 {
   std::insert_iterator< std::map<std::string, std::size_t> > iit(time_point_idx_, time_point_idx_.begin());
@@ -48,7 +48,7 @@ tws::wtss::timeline::timeline(const std::vector<std::string>& tp)
 }
 
 const std::string&
-tws::wtss::timeline::get(std::size_t pos) const
+tws::geoarray::timeline::get(std::size_t pos) const
 {
   if(pos >= time_points_.size())
   {
@@ -61,7 +61,7 @@ tws::wtss::timeline::get(std::size_t pos) const
 }
 
 std::size_t
-tws::wtss::timeline::index(const std::string& time_point) const
+tws::geoarray::timeline::index(const std::string& time_point) const
 {
   std::map<std::string, std::size_t>::const_iterator it = time_point_idx_.find(time_point);
 
@@ -76,7 +76,7 @@ tws::wtss::timeline::index(const std::string& time_point) const
 }
 
 const std::vector<std::string>&
-tws::wtss::timeline::time_points() const
+tws::geoarray::timeline::time_points() const
 {
   return time_points_;
 }

@@ -17,15 +17,15 @@
  */
 
 /*!
-  \file tws/wtss/timeline_manager.hpp
+  \file tws/geoarray/timeline_manager.hpp
 
   \brief A singleton for managing the timeline of geo-arrays.
 
   \author Gilberto Ribeiro de Queiroz
  */
 
-#ifndef __TWS_WTSS_TIMELINE_MANAGER_HPP__
-#define __TWS_WTSS_TIMELINE_MANAGER_HPP__
+#ifndef __TWS_GEOARRAY_TIMELINE_MANAGER_HPP__
+#define __TWS_GEOARRAY_TIMELINE_MANAGER_HPP__
 
 // STL
 #include <string>
@@ -37,7 +37,7 @@
 
 namespace tws
 {
-  namespace wtss
+  namespace geoarray
   {
     class timeline;
 
@@ -75,8 +75,8 @@ namespace tws
         impl* pimpl_;
     };
 
-  } // end namespace wtss
+  } // end namespace geoarray
 }   // end namespace tws
 
-#endif  // __TWS_WTSS_TIMELINE_MANAGER_HPP__
+#endif  // __TWS_GEOARRAY_TIMELINE_MANAGER_HPP__
 

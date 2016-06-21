@@ -17,15 +17,15 @@
  */
 
 /*!
-  \file tws/wtss/timeline.hpp
+  \file tws/geoarray/timeline.hpp
 
   \brief A class for handling the timeline of a geo-array.
 
   \author Gilberto Ribeiro de Queiroz
  */
 
-#ifndef __TWS_WTSS_TIMELINE_HPP__
-#define __TWS_WTSS_TIMELINE_HPP__
+#ifndef __TWS_GEOARRAY_TIMELINE_HPP__
+#define __TWS_GEOARRAY_TIMELINE_HPP__
 
 // STL
 #include <map>
@@ -34,7 +34,7 @@
 
 namespace tws
 {
-  namespace wtss
+  namespace geoarray
   {
 
     //!A class for handling the timeline of a geo-array.
@@ -66,8 +66,8 @@ namespace tws
         std::map<std::string, std::size_t> time_point_idx_;
     };
 
-  } // end namespace wtss
+  } // end namespace geoarray
 }   // end namespace tws
 
-#endif  // __TWS_WTSS_TIMELINE_HPP__
+#endif  // __TWS_GEOARRAY_TIMELINE_HPP__
 

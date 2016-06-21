@@ -71,6 +71,10 @@ namespace tws
 
     layer_t read_layer(const rapidjson::Value& jlayer);
 
+    std::vector<style_t> read_styles(const rapidjson::Value& jstyles);
+
+    style_t read_style(const rapidjson::Value& jstyle);
+
   }  // end namespace wms
 }    // end namespace tws
 

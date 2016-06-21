@@ -480,6 +480,13 @@ tws::wms::read_layer(const rapidjson::Value& jlayer)
 
   layer.bounding_box = read_bounding_box(jbounding_box_list);
 
+  if(jlayer.HasMember("styles"))
+  {
+    const rapidjson::Value& jstyles = jlayer["styles"];
+
+    layer.styles = read_styles(jstyles);
+  }
+
   const rapidjson::Value& jsub_layers = jlayer["layers"];
   if (!jsub_layers.IsArray())
     throw tws::parse_error() << tws::error_description("error parsing layers list metadata.");
@@ -490,4 +497,37 @@ tws::wms::read_layer(const rapidjson::Value& jlayer)
   }
 
   return layer;
+}
+
+std::vector<tws::wms::style_t>
+tws::wms::read_styles(const rapidjson::Value& jstyles)
+{
+  if(!jstyles.IsArray())
+    throw tws::parse_error() << tws::error_description("error parsing styles metadata.");
+
+  std::vector<style_t> styles;
+
+  for(unsigned int i = 0; i < jstyles.Size(); ++i)
+    styles.push_back(read_style(jstyles[i]));
+
+  return styles;
+}
+
+tws::wms::style_t
+tws::wms::read_style(const rapidjson::Value& jstyle)
+{
+  if(!jstyle.IsObject())
+    throw tws::parse_error() << tws::error_description("error parsing style metadata.");
+
+  style_t result;
+
+  result.name = jstyle["name"].GetString();
+  result.style_type = jstyle["type"].GetString();
+
+  const rapidjson::Value& jcolors = jstyle["colors"];
+
+  for(unsigned int i = 0; i < jcolors.Size(); ++i)
+    result.colors.push_back(jcolors[i].GetString());
+
+  return result;
 }
