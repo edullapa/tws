@@ -43,6 +43,7 @@
 // STL
 #include <algorithm>
 #include <memory>
+#include <tuple>
 
 // Boost
 #include <boost/algorithm/string/classification.hpp>
@@ -73,6 +74,7 @@ namespace tws
     {
       std::string version;
       std::vector<std::string> layers;
+      std::vector<std::string> styles;
       std::string crs;
       te::gm::Envelope bbox;
       uint32_t width;
@@ -81,11 +83,22 @@ namespace tws
       std::string time_point;
     };
 
-    get_map_request_parameters decode_get_map_request(const tws::core::query_string_t& qstr);
+    typedef std::tuple<const layer_t*, const style_t*, const tws::geoarray::geoarray_t*, const tws::geoarray::timeline*> layer_tuple_t;
 
-    void valid(const get_map_request_parameters& parameters);
+    get_map_request_parameters
+    decode_get_map_request(const tws::core::query_string_t& qstr);
 
-    std::size_t compute_time_index(const get_map_request_parameters& parameters);
+    std::vector<layer_tuple_t>
+    valid(const get_map_request_parameters& parameters);
+
+    void render(const layer_tuple_t& ltuple,
+                const get_map_request_parameters& parameters,
+                gdImagePtr img);
+
+    std::size_t
+    compute_time_index(const tws::geoarray::geoarray_t* geoarray,
+                       const tws::geoarray::timeline* tl,
+                       const get_map_request_parameters& parameters);
 
   } // end namespace wms
 }   // end namespace tws
@@ -121,21 +134,27 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
 // parse plain text query string to a std::map
   tws::core::query_string_t qstr = tws::core::expand(qstring);
 
-// parse parameters
+// parse parameters to a struct
   get_map_request_parameters parameters = decode_get_map_request(qstr);
 
 // valid parameters
-  valid(parameters);
+  std::vector<tws::wms::layer_tuple_t> layers_to_render = valid(parameters);
 
-// compute time_index
-  std::size_t time_idx = compute_time_index(parameters);
+// now... let's render the selected layers!
+  std::unique_ptr<gdImage, decltype(&gdImageDestroy)> img(gdImageCreateTrueColor(parameters.width, parameters.height), gdImageDestroy);
 
-//-------------------------------------------------------------------------------
-// WARNING: we are just rendering the array slice along column and row dimensions
-//-------------------------------------------------------------------------------
+  for(const auto& ltuple : layers_to_render)
+  {
+    render(ltuple, parameters, img.get());
+  }
 
+  int png_size = 0;
 
+  std::unique_ptr<void, decltype(&gdFree)> png_img(gdImagePngPtr(img.get(), &png_size), gdFree);
 
+  response.add_header("Content-Type", "image/png");
+  response.add_header("Access-Control-Allow-Origin", "*");
+  response.set_content((char*)(png_img.get()), png_size);
 }
 
 void
@@ -157,7 +176,7 @@ tws::wms::register_operations()
     tws::core::service_operation s_op;
 
     s_op.name = "GetCapabilities";
-    s_op.description = "List the metadata, describing the layers avaliable for vizualization.";
+    s_op.description = "List the metadata, describing the layers avaliable for visualization.";
     s_op.handler = get_capabilities_functor();
 
     service.operations.push_back(s_op);
@@ -216,6 +235,14 @@ tws::wms::decode_get_map_request(const tws::core::query_string_t& qstr)
 
   boost::split(parameters.layers, it->second, boost::is_any_of(","));
 
+// get layers
+    it = qstr.find("STYLES");
+
+    if(it == it_end)
+      throw tws::core::http_request_error() << tws::error_description("Error on GetMap operation: \"STYLES\" parameter is missing.");
+
+    boost::split(parameters.styles, it->second, boost::is_any_of(","));
+
 // retrieve crs
   it = qstr.find("CRS");
 
@@ -236,8 +263,8 @@ tws::wms::decode_get_map_request(const tws::core::query_string_t& qstr)
 
   if(str_bbox.size() != 4)
   {
-    boost::format err_ms("Error on GetMap operation: invalid bounding box '%1%'.");
-    throw tws::core::http_request_error() << tws::error_description((err_ms % it->second).str());
+    boost::format err_msg("Error on GetMap operation: invalid bounding box '%1%'.");
+    throw tws::core::http_request_error() << tws::error_description((err_msg % it->second).str());
   }
 
   parameters.bbox.m_llx = std::stod(str_bbox[0]);
@@ -276,73 +303,188 @@ tws::wms::decode_get_map_request(const tws::core::query_string_t& qstr)
   return parameters;
 }
 
-void
+std::vector<tws::wms::layer_tuple_t>
 tws::wms::valid(const get_map_request_parameters& parameters)
 {
-// WMS version
+// check WMS version
   if(parameters.version != "1.3.0")
   {
     boost::format err_msg("Error on GetMap operation: invalid service version '%1%'.");
     throw tws::core::http_request_error() << tws::error_description((err_msg % parameters.version).str());
   }
 
-// layer list
+// check if layer list is not empty
   if(parameters.layers.empty())
     throw tws::core::http_request_error() << tws::error_description("Error on GetMap operation: empty layer list.");
 
+// artificial check: currently, we are accepting just one layer per request
   if(parameters.layers.size() > 1) // TODO: remove this restriction in near future!
     throw tws::core::http_request_error() << tws::error_description("Error on GetMap operation: this WMS implementation can only render one array per time.");
 
-  const capabilities_t& capabilities = tws::wms::wms_manager::instance().capabilities();
+// check if style-list size is the same as layer-list size
+  if(parameters.layers.size() != parameters.styles.size())
+    throw tws::core::http_request_error() << tws::error_description("Error on GetMap operation: the requested layer list must have the same size as style list.");
 
-  for(const auto& layer_name : parameters.layers)
+// valid layer list and styles and prepare rendering data
+  std::vector<tws::wms::layer_tuple_t> result;
+
+  const capabilities_t& wms_capabilities = tws::wms::wms_manager::instance().capabilities();
+
+  const layer_t& root_layer = wms_capabilities.capability.layer;
+
+  for(std::size_t i = 0; i < parameters.layers.size(); ++i)
   {
-    std::vector<layer_t>::const_iterator it = std::find_if(capabilities.capability.layer.layers.begin(),
-                                                           capabilities.capability.layer.layers.end(),
-                                                           [&layer_name](const layer_t& layer){ return (layer.name == layer_name); });
+// find requested layer in the server layer list
+    const std::string& layer_name = parameters.layers[i];
 
-    if(it == capabilities.capability.layer.layers.end())
+    const auto& it_layer = std::find_if(root_layer.layers.begin(), root_layer.layers.end(), [&layer_name]
+                                                                                            (const layer_t& l)
+                                                                                            { return l.name == layer_name; });
+
+    if(it_layer == root_layer.layers.end())
     {
-      boost::format err_msg("Error on GetMap operation: layer '%1%' is not a valid layer name.");
+      boost::format err_msg("Error on GetMap operation: could not find layer '%1%'.");
       throw tws::core::http_request_error() << tws::error_description((err_msg % layer_name).str());
     }
+
+    const layer_t& current_layer = *it_layer;
+
+// find the requested layer style
+    const std::string& style_name = parameters.styles[i];
+
+    const auto& it_style = std::find_if(current_layer.styles.begin(), current_layer.styles.end(), [&style_name]
+                                                                                                  (const style_t& s)
+                                                                                                  { return s.name == style_name; });
+
+    if(it_style == current_layer.styles.end())
+    {
+      boost::format err_msg("Error on GetMap operation: could not find layer style named '%1%'.");
+      throw tws::core::http_request_error() << tws::error_description((err_msg % style_name).str());
+    }
+
+    const auto& current_layer_style = *it_style;
+
+// find layer's original geoarray and time-line info
+    const tws::geoarray::timeline& tl = tws::geoarray::timeline_manager::instance().get(layer_name);
+
+    const tws::geoarray::geoarray_t& geo_array = tws::geoarray::geoarray_manager::instance().get(layer_name);
+
+// check if it is a 3D array
+    if(geo_array.dimensions.size() != 3)
+    {
+      boost::format err_msg("Error on GetMap operation: layer '%1%' is not a spatio-temporal array.");
+      throw tws::core::http_request_error() << tws::error_description((err_msg % layer_name).str());
+    }
+
+// create tuple info
+    layer_tuple_t ltuple = std::make_tuple(&current_layer, &current_layer_style , &geo_array, &tl);
+
+    result.push_back(ltuple);
   }
 
-// output image size
-  if(parameters.width > capabilities.service.max_width)
+// check output image size
+  if(parameters.width > wms_capabilities.service.max_width)
     throw tws::core::http_request_error() << tws::error_description("Error on GetMap operation: \"WIDTH\" parameter is out-of bounds.");
 
-  if(parameters.height > capabilities.service.max_height)
+  if(parameters.height > wms_capabilities.service.max_height)
     throw tws::core::http_request_error() << tws::error_description("Error on GetMap operation: \"HEIGHT\" parameter is out-of bounds.");
 
 // check requested output format
-  if(std::find_if(capabilities.capability.request.get_map.format.begin(),
-                  capabilities.capability.request.get_map.format.end(),
-                  [&parameters](const std::string& f){ return (f == parameters.format); }) != capabilities.capability.request.get_map.format.end())
+  if(std::find_if(wms_capabilities.capability.request.get_map.format.begin(),
+                  wms_capabilities.capability.request.get_map.format.end(),
+                  [&parameters](const std::string& f){ return (f == parameters.format); }) == wms_capabilities.capability.request.get_map.format.end())
   {
     boost::format err_msg("Error on GetMap operation: image output format '%1%' is not valid.");
     throw tws::core::http_request_error() << tws::error_description((err_msg % parameters.format).str());
   }
+
+// ok: return rendering info computed during validation
+  return result;
+}
+
+void
+tws::wms::render(const layer_tuple_t& ltuple,
+                 const get_map_request_parameters& parameters,
+                 gdImagePtr img)
+{
+  const layer_t* layer = std::get<0>(ltuple);
+  const style_t* style = std::get<1>(ltuple);
+  const tws::geoarray::geoarray_t* garray = std::get<2>(ltuple);
+  const tws::geoarray::timeline* tline = std::get<3>(ltuple);
+
+// compute time-index
+  std::size_t time_idx = compute_time_index(garray, tline, parameters);
+
+// get connection
+  std::unique_ptr<tws::scidb::connection> conn(tws::scidb::connection_pool::instance().get());
+
+// prepare the query string
+  std::string str_aql = "SELECT " + style->colors[0] + " "
+                      + "FROM between(" + layer->name + ", "
+                                        + std::to_string(garray->dimensions[0].min_idx) + ","
+                                        + std::to_string(garray->dimensions[1].min_idx) + ","
+                                        + std::to_string(time_idx) + ","
+                                        + std::to_string(garray->dimensions[0].min_idx + (parameters.width - 1)) + ","
+                                        + std::to_string(garray->dimensions[1].min_idx + (parameters.height - 1)) + ","
+                                        + std::to_string(time_idx)
+                                        + ")";
+
+// execute query
+    boost::shared_ptr< ::scidb::QueryResult > qresult = conn->execute(str_aql, false);
+
+    if((qresult.get() == nullptr) || (qresult->array.get() == nullptr))
+    {
+      boost::format err_msg("Error querying layer: '%1%'!");
+      throw tws::core::http_request_error() << tws::error_description((err_msg % layer->name).str());
+    }
+
+    const ::scidb::ArrayDesc& array_desc = qresult->array->getArrayDesc();
+    const ::scidb::Attributes& array_attributes = array_desc.getAttributes(true);
+    const ::scidb::AttributeDesc& attr = array_attributes.front();
+
+    std::shared_ptr<::scidb::ConstArrayIterator> array_it = qresult->array->getConstIterator(attr.getId());
+
+    while(!array_it->end())
+    {
+
+      const ::scidb::ConstChunk& chunk = array_it->getChunk();
+
+      std::shared_ptr< ::scidb::ConstChunkIterator > chunk_it = chunk.getConstIterator();
+
+      while(!chunk_it->end())
+      {
+        const ::scidb::Value& v = chunk_it->getItem();
+
+        const ::scidb::Coordinates& coords = chunk_it->getPosition();
+
+        int color = v.getUint8();
+
+        int gray = gdTrueColorAlpha(color, color, color, 0);
+
+        int col = coords[0];
+        int row = coords[1];
+        int t = coords[2];
+
+        gdImageSetPixel(img, col, row, gray);
+
+        ++(*chunk_it);
+      }
+
+      ++(*array_it);
+
+    }
+
+
 }
 
 std::size_t
-tws::wms::compute_time_index(const get_map_request_parameters& parameters)
+tws::wms::compute_time_index(const tws::geoarray::geoarray_t* geoarray,
+                             const tws::geoarray::timeline* tl,
+                             const get_map_request_parameters& parameters)
 {
-  if(parameters.layers.size() != 1)
-    throw tws::core::http_request_error() << tws::error_description("Error on GetMap operation: empty layer list or multiple geoarray selected for rendering.");
+  std::size_t time_idx = parameters.time_point.empty() ? tl->index(tl->time_points().front()) : tl->index(parameters.time_point);
 
-  const std::string& layer_name = parameters.layers.front();
-
-  const tws::geoarray::timeline& tl = tws::geoarray::timeline_manager::instance().get(layer_name);
-
-  std::size_t time_idx = parameters.time_point.empty() ? tl.index(tl.time_points().front()) : tl.index(parameters.time_point);
-
-  const tws::geoarray::geoarray_t& geo_array = tws::geoarray::geoarray_manager::instance().get(layer_name);
-
-  if(geo_array.dimensions.size() != 3)
-    throw tws::core::http_request_error() << tws::error_description("Error on GetMap operation: geo-array must be a 3D SciDB array.");
-
-  time_idx += geo_array.dimensions[2].min_idx;
+  time_idx += geoarray->dimensions[2].min_idx;
 
   return time_idx;
 }
