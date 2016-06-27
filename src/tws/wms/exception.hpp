@@ -17,60 +17,30 @@
  */
 
 /*!
-  \file tws/wtss/plugin.cpp
+  \file tws/wtss/exception.hpp
 
-  \brief Add a plugin interface for dynamic loading of the Web Time Series Data Service module.
+  \brief Specific exception types for the WTSS module.
 
   \author Gilberto Ribeiro de Queiroz
  */
 
+#ifndef __TWS_WMS_EXCEPTION_HPP__
+#define __TWS_WMS_EXCEPTION_HPP__
+
 // TWS
-#include "../core/service_operations_manager.hpp"
-#include "wtss.hpp"
+#include "../exception.hpp"
 
-// TerraLib
-#include <terralib/plugin/Plugin.h>
-
-// STL
-#include <memory>
-
-class Plugin : public te::plugin::Plugin
+namespace tws
 {
-  public:
-  
-    Plugin(const te::plugin::PluginInfo& pluginInfo)
-      : te::plugin::Plugin(pluginInfo)
-    {
-    }
-  
-    ~Plugin()
-    {
-    }
-  
-    void startup()
-    {
-      if(m_initialized)
-        return;
+  //! The namespace for the WMS module.
+  namespace wms
+  {
 
-      tws::wtss::register_operations();
-      
-      tws::wtss::initialize_operations();
-      
-      m_initialized = true;
-    }
-  
-    void shutdown()
-    {
-      if(!m_initialized)
-        return;
+    //! The base type for the WMS module exceptions.
+    struct exception: virtual tws::exception { };
 
-      m_initialized = false;
-    }
-};
 
-#define export_macro
+  }  // end namespace wms
+}    // end namespace tws
 
-PLUGIN_CALL_BACK_DECLARATION(export_macro)
-
-PLUGIN_CALL_BACK_IMPL(Plugin)
-
+#endif  // __TWS_WMS_EXCEPTION_HPP__

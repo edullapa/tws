@@ -32,49 +32,47 @@
 #include "data_types.hpp"
 
 // STL
-#include <vector>
 #include <string>
+#include <vector>
+
+// RapidXml
+#include <rapidxml/rapidxml.hpp>
 
 namespace tws
 {
   namespace wms
   {
-    // forward declarations
+// forward declarations
     struct capabilities_t;
     struct service_t;
 
     class wms_manager
     {
       public:
+
         //! Singleton method
         static wms_manager& instance();
 
         /*!
-          \brief It makes a capabilities operation object with wms metadata
+          \brief It makes a capabilities object with wms metadata
+
           \return A tws::wms::capabilities_t struct containing wms configuration
         */
-        capabilities_t capabilities();
+        const capabilities_t& capabilities() const;
 
-        /*!
-          \brief It makes a provider object with wms metadata
-          \return A tws::wms::service_t struct containing wms configuration
-        */
-        service_t service();
-
-        /*!
-          \brief It makes a provider object with wms metadata
-          \return A tws::wms::capability_t struct containing wms configuration
-        */
-        capability_t capability();
+        const rapidxml::xml_document<>& xml_capabilities() const;
 
       private:
+
+// singleton is accesible through class member function: instance()
         //! Constructor
         wms_manager();
 
         //! Destructor
         ~wms_manager();
 
-        struct impl; //!< Pimpl idiom
+// Pimpl idiom
+        struct impl;
 
         impl* pimpl_;
     };

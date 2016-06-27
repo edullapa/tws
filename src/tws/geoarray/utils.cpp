@@ -42,6 +42,172 @@
 // TerraLib
 //#include <terralib/srs/SpatialReferenceSystemManager.h>
 
+std::vector<std::pair<std::string, std::string> >
+tws::geoarray::read_timelines_file_name(const std::string& input_file)
+{
+  std::vector<std::pair<std::string, std::string> > timelines;
+
+  if(!boost::filesystem::is_regular(input_file))
+  {
+    boost::format err_msg("input file '%1%' doesn't exist.");
+    throw tws::file_exists_error() << tws::error_description((err_msg % input_file).str());
+  }
+
+  FILE* pfile = fopen(input_file.c_str(), "r");
+
+  if(pfile == nullptr)
+  {
+    boost::format err_msg("error opening input file '%1%'.");
+    throw tws::file_open_error() << tws::error_description((err_msg % input_file).str());
+  }
+
+  try
+  {
+    rapidjson::FileStream istr(pfile);
+
+    rapidjson::Document doc;
+
+    doc.ParseStream<0>(istr);
+
+    if(doc.HasParseError())
+    {
+      boost::format err_msg("error parsing input file '%1%': %2%.");
+      throw tws::parse_error() << tws::error_description((err_msg % input_file % doc.GetParseError()).str());
+    }
+
+    if(!doc.IsObject() || doc.IsNull())
+    {
+      boost::format err_msg("error parsing input file '%1%': unexpected file format.");
+      throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
+    }
+
+    const rapidjson::Value& jtimelines = doc["timelines"];
+
+    if(!jtimelines.IsArray())
+    {
+      boost::format err_msg("error parsing input file '%1%': expected a vector of array with time values.");
+      throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
+    }
+
+    const rapidjson::SizeType nelements = jtimelines.Size();
+
+    for(rapidjson::SizeType i = 0; i != nelements; ++i)
+    {
+      const rapidjson::Value& jtimeline = jtimelines[i];
+
+      if(jtimeline.IsNull())
+        continue;
+
+      if(!jtimeline.IsObject())
+      {
+        boost::format err_msg("error parsing input file '%1%': expected an object description for array timeline.");
+        throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
+      }
+
+      const rapidjson::Value& jarray_name = jtimeline["array"];
+
+      if(!jarray_name.IsString() || jarray_name.IsNull())
+        throw tws::parse_error() << tws::error_description("error in array timeline entry name in timelines metadata file.");
+
+      std::string array_name = jarray_name.GetString();
+
+      const rapidjson::Value& jarray_timeline = jtimeline["timeline"];
+
+      if(!jarray_timeline.IsString() || jarray_timeline.IsNull())
+        throw tws::parse_error() << tws::error_description("error in array timeline entry in timelines metadata file.");
+
+      std::string timeline_file = jarray_timeline.GetString();
+
+      timelines.push_back(std::make_pair(array_name, timeline_file));
+    }
+  }
+  catch(...)
+  {
+    fclose(pfile);
+    throw;
+  }
+
+  fclose(pfile);
+
+  return timelines;
+}
+
+std::vector<std::string>
+tws::geoarray::read_timeline(const std::string& input_file)
+{
+  std::vector<std::string> timeline;
+
+  if(!boost::filesystem::is_regular(input_file))
+  {
+    boost::format err_msg("input file '%1%' doesn't exist.");
+    throw tws::file_exists_error() << tws::error_description((err_msg % input_file).str());
+  }
+
+  FILE* pfile = fopen(input_file.c_str(), "r");
+
+  if(pfile == nullptr)
+  {
+    boost::format err_msg("error opening input file '%1%'.");
+    throw tws::file_open_error() << tws::error_description((err_msg % input_file).str());
+  }
+
+  try
+  {
+    rapidjson::FileStream istr(pfile);
+
+    rapidjson::Document doc;
+
+    doc.ParseStream<0>(istr);
+
+    if(doc.HasParseError())
+    {
+      boost::format err_msg("error parsing input file '%1%': %2%.");
+      throw tws::parse_error() << tws::error_description((err_msg % input_file % doc.GetParseError()).str());
+    }
+
+    if(!doc.IsObject() || doc.IsNull())
+    {
+      boost::format err_msg("error parsing input file '%1%': unexpected file format.");
+      throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
+    }
+
+    const rapidjson::Value& jtimes = doc["timeline"];
+
+    if(!jtimes.IsArray())
+    {
+      boost::format err_msg("error parsing input file '%1%': expected a vector of array with time values.");
+      throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
+    }
+
+    const rapidjson::SizeType nelements = jtimes.Size();
+
+    for(rapidjson::SizeType i = 0; i != nelements; ++i)
+    {
+      const rapidjson::Value& jtime = jtimes[i];
+
+      if(jtime.IsNull())
+        continue;
+
+      if(!jtime.IsString())
+      {
+        boost::format err_msg("error parsing input file '%1%': expected a string description for date.");
+        throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
+      }
+
+      timeline.push_back(jtime.GetString());
+    }
+  }
+  catch(...)
+  {
+    fclose(pfile);
+    throw;
+  }
+
+  fclose(pfile);
+
+  return timeline;
+}
+
 void
 tws::geoarray::load_geoarrays(std::map<std::string, geoarray_t>& arrays)
 {
@@ -61,7 +227,7 @@ tws::geoarray::load_geoarrays(std::map<std::string, geoarray_t>& arrays,
 
   try
   {
-    rapidjson::Document* doc = tws::core::open_json_file(input_file);
+    std::unique_ptr<rapidjson::Document> doc(tws::core::open_json_file(input_file));
 
     const rapidjson::Value& jarrays = (*doc)["arrays"];
 
@@ -69,7 +235,7 @@ tws::geoarray::load_geoarrays(std::map<std::string, geoarray_t>& arrays,
     {
       boost::format err_msg("error parsing input file '%1%': expected a vector of array metadata.");
 
-      throw tws::parser_error() << tws::error_description((err_msg % input_file).str());
+      throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
     }
 
     const rapidjson::SizeType nelements = jarrays.Size();
@@ -97,19 +263,19 @@ tws::geoarray::geoarray_t
 tws::geoarray::read_array_metadata(const rapidjson::Value& jmetadata)
 {
   if(!jmetadata.IsObject())
-    throw tws::parser_error() << tws::error_description("error parsing array metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing array metadata.");
 
   geoarray_t ameta;
 
   const rapidjson::Value& jarray_name = jmetadata["name"];
 
   if(!jarray_name.IsString() || jarray_name.IsNull())
-    throw tws::parser_error() << tws::error_description("error in array entry name in metadata.");
+    throw tws::parse_error() << tws::error_description("error in array entry name in metadata.");
 
   ameta.name = jarray_name.GetString();
 
   if(ameta.name.empty())
-    throw tws::parser_error() << tws::error_description("array name can not be empty in metadata.");
+    throw tws::parse_error() << tws::error_description("array name can not be empty in metadata.");
 
   const rapidjson::Value& jarray_dsc = jmetadata["description"];
 
@@ -140,7 +306,7 @@ std::vector<tws::geoarray::attribute_t>
 tws::geoarray::read_array_attributes(const rapidjson::Value& jattributes)
 {
   if(!jattributes.IsArray() || jattributes.IsNull())
-    throw tws::parser_error() << tws::error_description("error parsing array attributes in metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing array attributes in metadata.");
 
   std::vector<attribute_t> attributes;
 
@@ -163,7 +329,7 @@ std::vector<tws::geoarray::dimension_t>
 tws::geoarray::read_dimensions(const rapidjson::Value& jdims)
 {
   if(!jdims.IsArray() || jdims.IsNull())
-    throw tws::parser_error() << tws::error_description("error parsing array dimensions in metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing array dimensions in metadata.");
 
   std::vector<dimension_t> dims;
 
@@ -186,21 +352,21 @@ tws::geoarray::spatial_resolution_t
 tws::geoarray::read_spatial_resolution(const rapidjson::Value& jresolution)
 {
   if(!jresolution.IsObject() || jresolution.IsNull())
-    throw tws::parser_error() << tws::error_description("error parsing spatial resolution in metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing spatial resolution in metadata.");
 
   spatial_resolution_t resolution;
 
   const rapidjson::Value& jx = jresolution["x"];
 
   if(!jx.IsNumber() || jx.IsNull())
-    throw tws::parser_error() << tws::error_description("error in spatial resolution 'x' entry in metadata.");
+    throw tws::parse_error() << tws::error_description("error in spatial resolution 'x' entry in metadata.");
 
   resolution.x = jx.GetDouble();
 
   const rapidjson::Value& jy = jresolution["y"];
 
   if(!jy.IsNumber() || jy.IsNull())
-    throw tws::parser_error() << tws::error_description("error in spatial resolution 'y' entry in metadata.");
+    throw tws::parse_error() << tws::error_description("error in spatial resolution 'y' entry in metadata.");
 
   resolution.y = jy.GetDouble();
 
@@ -211,21 +377,21 @@ tws::geoarray::numeric_range_t
 tws::geoarray::read_numeric_range(const rapidjson::Value& jrange)
 {
   if(!jrange.IsObject() || jrange.IsNull())
-    throw tws::parser_error() << tws::error_description("error parsing attribute range in metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing attribute range in metadata.");
 
   numeric_range_t r;
 
   const rapidjson::Value& jmin_val = jrange["min"];
 
   if(!jmin_val.IsNumber() || jmin_val.IsNull())
-    throw tws::parser_error() << tws::error_description("error in attribute range entry in metadata.");
+    throw tws::parse_error() << tws::error_description("error in attribute range entry in metadata.");
 
   r.min_val = jmin_val.GetDouble();
 
   const rapidjson::Value& jmax_val = jrange["max"];
 
   if(!jmax_val.IsNumber() || jmax_val.IsNull())
-    throw tws::parser_error() << tws::error_description("error in attribute range entry in metadata.");
+    throw tws::parse_error() << tws::error_description("error in attribute range entry in metadata.");
 
   r.max_val = jmax_val.GetDouble();
 
@@ -236,21 +402,21 @@ tws::geoarray::time_interval_t
 tws::geoarray::read_time_interval(const rapidjson::Value& jinterval)
 {
   if(!jinterval.IsObject() || jinterval.IsNull())
-    throw tws::parser_error() << tws::error_description("error parsing temporal interval in metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing temporal interval in metadata.");
 
   time_interval_t ti;
 
   const rapidjson::Value& jstart_val = jinterval["start"];
 
   if(!jstart_val.IsString() || jstart_val.IsNull())
-    throw tws::parser_error() << tws::error_description("error parsing temporal interval in metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing temporal interval in metadata.");
 
   ti.start = jstart_val.GetString();
 
   const rapidjson::Value& jend_val = jinterval["end"];
 
   if(!jend_val.IsString() || jend_val.IsNull())
-    throw tws::parser_error() << tws::error_description("error parsing temporal interval in metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing temporal interval in metadata.");
 
   ti.end = jend_val.GetString();
 
@@ -261,35 +427,35 @@ tws::geoarray::extent_t
 tws::geoarray::read_extent(const rapidjson::Value& jextent)
 {
   if(!jextent.IsObject() || jextent.IsNull())
-    throw tws::parser_error() << tws::error_description("error parsing spatial extent in metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing spatial extent in metadata.");
 
   extent_t extent;
 
   const rapidjson::Value& jxmin = jextent["xmin"];
 
   if(!jxmin.IsNumber() || jxmin.IsNull())
-    throw tws::parser_error() << tws::error_description("error in spatial extent 'xmin' entry in metadata.");
+    throw tws::parse_error() << tws::error_description("error in spatial extent 'xmin' entry in metadata.");
 
   extent.xmin = jxmin.GetDouble();
 
   const rapidjson::Value& jymin = jextent["ymin"];
 
   if(!jymin.IsNumber() || jymin.IsNull())
-    throw tws::parser_error() << tws::error_description("error in spatial extent 'ymin' entry in metadata.");
+    throw tws::parse_error() << tws::error_description("error in spatial extent 'ymin' entry in metadata.");
 
   extent.ymin = jymin.GetDouble();
 
   const rapidjson::Value& jxmax = jextent["xmax"];
 
   if(!jxmax.IsNumber() || jxmax.IsNull())
-    throw tws::parser_error() << tws::error_description("error in spatial extent 'xmax' entry in metadata.");
+    throw tws::parse_error() << tws::error_description("error in spatial extent 'xmax' entry in metadata.");
 
   extent.xmax = jxmax.GetDouble();
 
   const rapidjson::Value& jymax = jextent["ymax"];
 
   if(!jymax.IsNumber() || jymax.IsNull())
-    throw tws::parser_error() << tws::error_description("error in spatial extent 'ymax' entry in metadata.");
+    throw tws::parse_error() << tws::error_description("error in spatial extent 'ymax' entry in metadata.");
 
   extent.ymax = jymax.GetDouble();
 
@@ -300,14 +466,14 @@ tws::geoarray::dimension_t
 tws::geoarray::read_dimension(const rapidjson::Value& jdim)
 {
   if(!jdim.IsObject() || jdim.IsNull())
-    throw tws::parser_error() << tws::error_description("error parsing array dimension in metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing array dimension in metadata.");
 
   dimension_t dim;
 
   const rapidjson::Value& jname = jdim["name"];
 
   if(!jname.IsString() || jname.IsNull())
-    throw tws::parser_error() << tws::error_description("error in dimension name entry in metadata.");
+    throw tws::parse_error() << tws::error_description("error in dimension name entry in metadata.");
 
   dim.name = jname.GetString();
 
@@ -319,21 +485,21 @@ tws::geoarray::read_dimension(const rapidjson::Value& jdim)
   const rapidjson::Value& jdim_min = jdim["min_idx"];
 
   if(!jdim_min.IsNumber() || jdim_min.IsNull())
-    throw tws::parser_error() << tws::error_description("error in dimension min_idx entry in metadata.");
+    throw tws::parse_error() << tws::error_description("error in dimension min_idx entry in metadata.");
 
   dim.min_idx = jdim_min.GetInt64();
 
   const rapidjson::Value& jdim_max = jdim["max_idx"];
 
   if(!jdim_max.IsNumber() || jdim_max.IsNull())
-    throw tws::parser_error() << tws::error_description("error in dimension max_idx entry in metadata.");
+    throw tws::parse_error() << tws::error_description("error in dimension max_idx entry in metadata.");
 
   dim.max_idx = jdim_max.GetInt64();
 
   const rapidjson::Value& jdim_pos = jdim["pos"];
 
   if(!jdim_pos.IsNumber() || jdim_pos.IsNull())
-    throw tws::parser_error() << tws::error_description("error in dimension position entry in metadata.");
+    throw tws::parse_error() << tws::error_description("error in dimension position entry in metadata.");
 
   dim.pos = jdim_pos.GetUint();
 
@@ -344,7 +510,7 @@ tws::geoarray::spatial_extent_t
 tws::geoarray::read_spatial_extent(const rapidjson::Value& jspatial_extent)
 {
   if(!jspatial_extent.IsObject() || jspatial_extent.IsNull())
-    throw tws::parser_error() << tws::error_description("error parsing spatial extent in metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing spatial extent in metadata.");
 
   spatial_extent_t sp_extent;
 
@@ -356,16 +522,21 @@ tws::geoarray::read_spatial_extent(const rapidjson::Value& jspatial_extent)
 
   sp_extent.resolution = read_spatial_resolution(jres);
 
-  const rapidjson::Value& jcrs = jspatial_extent["crs"];
+  //const rapidjson::Value& jcrs = jspatial_extent["crs"];
 
-  if(!jcrs.IsString() || jcrs.IsNull())
-    throw tws::parser_error() << tws::error_description("error in CRS in metadata.");
+  //if(!jcrs.IsString() || jcrs.IsNull())
+    //throw tws::parse_error() << tws::error_description("error in CRS in metadata.");
 
-  std::string crs = jcrs.GetString();
+  //std::string crs = jcrs.GetString();
 
   //std::pair<std::string,unsigned int> crs_id = te::srs::SpatialReferenceSystemManager::getInstance().getIdFromP4Txt(crs);
 
-  //sp_extent.crs_code = crs_id.second;
+  const rapidjson::Value& jsrid = jspatial_extent["srid"];
+
+  if(!jsrid.IsInt() || jsrid.IsNull())
+    throw tws::parse_error() << tws::error_description("error reading geoarray srid.");
+
+  sp_extent.crs_code = jsrid.GetUint();
 
   return sp_extent;
 }
@@ -374,7 +545,7 @@ tws::geoarray::temporal_extent_t
 tws::geoarray::read_temporal_extent(const rapidjson::Value& jtemporal_extent)
 {
   if(!jtemporal_extent.IsObject() || jtemporal_extent.IsNull())
-    throw tws::parser_error() << tws::error_description("error parsing temporal extent in metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing temporal extent in metadata.");
 
   temporal_extent_t t_ext;
 
@@ -399,7 +570,7 @@ tws::geoarray::geo_extent_t
 tws::geoarray::read_geo_extent(const rapidjson::Value& jgeo_extent)
 {
   if(!jgeo_extent.IsObject() || jgeo_extent.IsNull())
-    throw tws::parser_error() << tws::error_description("error parsing geographical extent in metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing geographical extent in metadata.");
 
   geo_extent_t geo_extent;
 
@@ -418,14 +589,14 @@ tws::geoarray::attribute_t
 tws::geoarray::read_array_attribute(const rapidjson::Value& jattribute)
 {
   if(!jattribute.IsObject() || jattribute.IsNull())
-    throw tws::parser_error() << tws::error_description("error parsing array attribute in metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing array attribute in metadata.");
 
   attribute_t attr;
 
   const rapidjson::Value& jname = jattribute["name"];
 
   if(!jname.IsString() || jname.IsNull())
-    throw tws::parser_error() << tws::error_description("error in attribute name entry in metadata.");
+    throw tws::parse_error() << tws::error_description("error in attribute name entry in metadata.");
 
   attr.name = jname.GetString();
 
@@ -437,7 +608,7 @@ tws::geoarray::read_array_attribute(const rapidjson::Value& jattribute)
   const rapidjson::Value& jdatatype = jattribute["datatype"];
 
   if(!jdatatype.IsString() || jdatatype.IsNull())
-    throw tws::parser_error() << tws::error_description("error in attribute datatype entry in metadata.");
+    throw tws::parse_error() << tws::error_description("error in attribute datatype entry in metadata.");
 
   attr.datatype = datatype_t::from_string(jdatatype.GetString());
 
@@ -448,14 +619,14 @@ tws::geoarray::read_array_attribute(const rapidjson::Value& jattribute)
   const rapidjson::Value& jscale_factor = jattribute["scale_factor"];
 
   if(!jscale_factor.IsNumber() || jscale_factor.IsNull())
-    throw tws::parser_error() << tws::error_description("error in attribute scale_factor entry in metadata.");
+    throw tws::parse_error() << tws::error_description("error in attribute scale_factor entry in metadata.");
 
   attr.scale_factor = jscale_factor.GetDouble();
 
   const rapidjson::Value& jmissing_value = jattribute["missing_value"];
 
   if(!jmissing_value.IsNumber() || jmissing_value.IsNull())
-    throw tws::parser_error() << tws::error_description("error in attribute missing_value entry in metadata.");
+    throw tws::parse_error() << tws::error_description("error in attribute missing_value entry in metadata.");
 
   attr.missing_value = jmissing_value.GetDouble();
 

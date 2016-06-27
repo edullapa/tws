@@ -96,6 +96,7 @@ namespace tws
     //! Used to indicate what values along a dimension are valid.
     struct dimension_t
     {
+      std::string value;
       std::string name;
       std::string units;
       std::string unit_symbol;
@@ -192,42 +193,44 @@ namespace tws
       std::vector<legend_url_t> legend_url;
       style_sheet_url_t style_sheet_url;
       style_url_t style_url;
+      std::string style_type;
+      std::vector<std::string> colors;
     };
    
     //! Nested list of zero or more map Layers offered by this server.
     struct layer_t
     {
       std::string name;         //!< Same name as main geo-array name.
-      //std::string title;
-      //std::string abstract;
-      //std::vector<keyword_t> keyword_list;
-      //std::vector<std::string> crs;
-      //ex_geographic_bounding_box_t ex_geographic_bounding_box;
-      //std::vector<bounding_box_t> bounding_box;
-      //std::vector<dimension_t> dimension;
-      //attribution_t attribution;
-      //authority_url_t authority_url;
-      //std::vector<identifier_t> identifier;
-      //std::vector<metadata_url_t> metadata_url;
-      //std::vector<data_url_t> data_url;
-      //std::vector<feature_list_url_t> feature_list_url;
-      std::vector<style_t> style;
+      std::string title;
+      std::string abstract;
+      std::vector<keyword_t> keyword_list;
+      std::vector<std::string> crs;
+      ex_geographic_bounding_box_t ex_geographic_bounding_box;
+      std::vector<bounding_box_t> bounding_box;
+      std::vector<dimension_t> dimension;
+      attribution_t attribution;
+      std::vector<authority_url_t> authority_url;
+      std::vector<identifier_t> identifier;
+      std::vector<metadata_url_t> metadata_url;
+      std::vector<data_url_t> data_url;
+      std::vector<feature_list_url_t> feature_list_url;
+      std::vector<style_t> styles;
       double min_scale_denominator;
       double max_scale_denominator;
       std::vector<layer_t> layers;
-      //bool queryable;
-      //uint32_t cascaded;
-      //bool opaque;
-      //bool no_subsets;
-      //uint32_t fixed_width;
-      //uint32_t fixed_height;
+      bool queryable;
+      uint32_t cascaded;
+      bool opaque;
+      bool no_subsets;
+      uint32_t fixed_width;
+      uint32_t fixed_height;
       std::vector<tws::geoarray::geoarray_t> overviews;
     };
     
     //! Output format and URI of an operation.
     struct operation_t
     {
-      std::string format;
+      std::vector<std::string> format;
       dcp_type_t dcp_type;
     };
     
@@ -295,7 +298,6 @@ namespace tws
       service_t service;
       capability_t capability;
       std::string version;
-      std::string update_sequence;
     };
     
 //    //! An overview of a given geo-array.

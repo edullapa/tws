@@ -17,12 +17,20 @@
  */
 
 /*!
-  \file tws/wms/layer_manager.cpp
+  \file tws/scidb/config.hpp
 
-  \brief A singleton for controlling the list of map layers to be served.
+  \brief Configuration file for SciDB module.
 
-  \author Roger Victor
+  \author Gilberto Ribeiro de Queiroz
+  \author Eduardo Llapa Rodriguez
+  \author Luiz Fernando ferreira Gomes de Assis
  */
 
+#ifndef __TWS_SCIDB_CONFIG_HPP__
+#define __TWS_SCIDB_CONFIG_HPP__
+
 // TWS
-#include "layer_manager.hpp"
+#include "../config.hpp"
+
+#endif  // __TWS_SCIDB_CONFIG_HPP__
+

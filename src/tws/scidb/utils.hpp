@@ -17,60 +17,29 @@
  */
 
 /*!
-  \file tws/wtss/plugin.cpp
+  \file tws/scidb/utils.hpp
 
-  \brief Add a plugin interface for dynamic loading of the Web Time Series Data Service module.
+  \brief Utility functions.
 
   \author Gilberto Ribeiro de Queiroz
  */
 
+#ifndef __TWS_SCIDB_UTILS_HPP__
+#define __TWS_SCIDB_UTILS_HPP__
+
 // TWS
-#include "../core/service_operations_manager.hpp"
-#include "wtss.hpp"
+#include "config.hpp"
 
-// TerraLib
-#include <terralib/plugin/Plugin.h>
 
-// STL
-#include <memory>
 
-class Plugin : public te::plugin::Plugin
+namespace tws
 {
-  public:
-  
-    Plugin(const te::plugin::PluginInfo& pluginInfo)
-      : te::plugin::Plugin(pluginInfo)
-    {
-    }
-  
-    ~Plugin()
-    {
-    }
-  
-    void startup()
-    {
-      if(m_initialized)
-        return;
+  namespace scidb
+  {
 
-      tws::wtss::register_operations();
-      
-      tws::wtss::initialize_operations();
-      
-      m_initialized = true;
-    }
-  
-    void shutdown()
-    {
-      if(!m_initialized)
-        return;
 
-      m_initialized = false;
-    }
-};
 
-#define export_macro
+  }   // end namespace scidb
+}     // end namespace tws
 
-PLUGIN_CALL_BACK_DECLARATION(export_macro)
-
-PLUGIN_CALL_BACK_IMPL(Plugin)
-
+#endif  // __TWS_SCIDB_UTILS_HPP__

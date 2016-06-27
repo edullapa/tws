@@ -17,17 +17,39 @@
  */
 
 /*!
-  \file tws/wms/layer_manager.hpp
+  \file tws/scidb/connection.cpp
 
-  \brief A singleton for controlling the list of map layers to be served.
+  \brief A class for representing database connections retrieved from connection pool.
 
-  \author Roger Victor
+  \author Gilberto Ribeiro de Queiroz
+  \author Eduardo Llapa Rodriguez
+  \author Luiz Fernando ferreira Gomes de Assis
  */
 
-#ifndef __TWS_WMS_LAYER_MANAGER_HPP__
-#define __TWS_WMS_LAYER_MANAGER_HPP__
-
 // TWS
-#include "config.hpp"
+#include "connection.hpp"
+#include "connection_pool.hpp"
+#include "exception.hpp"
+#include "pool_connection.hpp"
 
-#endif  // __TWS_WMS_LAYER_MANAGER_HPP__
+tws::scidb::connection::~connection()
+{
+  connection_pool::instance().release(conn_);
+}
+
+boost::shared_ptr<scidb::QueryResult>
+tws::scidb::connection::execute(const std::string& query_str, const bool afl)
+{
+  return conn_->execute(query_str, afl);
+}
+
+void
+tws::scidb::connection::completed(::scidb::QueryID id)
+{
+  conn_->completed(id);
+}
+
+tws::scidb::connection::connection(pool_connection* conn_impl)
+  : conn_(conn_impl)
+{
+}

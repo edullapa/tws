@@ -72,14 +72,14 @@ namespace tws
         boost::tokenizer<boost::char_separator<char> >::iterator ikv = key_value_pair.begin();
 
         if(ikv == key_value_pair.end())
-          throw tws::parser_error() << tws::error_description("invalid key-value pair format in query string!");
+          throw tws::parse_error() << tws::error_description("invalid key-value pair format in query string!");
 
         std::string k = *ikv;
 
         ++ikv;
 
         if(ikv == key_value_pair.end())
-          throw tws::parser_error() << error_description("invalid key-value pair format in query string!");
+          throw tws::parse_error() << error_description("invalid key-value pair format in query string!");
 
         std::string v = *ikv;
 
@@ -126,7 +126,7 @@ namespace tws
       \exception tws::file_open_error It may throwed when the file is invalid or cannot be open.
     */
     rapidjson::Document *open_json_file(const std::string& path);
-    
+
     //! Copy the JSON string array to a range beginning at result.
     template<class OutputIterator> void
     copy_string_array(const rapidjson::Value& jvalues, OutputIterator result);

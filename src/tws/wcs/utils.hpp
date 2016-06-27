@@ -28,9 +28,20 @@
 #ifndef __TWS_WCS_UTILS_HPP__
 #define __TWS_WCS_UTILS_HPP__
 
+// STL
+#include <string>
+
+// RapidXML
 #include <rapidxml/rapidxml.hpp>
+
 namespace tws
 {
+  namespace core
+  {
+    class http_request;
+    class http_response;
+  }
+
   namespace wcs
   {
     /*!
@@ -39,6 +50,10 @@ namespace tws
       \return a pointer root node.
     */
     rapidxml::xml_node<char>* initialize_wcs_xml_namespaces(rapidxml::xml_document<char>& doc);
+
+    bool validate_request_parameters(const tws::core::http_request& request,
+                                     const tws::core::http_response& response,
+                                     const std::string& operation);
 
   }   // end namespace wcs
 }     // end namespace tws

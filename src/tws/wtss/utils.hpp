@@ -34,28 +34,13 @@
 // RapidJSON
 #include <rapidjson/document.h>
 
+// SciDB
+#include <SciDBAPI.h>
+
 namespace tws
 {
   namespace wtss
   {
-
-    //! Read the list of timelines files
-    /*!
-      \exception tws::file_exists_error If the file doesn't exists.
-      \exception tws::file_open_error   If the file can not be opened.
-      \exception tws::parser_error      If the file has any syntax error.
-     */
-    //std::vector<std::pair<std::string, std::string> >
-    //read_timelines_file_name(const std::string& input_file);
-
-    //! Read the timeline from informed file.
-    /*!
-      \exception tws::file_exists_error If the file doesn't exists.
-      \exception tws::file_open_error   If the file can not be opened.
-      \exception tws::parser_error      If the file has any syntax error.
-     */
-    //std::vector<std::string> read_timeline(const std::string& input_file);
-
     //! Read the list of coverages from informed file.
     /*!
       \exception tws::file_exists_error If the file doesn't exists.
@@ -93,6 +78,25 @@ namespace tws
     void write(const tws::geoarray::dimension_t& dim,
                rapidjson::Value& jdim,
                rapidjson::Document::AllocatorType& allocator);
+
+    /*!
+       \brief Fill the timeseries with cell values.
+
+       \param values   A pre-allocated vector with at least nvalues.
+       \param nvalues  Number of expected values in the timeseries.
+       \param it       An array iterator.
+       \param id       The datatype of the cell.
+       \param time_idx The time coordinate index. It will be used to map cell-values to the time-series vector.
+       \param offset   An offset considered in the time_idx mapping.
+
+       \exception tws::outof_bounds_error If the number of values found is less than or greater than the number o expected time-series values.
+     */
+    void fill_time_series(std::vector<double>& values,
+                          std::size_t nvalues,
+                          ::scidb::ConstArrayIterator* it,
+                          const ::scidb::TypeId& id,
+                          ::scidb::Coordinate time_idx,
+                          int64_t offset);
 
   } // end namespace wtss
 }   // end namespace tws

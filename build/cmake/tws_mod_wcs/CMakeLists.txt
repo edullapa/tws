@@ -36,6 +36,8 @@ add_library(tws_mod_wcs SHARED ${TWS_SRC_FILES} ${TWS_HDR_FILES})
 
 target_link_libraries(tws_mod_wcs tws_mod_geoarray
                                   terralib_mod_plugin
+                                  terralib_mod_raster
+                                  terralib_mod_srs
                                   ${Boost_FILESYSTEM_LIBRARY}
                                   ${Boost_SYSTEM_LIBRARY})
 

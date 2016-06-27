@@ -17,60 +17,36 @@
  */
 
 /*!
-  \file tws/wtss/plugin.cpp
+  \file tws/scidb/exception.hpp
 
-  \brief Add a plugin interface for dynamic loading of the Web Time Series Data Service module.
+  \brief Specific exception types for SciDB module.
 
   \author Gilberto Ribeiro de Queiroz
+  \author Eduardo Llapa Rodriguez
+  \author Luiz Fernando ferreira Gomes de Assis
  */
 
+#ifndef __TWS_SCIDB_EXCEPTION_HPP__
+#define __TWS_SCIDB_EXCEPTION_HPP__
+
 // TWS
-#include "../core/service_operations_manager.hpp"
-#include "wtss.hpp"
+#include "../exception.hpp"
 
-// TerraLib
-#include <terralib/plugin/Plugin.h>
-
-// STL
-#include <memory>
-
-class Plugin : public te::plugin::Plugin
+namespace tws
 {
-  public:
-  
-    Plugin(const te::plugin::PluginInfo& pluginInfo)
-      : te::plugin::Plugin(pluginInfo)
-    {
-    }
-  
-    ~Plugin()
-    {
-    }
-  
-    void startup()
-    {
-      if(m_initialized)
-        return;
+  //! The namespace for the SciDB module of TerraLib Web Services.
+  namespace scidb
+  {
 
-      tws::wtss::register_operations();
-      
-      tws::wtss::initialize_operations();
-      
-      m_initialized = true;
-    }
-  
-    void shutdown()
-    {
-      if(!m_initialized)
-        return;
+    //! The base type for SciDB module exceptions.
+    struct exception: virtual tws::exception { };
 
-      m_initialized = false;
-    }
-};
+    struct connection_error: virtual exception { };
 
-#define export_macro
+    struct query_execution_error: virtual exception { };
 
-PLUGIN_CALL_BACK_DECLARATION(export_macro)
+  }  // end namespace scidb
+}    // end namespace tws
 
-PLUGIN_CALL_BACK_IMPL(Plugin)
+#endif  // __TWS_SCIDB_EXCEPTION_HPP__
 

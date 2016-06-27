@@ -201,14 +201,14 @@ tws_mongoose_http_config tws_mongoose_read_config_file()
     {
       boost::format err_msg("error parsing input file '%1%': %2%.");
 
-      throw tws::parser_error() << tws::error_description((err_msg % input_file % doc.GetParseError()).str());
+      throw tws::parse_error() << tws::error_description((err_msg % input_file % doc.GetParseError()).str());
     }
 
     if(!doc.IsObject() || doc.IsNull())
     {
       boost::format err_msg("error parsing input file '%1%': unexpected file format.");
 
-      throw tws::parser_error() << tws::error_description((err_msg % input_file).str());
+      throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
     }
 
     const rapidjson::Value& jlistening_port = doc["listening_port"];
@@ -217,7 +217,7 @@ tws_mongoose_http_config tws_mongoose_read_config_file()
     {
       boost::format err_msg("error parsing input file '%1%': expecting listening_port argument.");
       
-      throw tws::parser_error() << tws::error_description((err_msg % input_file).str());
+      throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
     }
     
     result.listening_port = jlistening_port.GetUint();
@@ -228,7 +228,7 @@ tws_mongoose_http_config tws_mongoose_read_config_file()
     {
       boost::format err_msg("error parsing input file '%1%': expecting max_threads argument.");
       
-      throw tws::parser_error() << tws::error_description((err_msg % input_file).str());
+      throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
     }
     
     result.max_threads = jmax_threads.GetUint();
@@ -239,7 +239,7 @@ tws_mongoose_http_config tws_mongoose_read_config_file()
     {
       boost::format err_msg("error parsing input file '%1%': expecting max_connections argument.");
       
-      throw tws::parser_error() << tws::error_description((err_msg % input_file).str());
+      throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
     }
     
     result.max_connections = jmax_connections.GetUint();
@@ -250,7 +250,7 @@ tws_mongoose_http_config tws_mongoose_read_config_file()
     {
       boost::format err_msg("error parsing input file '%1%': expecting log_file argument.");
       
-      throw tws::parser_error() << tws::error_description((err_msg % input_file).str());
+      throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
     }
     
     result.log_file = jlog_file.GetString();
@@ -261,7 +261,7 @@ tws_mongoose_http_config tws_mongoose_read_config_file()
     {
       boost::format err_msg("error parsing input file '%1%': expecting document_root argument.");
       
-      throw tws::parser_error() << tws::error_description((err_msg % input_file).str());
+      throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
     }
     
     result.document_root = jdocument_root.GetString();

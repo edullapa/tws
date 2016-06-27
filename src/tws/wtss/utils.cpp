@@ -30,6 +30,7 @@
 
 
 // STL
+#include <cassert>
 #include <cstdio>
 
 // Boost
@@ -41,173 +42,8 @@
 
 // TerraLib
 //#include <terralib/srs/SpatialReferenceSystemManager.h>
+
 /*
-std::vector<std::pair<std::string, std::string> >
-tws::wtss::read_timelines_file_name(const std::string& input_file)
-{
-  std::vector<std::pair<std::string, std::string> > timelines;
-
-  if(!boost::filesystem::is_regular(input_file))
-  {
-    boost::format err_msg("input file '%1%' doesn't exist.");
-    throw tws::file_exists_error() << tws::error_description((err_msg % input_file).str());
-  }
-
-  FILE* pfile = fopen(input_file.c_str(), "r");
-
-  if(pfile == nullptr)
-  {
-    boost::format err_msg("error opening input file '%1%'.");
-    throw tws::file_open_error() << tws::error_description((err_msg % input_file).str());
-  }
-
-  try
-  {
-    rapidjson::FileStream istr(pfile);
-
-    rapidjson::Document doc;
-
-    doc.ParseStream<0>(istr);
-
-    if(doc.HasParseError())
-    {
-      boost::format err_msg("error parsing input file '%1%': %2%.");
-      throw tws::parser_error() << tws::error_description((err_msg % input_file % doc.GetParseError()).str());
-    }
-
-    if(!doc.IsObject() || doc.IsNull())
-    {
-      boost::format err_msg("error parsing input file '%1%': unexpected file format.");
-      throw tws::parser_error() << tws::error_description((err_msg % input_file).str());
-    }
-
-    const rapidjson::Value& jtimelines = doc["timelines"];
-
-    if(!jtimelines.IsArray())
-    {
-      boost::format err_msg("error parsing input file '%1%': expected a vector of array with time values.");
-      throw tws::parser_error() << tws::error_description((err_msg % input_file).str());
-    }
-
-    const rapidjson::SizeType nelements = jtimelines.Size();
-
-    for(rapidjson::SizeType i = 0; i != nelements; ++i)
-    {
-      const rapidjson::Value& jtimeline = jtimelines[i];
-
-      if(jtimeline.IsNull())
-        continue;
-
-      if(!jtimeline.IsObject())
-      {
-        boost::format err_msg("error parsing input file '%1%': expected an object description for array timeline.");
-        throw tws::parser_error() << tws::error_description((err_msg % input_file).str());
-      }
-
-      const rapidjson::Value& jarray_name = jtimeline["array"];
-
-      if(!jarray_name.IsString() || jarray_name.IsNull())
-        throw tws::parser_error() << tws::error_description("error in array timeline entry name in timelines metadata file.");
-
-      std::string array_name = jarray_name.GetString();
-
-      const rapidjson::Value& jarray_timeline = jtimeline["timeline"];
-
-      if(!jarray_timeline.IsString() || jarray_timeline.IsNull())
-        throw tws::parser_error() << tws::error_description("error in array timeline entry in timelines metadata file.");
-
-      std::string timeline_file = jarray_timeline.GetString();
-
-      timelines.push_back(std::make_pair(array_name, timeline_file));
-    }
-  }
-  catch(...)
-  {
-    fclose(pfile);
-    throw;
-  }
-
-  fclose(pfile);
-
-  return timelines;
-}
-
-std::vector<std::string>
-tws::wtss::read_timeline(const std::string& input_file)
-{
-  std::vector<std::string> timeline;
-
-  if(!boost::filesystem::is_regular(input_file))
-  {
-    boost::format err_msg("input file '%1%' doesn't exist.");
-    throw tws::file_exists_error() << tws::error_description((err_msg % input_file).str());
-  }
-
-  FILE* pfile = fopen(input_file.c_str(), "r");
-
-  if(pfile == nullptr)
-  {
-    boost::format err_msg("error opening input file '%1%'.");
-    throw tws::file_open_error() << tws::error_description((err_msg % input_file).str());
-  }
-
-  try
-  {
-    rapidjson::FileStream istr(pfile);
-
-    rapidjson::Document doc;
-
-    doc.ParseStream<0>(istr);
-
-    if(doc.HasParseError())
-    {
-      boost::format err_msg("error parsing input file '%1%': %2%.");
-      throw tws::parser_error() << tws::error_description((err_msg % input_file % doc.GetParseError()).str());
-    }
-
-    if(!doc.IsObject() || doc.IsNull())
-    {
-      boost::format err_msg("error parsing input file '%1%': unexpected file format.");
-      throw tws::parser_error() << tws::error_description((err_msg % input_file).str());
-    }
-
-    const rapidjson::Value& jtimes = doc["timeline"];
-
-    if(!jtimes.IsArray())
-    {
-      boost::format err_msg("error parsing input file '%1%': expected a vector of array with time values.");
-      throw tws::parser_error() << tws::error_description((err_msg % input_file).str());
-    }
-
-    const rapidjson::SizeType nelements = jtimes.Size();
-
-    for(rapidjson::SizeType i = 0; i != nelements; ++i)
-    {
-      const rapidjson::Value& jtime = jtimes[i];
-      
-      if(jtime.IsNull())
-        continue;
-
-      if(!jtime.IsString())
-      {
-        boost::format err_msg("error parsing input file '%1%': expected a string description for date.");
-        throw tws::parser_error() << tws::error_description((err_msg % input_file).str());
-      }
-      
-      timeline.push_back(jtime.GetString());
-    }
-  }
-  catch(...)
-  {
-    fclose(pfile);
-    throw;
-  }
-
-  fclose(pfile);
-
-  return timeline;
-}
-
 std::vector<tws::wtss::coverage_t>
 tws::wtss::read_coverages(const std::string& input_file)
 {
@@ -238,13 +74,13 @@ tws::wtss::read_coverages(const std::string& input_file)
     if(doc.HasParseError())
     {
       boost::format err_msg("error parsing input file '%1%': %2%.");
-      throw tws::parser_error() << tws::error_description((err_msg % input_file % doc.GetParseError()).str());
+      throw tws::parse_error() << tws::error_description((err_msg % input_file % doc.GetParseError()).str());
     }
 
     if(!doc.IsObject() || doc.IsNull())
     {
       boost::format err_msg("error parsing input file '%1%': unexpected file format.");
-      throw tws::parser_error() << tws::error_description((err_msg % input_file).str());
+      throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
     }
 
     const rapidjson::Value& jcoverages = doc["coverages"];
@@ -252,7 +88,7 @@ tws::wtss::read_coverages(const std::string& input_file)
     if(!jcoverages.IsArray())
     {
       boost::format err_msg("error parsing input file '%1%': expected a vector of coverages.");
-      throw tws::parser_error() << tws::error_description((err_msg % input_file).str());
+      throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
     }
 
     const rapidjson::SizeType nelements = jcoverages.Size();
@@ -269,7 +105,7 @@ tws::wtss::read_coverages(const std::string& input_file)
       if(!jcoverage.IsObject())
       {
         boost::format err_msg("error parsing input file '%1%': expected an object description for coverage.");
-        throw tws::parser_error() << tws::error_description((err_msg % input_file).str());
+        throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
       }
 
       coverage_t coverage = read_coverage(jcoverage);
@@ -292,19 +128,19 @@ tws::wtss::coverage_t
 tws::wtss::read_coverage(const rapidjson::Value& jcoverage)
 {
   if(!jcoverage.IsObject())
-    throw tws::parser_error() << tws::error_description("error parsing views input file: expected an object description for coverage.");
+    throw tws::parse_error() << tws::error_description("error parsing views input file: expected an object description for coverage.");
 
   coverage_t coverage;
 
   const rapidjson::Value& jcoverage_name = jcoverage["name"];
 
   if(!jcoverage_name.IsString() || jcoverage_name.IsNull())
-    throw tws::parser_error() << tws::error_description("error in coverage entry name in coverages metadata.");
+    throw tws::parse_error() << tws::error_description("error in coverage entry name in coverages metadata.");
 
   coverage.name = jcoverage_name.GetString();
 
   if(coverage.name.empty())
-    throw tws::parser_error() << tws::error_description("coverage name can not be empty in coverages metadata.");
+    throw tws::parse_error() << tws::error_description("coverage name can not be empty in coverages metadata.");
 
   const rapidjson::Value& jcoverage_dsc = jcoverage["description"];
 
@@ -345,7 +181,7 @@ std::vector<tws::wtss::coverage_attribute_t>
 tws::wtss::read_coverage_attributes(const rapidjson::Value& jattributes)
 {
   if(!jattributes.IsArray() || jattributes.IsNull())
-    throw tws::parser_error() << tws::error_description("error parsing coverage attributes in metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing coverage attributes in metadata.");
 
   std::vector<coverage_attribute_t> attributes;
 
@@ -368,7 +204,7 @@ tws::wtss::coverage_attribute_t
 tws::wtss::read_coverage_attribute(const rapidjson::Value& jattribute)
 {
   if(!jattribute.IsObject() || jattribute.IsNull())
-    throw tws::parser_error() << tws::error_description("error parsing coverage attribute in metadata.");
+    throw tws::parse_error() << tws::error_description("error parsing coverage attribute in metadata.");
 
   coverage_attribute_t cv_attr;
 
@@ -379,7 +215,7 @@ tws::wtss::read_coverage_attribute(const rapidjson::Value& jattribute)
   const rapidjson::Value& jexp = jattribute["expression"];
 
   if(!jexp.IsString() || jexp.IsNull())
-    throw tws::parser_error() << tws::error_description("error in attribute expression entry in metadata.");
+    throw tws::parse_error() << tws::error_description("error in attribute expression entry in metadata.");
 
   cv_attr.expression = jexp.GetString();
 
@@ -534,3 +370,130 @@ tws::wtss::write(const tws::geoarray::dimension_t& dim,
   //jdim.AddMember("pos", dim.pos, allocator);
 }
 
+#define TWS_FILL_VECTOR(values, nvalues, array_it, time_idx, offset, get_name) \
+  std::size_t npts = 0; \
+  \
+  while(!array_it->end()) \
+  { \
+  \
+    const ::scidb::ConstChunk& chunk = array_it->getChunk(); \
+  \
+    std::shared_ptr< ::scidb::ConstChunkIterator > chunk_it = chunk.getConstIterator(); \
+  \
+    while(!chunk_it->end()) \
+    { \
+      ++npts; \
+  \
+      if(npts > nvalues) \
+        throw tws::outof_bounds_error() << tws::error_description("Invalid timeseries range: found too many values."); \
+  \
+      const ::scidb::Value& v = chunk_it->getItem(); \
+  \
+      const ::scidb::Coordinates& coords = chunk_it->getPosition(); \
+  \
+      ::scidb::Coordinate cell_idx = coords[time_idx] + offset; \
+  \
+      values[cell_idx] = v.get_name(); \
+  \
+      ++(*chunk_it); \
+    } \
+  \
+    ++(*array_it); \
+ \
+  } \
+  if(npts != nvalues) \
+      throw tws::outof_bounds_error() << tws::error_description("Invalid timeseries range: missing some values.");
+
+inline void
+tws_scidb_fill_int8(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
+{
+  TWS_FILL_VECTOR(values, nvalues, it, time_idx, offset, getInt8)
+}
+
+inline void
+tws_scidb_fill_uint8(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
+{
+  TWS_FILL_VECTOR(values, nvalues, it, time_idx, offset, getUint8)
+}
+
+inline void
+tws_scidb_fill_int16(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
+{
+  TWS_FILL_VECTOR(values, nvalues, it, time_idx, offset, getInt16)
+}
+
+inline void
+tws_scidb_fill_uint16(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
+{
+  TWS_FILL_VECTOR(values, nvalues, it, time_idx, offset, getUint16)
+}
+
+inline void
+tws_scidb_fill_int32(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
+{
+  TWS_FILL_VECTOR(values, nvalues, it, time_idx, offset, getInt32)
+}
+
+inline void
+tws_scidb_fill_uint32(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
+{
+  TWS_FILL_VECTOR(values, nvalues, it, time_idx, offset, getUint32)
+}
+
+inline void
+tws_scidb_fill_int64(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
+{
+  TWS_FILL_VECTOR(values, nvalues, it, time_idx, offset, getInt64)
+}
+
+inline void
+tws_scidb_fill_uint64(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
+{
+  TWS_FILL_VECTOR(values, nvalues, it, time_idx, offset, getUint64)
+}
+
+inline void
+tws_scidb_fill_float(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
+{
+  TWS_FILL_VECTOR(values, nvalues, it, time_idx, offset, getFloat)
+}
+
+inline void
+tws_scidb_fill_double(std::vector<double>& values, std::size_t nvalues, ::scidb::ConstArrayIterator* it, ::scidb::Coordinate time_idx, int64_t offset)
+{
+  TWS_FILL_VECTOR(values, nvalues, it, time_idx, offset, getDouble)
+}
+
+void
+tws::wtss::fill_time_series(std::vector<double>& values,
+                            std::size_t nvalues,
+                            ::scidb::ConstArrayIterator* it,
+                            const ::scidb::TypeId& id,
+                            ::scidb::Coordinate time_idx,
+                            int64_t offset)
+{
+  assert(values.size() == nvalues);
+
+  if(id == ::scidb::TID_INT8)
+    tws_scidb_fill_int8(values, nvalues, it, time_idx, offset);
+  else if(id == ::scidb::TID_UINT8)
+    tws_scidb_fill_uint8(values, nvalues, it, time_idx, offset);
+  else if(id == ::scidb::TID_INT16)
+    tws_scidb_fill_int16(values, nvalues, it, time_idx, offset);
+  else if(id == ::scidb::TID_UINT16)
+    tws_scidb_fill_uint16(values, nvalues, it, time_idx, offset);
+  else if(id == ::scidb::TID_INT32)
+    tws_scidb_fill_int32(values, nvalues, it, time_idx, offset);
+  else if(id == ::scidb::TID_UINT32)
+    tws_scidb_fill_uint32(values, nvalues, it, time_idx, offset);
+  else if(id == ::scidb::TID_INT64)
+      tws_scidb_fill_int64(values, nvalues, it, time_idx, offset);
+    else if(id == ::scidb::TID_UINT64)
+      tws_scidb_fill_uint64(values, nvalues, it, time_idx, offset);
+  else if(id == ::scidb::TID_FLOAT)
+    tws_scidb_fill_float(values, nvalues, it, time_idx, offset);
+  else if(id == ::scidb::TID_DOUBLE)
+    tws_scidb_fill_double(values, nvalues, it, time_idx, offset);
+  else
+    throw tws::conversion_error() << tws::error_description("Could not fill values vector with iterator items: data type not supported.");
+}

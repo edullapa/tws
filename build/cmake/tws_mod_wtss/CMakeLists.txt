@@ -38,8 +38,11 @@ file(GLOB TWS_HDR_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/wtss/*.hpp)
 add_library(tws_mod_wtss SHARED ${TWS_SRC_FILES} ${TWS_HDR_FILES})
 
 target_link_libraries(tws_mod_wtss tws_mod_geoarray
+                                   tws_mod_scidb
                                    tws_mod_core
                                    terralib_mod_plugin
+                                   terralib_mod_raster
+                                   terralib_mod_srs
                                    ${SCIDB_CLIENT_LIBRARY}
                                    ${Boost_FILESYSTEM_LIBRARY}
                                    ${Boost_SYSTEM_LIBRARY})
