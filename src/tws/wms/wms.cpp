@@ -95,10 +95,10 @@ namespace tws
                 const get_map_request_parameters& parameters,
                 gdImagePtr img);
 
-    std::size_t
-    compute_time_index(const tws::geoarray::geoarray_t* geoarray,
-                       const tws::geoarray::timeline* tl,
-                       const get_map_request_parameters& parameters);
+//    std::size_t
+//    compute_time_index(const tws::geoarray::geoarray_t* geoarray,
+//                       const tws::geoarray::timeline* tl,
+//                       const get_map_request_parameters& parameters);
 
   } // end namespace wms
 }   // end namespace tws
@@ -210,6 +210,7 @@ tws::wms::register_operations()
 void
 tws::wms::initialize_operations()
 {
+  tws::geoarray::geoarray_manager::instance();
   tws::geoarray::timeline_manager::instance();
   wms_manager::instance();
 }
@@ -413,7 +414,8 @@ tws::wms::render(const layer_tuple_t& ltuple,
   const tws::geoarray::timeline* tline = std::get<3>(ltuple);
 
 // compute time-index
-  std::size_t time_idx = compute_time_index(garray, tline, parameters);
+  //std::size_t time_idx = compute_time_index(garray, tline, parameters);
+  std::size_t time_idx = parameters.time_point.empty() ? tline->index(tline->time_points().front()) : tline->index(parameters.time_point);
 
 // get connection
   std::unique_ptr<tws::scidb::connection> conn(tws::scidb::connection_pool::instance().get());
@@ -463,7 +465,7 @@ tws::wms::render(const layer_tuple_t& ltuple,
 
         int col = coords[0];
         int row = coords[1];
-        int t = coords[2];
+        //int t = coords[2];
 
         gdImageSetPixel(img, col, row, gray);
 
@@ -477,14 +479,14 @@ tws::wms::render(const layer_tuple_t& ltuple,
 
 }
 
-std::size_t
-tws::wms::compute_time_index(const tws::geoarray::geoarray_t* geoarray,
-                             const tws::geoarray::timeline* tl,
-                             const get_map_request_parameters& parameters)
-{
-  std::size_t time_idx = parameters.time_point.empty() ? tl->index(tl->time_points().front()) : tl->index(parameters.time_point);
+//std::size_t
+//tws::wms::compute_time_index(const tws::geoarray::geoarray_t* geoarray,
+//                             const tws::geoarray::timeline* tl,
+//                             const get_map_request_parameters& parameters)
+//{
+//  std::size_t time_idx = parameters.time_point.empty() ? tl->index(tl->time_points().front()) : tl->index(parameters.time_point);
 
-  time_idx += geoarray->dimensions[2].min_idx;
+//  time_idx += geoarray->dimensions[2].min_idx;
 
-  return time_idx;
-}
+//  return time_idx;
+//}

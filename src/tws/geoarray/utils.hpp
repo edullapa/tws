@@ -35,6 +35,7 @@
 #include "data_types.hpp"
 
 // STL
+#include <cassert>
 #include <map>
 #include <string>
 #include <vector>
@@ -100,6 +101,35 @@ namespace tws
       \exception tws::parser_error      If the file has any syntax error.
      */
     std::vector<std::string> read_timeline(const std::string& input_file);
+
+    inline bool intersects(const double& x, const double& y, const extent_t& e)
+    {
+      if(x < e.xmin)
+        return false;
+
+      if(x > e.xmax)
+        return false;
+
+      if(y < e.ymin)
+        return false;
+
+      if(y > e.ymax)
+        return false;
+
+      return true;
+    }
+
+    inline bool is_in_range(int64_t pos, const dimension_t& d)
+    {
+      return (pos >= d.min_idx && pos <= d.max_idx);
+    }
+
+    inline bool is_in_spatial_range(int64_t col, int64_t row, const std::vector<dimension_t>& dimensions)
+    {
+      assert(dimensions.size() >= 2);
+
+      return is_in_range(col, dimensions[0]) && is_in_range(row, dimensions[1]);
+    }
 
   }   // end namespace geoarray
 }     // end namespace tws

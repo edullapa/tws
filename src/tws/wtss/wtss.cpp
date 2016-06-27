@@ -33,6 +33,7 @@
 #include "../geoarray/geoarray_manager.hpp"
 #include "../geoarray/timeline.hpp"
 #include "../geoarray/timeline_manager.hpp"
+#include "../geoarray/utils.hpp"
 #include "../scidb/connection.hpp"
 #include "../scidb/connection_pool.hpp"
 #include "../scidb/utils.hpp"
@@ -67,6 +68,64 @@
 #include <terralib/geometry/Point.h>
 #include <terralib/raster/Grid.h>
 #include <terralib/srs/Converter.h>
+
+namespace tws
+{
+  namespace wtss
+  {
+    struct timeseries_request_parameters
+    {
+      std::string cv_name;
+      std::vector<std::string> queried_attributes;
+      double longitude;
+      double latitude;
+      std::string start_time_point;
+      std::string end_time_point;
+    };
+
+    struct timeseries_validated_parameters
+    {
+      std::vector<std::size_t> attribute_positions;
+      const tws::geoarray::geoarray_t* geo_array;
+      const tws::geoarray::timeline* timeline;
+      std::size_t start_time_idx;
+      std::size_t end_time_idx;
+      int64_t pixel_col;
+      int64_t pixel_row;
+      double pixel_center_longitude;
+      double pixel_center_latitude;
+    };
+
+    timeseries_request_parameters
+    decode_timeseries_request(const tws::core::query_string_t& qstr);
+
+    timeseries_validated_parameters
+    valid(const timeseries_request_parameters& parameters);
+
+    void
+    compute_time_series(const timeseries_request_parameters& parameters,
+                        const timeseries_validated_parameters& vparameters,
+                        rapidjson::Document::AllocatorType& allocator,
+                        rapidjson::Value& jattributes);
+
+    void
+    prepare_timeseries_response(const timeseries_request_parameters& parameters,
+                                const timeseries_validated_parameters& vparameters,
+                                rapidjson::Document& doc,
+                                rapidjson::Value& jattributes,
+                                rapidjson::Document::AllocatorType& allocator);
+
+    //void render(const layer_tuple_t& ltuple,
+    //            const get_map_request_parameters& parameters,
+    //            gdImagePtr img);
+
+    //std::size_t
+    //compute_time_index(const tws::geoarray::geoarray_t* geoarray,
+    //                   const tws::geoarray::timeline* tl,
+    //                   const get_map_request_parameters& parameters);
+
+  }  // end namespace wtss
+}    // end namespace tws
 
 void
 tws::wtss::list_coverages_functor::operator()(const tws::core::http_request& request,
@@ -148,272 +207,35 @@ void
 tws::wtss::time_series_functor::operator()(const tws::core::http_request& request,
                                            tws::core::http_response& response)
 {
+// get client query string
   const char* qstring = request.query_string();
 
   if(qstring == nullptr)
     throw tws::core::http_request_error() << tws::error_description("time_series operation requires the following parameters: \"coverage\", \"attributes\", \"latitude\", \"longitude\", \"start\", \"end\".");
 
+// parse plain text query string to a std::map
   tws::core::query_string_t qstr = tws::core::expand(qstring);
 
-// which coverage?
-  tws::core::query_string_t::const_iterator it = qstr.find("coverage");
-  tws::core::query_string_t::const_iterator it_end = qstr.end();
+// parse parameters to a struct
+  timeseries_request_parameters parameters = tws::wtss::decode_timeseries_request(qstr);
 
-  if(it == it_end)
-    throw tws::core::http_request_error() << tws::error_description("check time_series operation: \"coverage\" parameter is missing!");
-
-// retrieve the coverage
-  const tws::geoarray::geoarray_t& cv = tws::geoarray::geoarray_manager::instance().get(it->second);
-
-// which attributes
-  it = qstr.find("attributes");
-
-  if(it == it_end)
-  {
-    boost::format err_ms("check time_series operation: \"attributes\" parameter is missing!");
-
-    throw tws::core::http_request_error() << tws::error_description((err_ms % cv.name).str());
-  }
-
-  std::vector<std::string> queried_attributes;
-
-  boost::split(queried_attributes, it->second, boost::is_any_of(","));
-
-  if(queried_attributes.empty())
-  {
-    boost::format err_ms("check time_series operation for coverage '%1%': please, inform at least one attribute.");
-
-    throw tws::core::http_request_error() << tws::error_description((err_ms % cv.name).str());
-  }
-
-// check if attributes are valid
-  for(const std::string& attr_name : queried_attributes)
-  {
-      std::vector<tws::geoarray::attribute_t>::const_iterator it = std::find_if(cv.attributes.begin(),
-                                                                                cv.attributes.end(),
-                                                                                [&attr_name](const tws::geoarray::attribute_t& attr){ return (attr.name == attr_name); });
-
-      if(it == cv.attributes.end())
-      {
-        boost::format err_ms("attribute '%1%' doesn't belong to coverage '%2%'!");
-        throw tws::core::http_request_error() << tws::error_description((err_ms % attr_name % cv.name).str());
-      }
-
-  }
-
-// extract longitude
-  it = qstr.find("longitude");
-
-  if(it == it_end || it->second.empty())
-    throw tws::core::http_request_error() << tws::error_description("check time_series operation: \"longitude\" parameter is missing!");
-
-  const double longitude = boost::lexical_cast<double>(it->second);
-
-// extract latitude
-  it = qstr.find("latitude");
-
-  if(it == it_end || it->second.empty())
-    throw tws::core::http_request_error() << tws::error_description("check time_series operation: \"latitude\" parameter is missing!");
-
-  const double latitude = boost::lexical_cast<double>(it->second);
-
-// extract start and end times if any
-  it = qstr.find("start");
-
-  const std::string start_time = (it != it_end) ? it->second : std::string("");
-
-  const tws::geoarray::timeline& tl = tws::geoarray::timeline_manager::instance().get(cv.name);
-
-  std::size_t start_time_idx = start_time.empty() ? tl.index(tl.time_points().front()) : tl.index(start_time);
-
-  it = qstr.find("end");
-
-  const std::string end_time = (it != it_end) ? it->second : std::string("");
-
-  std::size_t end_time_idx = end_time.empty() ? tl.index(tl.time_points().back()) : tl.index(end_time);
-
-  if(end_time_idx < start_time_idx)
-    throw tws::core::http_request_error() << tws::error_description("invalid time range!");
-
-  std::size_t ntime_pts = end_time_idx - start_time_idx + 1;
-
-// benchmark
-  //std::chrono::time_point<std::chrono::steady_clock> start, end;
-
-  //start = std::chrono::steady_clock::now();
-
-// TODO: check time interval and get a valid time range
-
-// prepare SRS conversor that allows to go from lat/long to array projection system and then come back to lat/long
-  te::srs::Converter srs_conv(4326, cv.geo_extent.spatial.crs_code);
-
-  double x = 0.0;
-  double y = 0.0;
-
-  srs_conv.convert(longitude, latitude, x, y); // degrees to radians
-
-// check if x and y values are within coverage boundary
-  if (!(te::gm::Envelope(x,y,x,y).within(te::gm::Envelope(cv.geo_extent.spatial.extent.xmin,
-         cv.geo_extent.spatial.extent.ymin, cv.geo_extent.spatial.extent.xmax,
-         cv.geo_extent.spatial.extent.ymax))))
-       throw tws::core::http_request_error() << tws::error_description("\"latitude\" and \"longitude\" parameters are not within the coverage boundary!");
-
-
-// compute pixel location from input Lat/Long WGS84 coordinate
-  te::rst::Grid array_grid(cv.dimensions[0].max_idx - cv.dimensions[0].min_idx + 1,
-                           cv.dimensions[1].max_idx - cv.dimensions[1].min_idx + 1,
-                           cv.geo_extent.spatial.resolution.x, cv.geo_extent.spatial.resolution.y,
-                           new te::gm::Envelope(cv.geo_extent.spatial.extent.xmin, cv.geo_extent.spatial.extent.ymin,
-                                                cv.geo_extent.spatial.extent.xmax, cv.geo_extent.spatial.extent.ymax),
-                           cv.geo_extent.spatial.crs_code);
-
-  double dpixel_col = 0.0;
-  double dpixel_row = 0.0;
-
-  array_grid.geoToGrid(x, y, dpixel_col, dpixel_row);
-
-  int64_t pixel_col = static_cast<int64_t>(dpixel_col);
-  int64_t pixel_row = static_cast<int64_t>(dpixel_row);
-
-// check if row and col are within array dimension ranges!
-  if (!(pixel_col > cv.dimensions[0].min_idx  && pixel_col < cv.dimensions[0].max_idx &&
-            pixel_row > cv.dimensions[1].min_idx && pixel_row < cv.dimensions[1].max_idx))
-       throw tws::core::http_request_error() << tws::error_description("\"pixelrow\" and \"pixelcol\" are not within the array dimension ranges!");
-
-// then compute the location of the center of the pixel
-  array_grid.gridToGeo(pixel_col, pixel_row, x, y);
-
-// get back from sinu to lat/long
-  srs_conv.invert(x, y, x, y);
-
-//end = std::chrono::steady_clock::now();
-
-//std::chrono::duration<double> elapsed_time = end - start;
-
-//std::cout << "\n\tSRS conversion time: " << elapsed_time.count() << "s" << std::endl;
-
-//start = std::chrono::steady_clock::now();
-
-// get a connection from the pool in order to retrieve the time series data
-  std::unique_ptr<tws::scidb::connection> conn(tws::scidb::connection_pool::instance().get());
-
-//end = std::chrono::steady_clock::now();
-
-//elapsed_time = end - start;
-
-//std::cout << "\tRetrieving a database connection: " << elapsed_time.count() << "s" << std::endl;
+// valid parameters
+  timeseries_validated_parameters vparameters = valid(parameters);
 
 // prepare the JSON root document
   rapidjson::Document::AllocatorType allocator;
 
   rapidjson::Value jattributes(rapidjson::kArrayType);
 
-// iterate through each queried attribute
-  for(std::size_t i = 0; i != queried_attributes.size(); ++i)
-  {
-    const auto& attr_name = queried_attributes[i];
+// compute timeseries for queried coverage attributes
+  compute_time_series(parameters, vparameters, allocator, jattributes);
 
-// the scidb query string
-    std::string str_afl = "project( between(" + cv.name + ", "
-                        + std::to_string(pixel_col) + "," + std::to_string(pixel_row) + "," + std::to_string(start_time_idx + cv.dimensions[2].min_idx) + ","
-                        + std::to_string(pixel_col) + "," + std::to_string(pixel_row) + "," + std::to_string(end_time_idx + cv.dimensions[2].min_idx) + "), "
-                        + attr_name + ")";
-
-    //start = std::chrono::steady_clock::now();
-
-    boost::shared_ptr< ::scidb::QueryResult > qresult = conn->execute(str_afl, true);
-
-    //end = std::chrono::steady_clock::now();
-
-    //elapsed_time = end - start;
-
-    //std::cout << "\tQuery: " << str_afl << "; executed in " << elapsed_time.count() << "s" << std::endl;
-
-    //start = std::chrono::steady_clock::now();
-
-    if((qresult.get() == nullptr) || (qresult->array.get() == nullptr))
-    {
-      rapidjson::Value jattribute(rapidjson::kObjectType);
-
-      jattribute.AddMember("attribute", attr_name.c_str(), allocator);
-
-      rapidjson::Value jvalues(rapidjson::kArrayType);
-
-      jattribute.AddMember("values", jvalues, allocator);
-
-      jattributes.PushBack(jattribute, allocator);
-
-      continue; // no query result returned after querying database.
-    }
-
-    std::vector<double> values(ntime_pts, cv.attributes[i].missing_value);
-
-    const ::scidb::ArrayDesc& array_desc = qresult->array->getArrayDesc();
-    const ::scidb::Attributes& array_attributes = array_desc.getAttributes(true);
-    const ::scidb::AttributeDesc& attr = array_attributes.front();
-
-    std::shared_ptr< ::scidb::ConstArrayIterator > array_it = qresult->array->getConstIterator(attr.getId());
-
-    fill_time_series(values, ntime_pts, array_it.get(), attr.getType(), 2, -(start_time_idx + cv.dimensions[2].min_idx));
-
-    //end = std::chrono::steady_clock::now();
-
-    //elapsed_time = end - start;
-
-    //std::cout << "\tTraversing array in " << elapsed_time.count() << "s" << std::endl;
-
-    rapidjson::Value jattribute(rapidjson::kObjectType);
-
-    jattribute.AddMember("attribute", attr_name.c_str(), allocator);
-
-    rapidjson::Value jvalues(rapidjson::kArrayType);
-
-    tws::core::copy_numeric_array(values.begin(), values.end(), jvalues, allocator);
-
-    jattribute.AddMember("values", jvalues, allocator);
-
-    jattributes.PushBack(jattribute, allocator);
-  }
-
-// prepare result part in response
-  rapidjson::Value jresult(rapidjson::kObjectType);
-
-  jresult.AddMember("attributes", jattributes, allocator);
-
-// add timeline in the response
-  rapidjson::Value jtimeline(rapidjson::kArrayType);
-  tws::core::copy_string_array(std::begin(tl.time_points()) + start_time_idx,  std::begin(tl.time_points()) + (start_time_idx + ntime_pts),
-                               jtimeline, allocator);
-  jresult.AddMember("timeline", jtimeline, allocator);
-
-// add the pixel center location in response
-  rapidjson::Value jcenter(rapidjson::kObjectType);
-  jcenter.AddMember("latitude", y, allocator);
-  jcenter.AddMember("longitude", x, allocator);
-  jresult.AddMember("center_coordinates", jcenter, allocator);
-
-// prepare the query part in response
-  rapidjson::Value jquery(rapidjson::kObjectType);
-
-  jquery.AddMember("coverage", cv.name.c_str(), allocator);
-
-  rapidjson::Value jqattributes(rapidjson::kArrayType);
-
-  tws::core::copy_string_array(queried_attributes.begin(), queried_attributes.end(), jqattributes, allocator);
-
-  jquery.AddMember("attributes", jqattributes, allocator);
-
-  jquery.AddMember("latitude", latitude, allocator);
-
-  jquery.AddMember("longitude", longitude, allocator);
-
-// form the final response
+// prepare the return document
   rapidjson::Document doc;
 
   doc.SetObject();
 
-  doc.AddMember("result", jresult, allocator);
-  doc.AddMember("query", jquery, allocator);
+  prepare_timeseries_response(parameters, vparameters, doc, jattributes, allocator);
 
 // send response
   rapidjson::StringBuffer str_buff;
@@ -476,5 +298,286 @@ tws::wtss::register_operations()
 void
 tws::wtss::initialize_operations()
 {
+  tws::geoarray::geoarray_manager::instance();
   tws::geoarray::timeline_manager::instance();
+}
+
+tws::wtss::timeseries_request_parameters
+tws::wtss::decode_timeseries_request(const tws::core::query_string_t& qstr)
+{
+  timeseries_request_parameters parameters;
+
+// get coverage name
+  tws::core::query_string_t::const_iterator it = qstr.find("coverage");
+  tws::core::query_string_t::const_iterator it_end = qstr.end();
+
+  if(it == it_end)
+    throw tws::core::http_request_error() << tws::error_description("Error on time_series operation: \"coverage\" parameter is missing.");
+
+  parameters.cv_name = it->second;
+
+// get queried attributes
+  it = qstr.find("attributes");
+
+  if(it == it_end)
+  {
+    boost::format err_msg("Error on time_series operation: \"attributes\" parameter is missing for coverage '%1%'.");
+
+    throw tws::core::http_request_error() << tws::error_description((err_msg % parameters.cv_name).str());
+  }
+
+  boost::split(parameters.queried_attributes, it->second, boost::is_any_of(","));
+
+// extract longitude
+  it = qstr.find("longitude");
+
+  if(it == it_end || it->second.empty())
+    throw tws::core::http_request_error() << tws::error_description("Error on time_series operation: \"longitude\" parameter is missing.");
+
+  parameters.longitude = boost::lexical_cast<double>(it->second);
+
+// extract latitude
+  it = qstr.find("latitude");
+
+  if(it == it_end || it->second.empty())
+    throw tws::core::http_request_error() << tws::error_description("check time_series operation: \"latitude\" parameter is missing.");
+
+  parameters.latitude = boost::lexical_cast<double>(it->second);
+
+// extract start and end times if any
+  it = qstr.find("start");
+
+  parameters.start_time_point = (it != it_end) ? it->second : std::string("");
+
+  it = qstr.find("end");
+
+  parameters.end_time_point = (it != it_end) ? it->second : std::string("");
+
+// ok: finished extracting parameters
+  return parameters;
+}
+
+tws::wtss::timeseries_validated_parameters
+tws::wtss::valid(const timeseries_request_parameters& parameters)
+{
+  timeseries_validated_parameters vparameters;
+
+// retrieve the underlying geoarray
+  vparameters.geo_array = & (tws::geoarray::geoarray_manager::instance().get(parameters.cv_name));
+
+// valid queried attributes
+  if(parameters.queried_attributes.empty())
+  {
+    boost::format err_msg("Error on time_series operation: please, inform at least one attribute coverage '%1%'.");
+
+    throw tws::core::http_request_error() << tws::error_description((err_msg % parameters.cv_name).str());
+  }
+
+  for(const std::string& attr_name : parameters.queried_attributes)
+  {
+    const std::vector<tws::geoarray::attribute_t>::const_iterator it = std::find_if(vparameters.geo_array->attributes.begin(),
+                                                                       vparameters.geo_array->attributes.end(),
+                                                                       [&attr_name](const tws::geoarray::attribute_t& attr){ return (attr.name == attr_name); });
+
+    const std::vector<tws::geoarray::attribute_t>::const_iterator it_end = vparameters.geo_array->attributes.end();
+
+    if(it == it_end)
+    {
+      boost::format err_msg("Error on time_series operation: attribute '%1%' doesn't belong to coverage '%2%'.");
+      throw tws::core::http_request_error() << tws::error_description((err_msg % attr_name % parameters.cv_name).str());
+    }
+
+    std::size_t pos = std::distance(it, it_end);
+
+    vparameters.attribute_positions.push_back(pos);
+  }
+
+// valid queried time-interval
+  vparameters.timeline = & (tws::geoarray::timeline_manager::instance().get(parameters.cv_name));
+
+  vparameters.start_time_idx = parameters.start_time_point.empty() ? vparameters.timeline->index(vparameters.timeline->time_points().front()) : vparameters.timeline->index(parameters.start_time_point);
+
+  vparameters.end_time_idx = parameters.end_time_point.empty() ? vparameters.timeline->index(vparameters.timeline->time_points().back()) : vparameters.timeline->index(parameters.end_time_point);
+
+  if(vparameters.end_time_idx < vparameters.start_time_idx)
+  {
+    boost::format err_msg("Error on time_series operation: invalid time range [%1%, %2%].");
+
+    throw tws::core::http_request_error() << tws::error_description((err_msg % parameters.start_time_point % parameters.end_time_point).str());
+  }
+
+// prepare SRS conversor that allows to go from lat/long to array projection system and then come back to lat/long
+// TODO: do this only if a transformation is needed!
+//  if(vparameters.geo_array->geo_extent.spatial.crs_code != 4326)
+
+  te::srs::Converter srs_conv(4326, vparameters.geo_array->geo_extent.spatial.crs_code);
+
+  srs_conv.convert(parameters.longitude, parameters.latitude, vparameters.pixel_center_longitude, vparameters.pixel_center_latitude);
+
+// check if x and y values are within coverage boundary
+  if(!intersects(vparameters.pixel_center_longitude, vparameters.pixel_center_latitude, vparameters.geo_array->geo_extent.spatial.extent))
+  {
+    boost::format err_msg("Error on time_series operation: queried longitude '%1%' or latitude '%2%' is outof coverage '%3%' extent (%4%, %5%, %6%, %7%).");
+
+    throw tws::core::http_request_error() << tws::error_description((err_msg % parameters.longitude % parameters.latitude % parameters.cv_name
+                                                                     % vparameters.geo_array->geo_extent.spatial.extent.xmin
+                                                                     % vparameters.geo_array->geo_extent.spatial.extent.xmax
+                                                                     % vparameters.geo_array->geo_extent.spatial.extent.ymin
+                                                                     % vparameters.geo_array->geo_extent.spatial.extent.ymax).str());
+  }
+
+// compute pixel location from input Lat/Long WGS84 coordinate
+  te::rst::Grid array_grid(vparameters.geo_array->dimensions[0].max_idx - vparameters.geo_array->dimensions[0].min_idx + 1,
+                           vparameters.geo_array->dimensions[1].max_idx - vparameters.geo_array->dimensions[1].min_idx + 1,
+                           vparameters.geo_array->geo_extent.spatial.resolution.x,
+                           vparameters.geo_array->geo_extent.spatial.resolution.y,
+                           new te::gm::Envelope(vparameters.geo_array->geo_extent.spatial.extent.xmin,
+                                                vparameters.geo_array->geo_extent.spatial.extent.ymin,
+                                                vparameters.geo_array->geo_extent.spatial.extent.xmax,
+                                                vparameters.geo_array->geo_extent.spatial.extent.ymax),
+                           vparameters.geo_array->geo_extent.spatial.crs_code);
+
+  double dpixel_col = 0.0;
+  double dpixel_row = 0.0;
+
+  array_grid.geoToGrid(vparameters.pixel_center_longitude, vparameters.pixel_center_latitude, dpixel_col, dpixel_row);
+
+  vparameters.pixel_col = static_cast<int64_t>(dpixel_col);
+  vparameters.pixel_row = static_cast<int64_t>(dpixel_row);
+
+// check if row and col are within array dimension ranges!
+  if(!is_in_spatial_range(vparameters.pixel_col, vparameters.pixel_row, vparameters.geo_array->dimensions))
+  {
+    boost::format err_msg("Error on timeseries operation: queried \"col\" (%1%) or \"row\" (%2%) are not within the array dimension ranges col=[%3%,%4%] or row=[%5%, %6%].");
+
+    throw tws::core::http_request_error() << tws::error_description((err_msg % vparameters.pixel_col % vparameters.pixel_row
+                                                                     % vparameters.geo_array->dimensions[0].min_idx
+                                                                     % vparameters.geo_array->dimensions[0].max_idx
+                                                                     % vparameters.geo_array->dimensions[1].min_idx
+                                                                     % vparameters.geo_array->dimensions[1].max_idx).str());
+  }
+
+// then compute the location of the center of the pixel
+  array_grid.gridToGeo(vparameters.pixel_col, vparameters.pixel_row, vparameters.pixel_center_longitude, vparameters.pixel_center_latitude);
+
+// get back from sinu (or any other CRS) to lat/long
+  srs_conv.invert(vparameters.pixel_center_longitude, vparameters.pixel_center_latitude, vparameters.pixel_center_longitude, vparameters.pixel_center_latitude);
+
+  return vparameters;
+}
+
+void
+tws::wtss::compute_time_series(const timeseries_request_parameters& parameters,
+                               const timeseries_validated_parameters& vparameters,
+                               rapidjson::Document::AllocatorType& allocator,
+                               rapidjson::Value& jattributes)
+{
+  const std::size_t ntime_pts = vparameters.end_time_idx - vparameters.start_time_idx + 1;
+
+  const std::size_t nattributes = parameters.queried_attributes.size();
+
+// get a connection from the pool in order to retrieve the time series data
+  std::unique_ptr<tws::scidb::connection> conn(tws::scidb::connection_pool::instance().get());
+
+// iterate through each queried attribute
+  for(std::size_t i = 0; i != nattributes; ++i)
+  {
+    const auto& attr_name = parameters.queried_attributes[i];
+
+    const std::size_t& attr_pos = vparameters.attribute_positions[i];
+
+// the scidb query string
+    std::string str_afl = "project( between(" + parameters.cv_name + ", "
+                          + std::to_string(vparameters.pixel_col) + "," + std::to_string(vparameters.pixel_row) + "," + std::to_string(vparameters.start_time_idx) + ","
+                          + std::to_string(vparameters.pixel_col) + "," + std::to_string(vparameters.pixel_row) + "," + std::to_string(vparameters.end_time_idx) + "), "
+                          + attr_name + ")";
+
+    boost::shared_ptr< ::scidb::QueryResult > qresult = conn->execute(str_afl, true);
+
+    if((qresult.get() == nullptr) || (qresult->array.get() == nullptr))
+    {
+      rapidjson::Value jattribute(rapidjson::kObjectType);
+
+      jattribute.AddMember("attribute", attr_name.c_str(), allocator);
+
+      rapidjson::Value jvalues(rapidjson::kArrayType);
+
+      jattribute.AddMember("values", jvalues, allocator);
+
+      jattributes.PushBack(jattribute, allocator);
+
+      continue; // no query result returned after querying database.
+    }
+
+    std::vector<double> values(ntime_pts, vparameters.geo_array->attributes[attr_pos].missing_value);
+
+    const ::scidb::ArrayDesc& array_desc = qresult->array->getArrayDesc();
+    const ::scidb::Attributes& array_attributes = array_desc.getAttributes(true);
+    const ::scidb::AttributeDesc& attr = array_attributes.front();
+
+    std::shared_ptr< ::scidb::ConstArrayIterator > array_it = qresult->array->getConstIterator(attr.getId());
+
+    fill_time_series(values, ntime_pts, array_it.get(), attr.getType(), 2, -(vparameters.start_time_idx));
+
+    rapidjson::Value jattribute(rapidjson::kObjectType);
+
+    jattribute.AddMember("attribute", attr_name.c_str(), allocator);
+
+    rapidjson::Value jvalues(rapidjson::kArrayType);
+
+    tws::core::copy_numeric_array(values.begin(), values.end(), jvalues, allocator);
+
+    jattribute.AddMember("values", jvalues, allocator);
+
+    jattributes.PushBack(jattribute, allocator);
+  }
+}
+
+void
+tws::wtss::prepare_timeseries_response(const timeseries_request_parameters& parameters,
+                                       const timeseries_validated_parameters& vparameters,
+                                       rapidjson::Document& doc,
+                                       rapidjson::Value& jattributes,
+                                       rapidjson::Document::AllocatorType& allocator)
+{
+// prepare result part in response
+  rapidjson::Value jresult(rapidjson::kObjectType);
+
+  jresult.AddMember("attributes", jattributes, allocator);
+
+// add timeline in the response
+  rapidjson::Value jtimeline(rapidjson::kArrayType);
+
+  std::size_t init_pos = vparameters.timeline->pos(vparameters.start_time_idx);
+  std::size_t fin_pos = vparameters.timeline->pos(vparameters.end_time_idx);
+
+  tws::core::copy_string_array(std::begin(vparameters.timeline->time_points()) + init_pos,
+                               std::begin(vparameters.timeline->time_points()) + (fin_pos + 1),
+                               jtimeline, allocator);
+
+  jresult.AddMember("timeline", jtimeline, allocator);
+
+// add the pixel center location in response
+  rapidjson::Value jcenter(rapidjson::kObjectType);
+  jcenter.AddMember("latitude", vparameters.pixel_center_latitude, allocator);
+  jcenter.AddMember("longitude", vparameters.pixel_center_longitude, allocator);
+  jresult.AddMember("center_coordinates", jcenter, allocator);
+
+// prepare the query part in response
+  rapidjson::Value jquery(rapidjson::kObjectType);
+
+  jquery.AddMember("coverage", parameters.cv_name.c_str(), allocator);
+
+  rapidjson::Value jqattributes(rapidjson::kArrayType);
+
+  tws::core::copy_string_array(parameters.queried_attributes.begin(), parameters.queried_attributes.end(), jqattributes, allocator);
+
+  jquery.AddMember("attributes", jqattributes, allocator);
+
+  jquery.AddMember("latitude", parameters.latitude, allocator);
+
+  jquery.AddMember("longitude", parameters.longitude, allocator);
+
+  doc.AddMember("result", jresult, allocator);
+  doc.AddMember("query", jquery, allocator);
 }
