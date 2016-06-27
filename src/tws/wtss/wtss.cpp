@@ -65,7 +65,6 @@
 
 // TerraLib
 #include <terralib/geometry/Envelope.h>
-#include <terralib/geometry/Point.h>
 #include <terralib/raster/Grid.h>
 #include <terralib/srs/Converter.h>
 
@@ -114,15 +113,6 @@ namespace tws
                                 rapidjson::Document& doc,
                                 rapidjson::Value& jattributes,
                                 rapidjson::Document::AllocatorType& allocator);
-
-    //void render(const layer_tuple_t& ltuple,
-    //            const get_map_request_parameters& parameters,
-    //            gdImagePtr img);
-
-    //std::size_t
-    //compute_time_index(const tws::geoarray::geoarray_t* geoarray,
-    //                   const tws::geoarray::timeline* tl,
-    //                   const get_map_request_parameters& parameters);
 
   }  // end namespace wtss
 }    // end namespace tws
