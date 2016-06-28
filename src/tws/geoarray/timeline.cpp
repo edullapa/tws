@@ -27,6 +27,7 @@
 // TWS
 #include "timeline.hpp"
 #include "exception.hpp"
+#include "utils.hpp"
 
 // STL
 #include <algorithm>
@@ -35,8 +36,9 @@
 // Boost
 #include <boost/format.hpp>
 
-tws::geoarray::timeline::timeline(const std::vector<std::string>& tp)
-  : time_points_(tp)
+tws::geoarray::timeline::timeline(const std::vector<std::string>& tp, const dimension_t& dim)
+  : time_points_(tp),
+    dim_(dim)
 {
   std::insert_iterator< std::map<std::string, std::size_t> > iit(time_point_idx_, time_point_idx_.begin());
 
@@ -63,16 +65,35 @@ tws::geoarray::timeline::get(std::size_t pos) const
 std::size_t
 tws::geoarray::timeline::index(const std::string& time_point) const
 {
+  return pos(time_point) + dim_.min_idx;
+}
+
+std::size_t
+tws::geoarray::timeline::pos(const std::string& time_point) const
+{
   std::map<std::string, std::size_t>::const_iterator it = time_point_idx_.find(time_point);
 
   if(it == time_point_idx_.end())
   {
     boost::format err_msg("could not find a time point '%1%'.");
-    
-    throw tws::item_not_found_error() << tws::error_description((err_msg % time_point).str());
+
+    throw tws::outof_bounds_error() << tws::error_description((err_msg % time_point).str());
   }
 
   return it->second;
+}
+
+std::size_t
+tws::geoarray::timeline::pos(std::size_t time_idx) const
+{
+  if(!is_in_range(time_idx, dim_))
+  {
+    boost::format err_msg("invalid time index: '%1%'.");
+
+    throw tws::outof_bounds_error() << tws::error_description((err_msg % time_idx).str());
+  }
+
+  return time_idx - dim_.min_idx;
 }
 
 const std::vector<std::string>&

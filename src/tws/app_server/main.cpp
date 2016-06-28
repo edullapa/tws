@@ -33,6 +33,7 @@
 #include <terralib/common/TerraLib.h>
 #include <terralib/core/logger/Logger.h>
 #include <terralib/core/translator/Translator.h>
+#include <terralib/plugin/PluginInfo.h>
 #include <terralib/plugin/PluginManager.h>
 #include <terralib/plugin/Utils.h>
 
@@ -56,20 +57,19 @@ void LoadModules()
 {
   std::string plugins_path = tws::core::find_in_app_path("share/tws/plugins");
   
-  te::plugin::PluginInfo* info = te::plugin::GetInstalledPlugin(plugins_path + "/tws.http_server.mongoose.teplg");
-  te::plugin::PluginManager::getInstance().add(info);
+  std::unique_ptr<te::plugin::PluginInfo> info(te::plugin::GetInstalledPlugin(plugins_path + "/tws.http_server.mongoose.teplg"));
+  te::plugin::PluginManager::getInstance().load(*info);
   
-  info = te::plugin::GetInstalledPlugin(plugins_path + "/tws.wms.teplg");
-  te::plugin::PluginManager::getInstance().add(info);
+  info.reset(te::plugin::GetInstalledPlugin(plugins_path + "/tws.wms.teplg"));
+  te::plugin::PluginManager::getInstance().load(*info);
 
-  info = te::plugin::GetInstalledPlugin(plugins_path + "/tws.wcs.teplg");
-  te::plugin::PluginManager::getInstance().add(info);
+  //info = te::plugin::GetInstalledPlugin(plugins_path + "/tws.wcs.teplg");
+  //te::plugin::PluginManager::getInstance().load(info);
 
-  info = te::plugin::GetInstalledPlugin(plugins_path + "/tws.wtss.teplg");
-  te::plugin::PluginManager::getInstance().add(info);
+  info.reset(te::plugin::GetInstalledPlugin(plugins_path + "/tws.wtss.teplg"));
+  te::plugin::PluginManager::getInstance().load(*info);
 
-
-  te::plugin::PluginManager::getInstance().loadAll();
+  //te::plugin::PluginManager::getInstance().loadAll();
 }
 
 void UnloadModules()

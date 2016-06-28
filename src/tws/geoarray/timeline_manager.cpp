@@ -28,6 +28,7 @@
 #include "timeline_manager.hpp"
 #include "../core/utils.hpp"
 #include "exception.hpp"
+#include "geoarray_manager.hpp"
 #include "timeline.hpp"
 #include "utils.hpp"
 
@@ -84,6 +85,8 @@ tws::geoarray::timeline_manager::timeline_manager()
 {
   pimpl_ = new impl;
 
+  geoarray_manager& gmanager = geoarray_manager::instance();
+
   std::string timelines = tws::core::find_in_app_path("share/tws/config/timelines.json");
 
   if(timelines.empty())
@@ -104,7 +107,11 @@ tws::geoarray::timeline_manager::timeline_manager()
 
     std::vector<std::string> str_timeline = read_timeline(input_file);
 
-    timeline t(str_timeline);
+    const geoarray_t& garray = gmanager.get(tf.first);
+
+    assert(garray.dimensions.size() == 3);
+
+    timeline t(str_timeline, garray.dimensions[2]);
 
     insert(tf.first, t);
   }
