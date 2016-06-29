@@ -103,10 +103,10 @@ int main(int argc, char *argv[])
     std::string log_file = jlog_file.GetString();
 
 // init logger
-    TE_INIT_LOGGER(log_file);
+    TE_INIT_DEFAULT_LOGGER(log_file);
 
 // init TerraLib and TWS frameworks
-    TE_LOG_CORE_INFO(TE_TR("Starting TerraLib GeoWeb Services..."));
+    TE_LOG_INFO(TE_TR("Starting TerraLib GeoWeb Services..."));
 
     TerraLib::getInstance().initialize();
 
@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
 
     TerraLib::getInstance().finalize();
 
-    TE_LOG_CORE_INFO(TE_TR("Finished TerraLib GeoWeb Services!"));
+    TE_LOG_INFO(TE_TR("Finished TerraLib GeoWeb Services!"));
   }
   catch(const boost::exception& e)
   {
@@ -135,11 +135,11 @@ int main(int argc, char *argv[])
     {
       boost::format err_msg(TE_TR("the following error has occurred: %1%."));
 
-      TE_LOG_CORE_ERROR((err_msg % *d).str());
+      TE_LOG_ERROR((err_msg % *d).str());
     }
     else
     {
-      TE_LOG_CORE_ERROR(TE_TR("an unknown error has occurred"));
+      TE_LOG_ERROR(TE_TR("an unknown error has occurred"));
     }
 
     return EXIT_FAILURE;
@@ -148,13 +148,13 @@ int main(int argc, char *argv[])
   {
     boost::format err_msg(TE_TR("the following error has occurred: %1%."));
 
-    TE_LOG_CORE_ERROR((err_msg % e.what()).str());
+    TE_LOG_ERROR((err_msg % e.what()).str());
 
     return EXIT_FAILURE;
   }
   catch(...)
   {
-    TE_LOG_CORE_ERROR(TE_TR("an unknown error has occurred."));
+    TE_LOG_ERROR(TE_TR("an unknown error has occurred."));
 
     return EXIT_FAILURE;
   }
