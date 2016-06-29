@@ -33,6 +33,7 @@
 #include "../geoarray/geoarray_manager.hpp"
 #include "../geoarray/timeline.hpp"
 #include "../geoarray/timeline_manager.hpp"
+#include "../scidb/cell_iterator.hpp"
 #include "../scidb/connection.hpp"
 #include "../scidb/connection_pool.hpp"
 #include "../scidb/utils.hpp"
@@ -91,14 +92,27 @@ namespace tws
     std::vector<layer_tuple_t>
     valid(const get_map_request_parameters& parameters);
 
-    void render(const layer_tuple_t& ltuple,
-                const get_map_request_parameters& parameters,
-                gdImagePtr img);
+    gdImagePtr render(const layer_tuple_t& ltuple,
+                      const get_map_request_parameters& parameters);
 
-//    std::size_t
-//    compute_time_index(const tws::geoarray::geoarray_t* geoarray,
-//                       const tws::geoarray::timeline* tl,
-//                       const get_map_request_parameters& parameters);
+    gdImagePtr
+    render_single_band_gray(tws::scidb::connection* conn,
+                            std::size_t time_idx,
+                            const layer_tuple_t& ltuple,
+                            const get_map_request_parameters& parameters);
+
+    gdImagePtr
+    render_rgb(tws::scidb::connection* conn,
+               std::size_t time_idx,
+               const layer_tuple_t& ltuple,
+               const get_map_request_parameters& parameters);
+
+    te::gm::Envelope
+    compute_intersection(te::gm::Envelope query_rectangle,
+                         int query_srid,
+                         const tws::geoarray::extent_t& layer_extent,
+                         int layer_srid);
+
 
   } // end namespace wms
 }   // end namespace tws
@@ -141,12 +155,7 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
   std::vector<tws::wms::layer_tuple_t> layers_to_render = valid(parameters);
 
 // now... let's render the selected layers!
-  std::unique_ptr<gdImage, decltype(&gdImageDestroy)> img(gdImageCreateTrueColor(parameters.width, parameters.height), gdImageDestroy);
-
-  for(const auto& ltuple : layers_to_render)
-  {
-    render(ltuple, parameters, img.get());
-  }
+  std::unique_ptr<gdImage, decltype(&gdImageDestroy)> img(render(layers_to_render[0], parameters), gdImageDestroy);
 
   int png_size = 0;
 
@@ -403,22 +412,54 @@ tws::wms::valid(const get_map_request_parameters& parameters)
   return result;
 }
 
-void
+gdImagePtr
 tws::wms::render(const layer_tuple_t& ltuple,
-                 const get_map_request_parameters& parameters,
-                 gdImagePtr img)
+                 const get_map_request_parameters& parameters)
 {
-  const layer_t* layer = std::get<0>(ltuple);
   const style_t* style = std::get<1>(ltuple);
-  const tws::geoarray::geoarray_t* garray = std::get<2>(ltuple);
   const tws::geoarray::timeline* tline = std::get<3>(ltuple);
 
 // compute time-index
-  //std::size_t time_idx = compute_time_index(garray, tline, parameters);
   std::size_t time_idx = parameters.time_point.empty() ? tline->index(tline->time_points().front()) : tline->index(parameters.time_point);
 
 // get connection
   std::unique_ptr<tws::scidb::connection> conn(tws::scidb::connection_pool::instance().get());
+
+// choose renderization mode
+  if(style->style_type == "single band gray")
+  {
+    return render_single_band_gray(conn.get(), time_idx, ltuple, parameters);
+  }
+  else if(style->style_type == "rgb")
+  {
+    return render_rgb(conn.get(), time_idx, ltuple, parameters);
+  }
+  else
+  {
+    throw tws::core::http_request_error() << tws::error_description("Error on GetMap operation: unsupported layer style-type.");
+  }
+
+}
+
+gdImagePtr
+tws::wms::render_single_band_gray(tws::scidb::connection* conn,
+                                  std::size_t time_idx,
+                                  const layer_tuple_t& ltuple,
+                                  const get_map_request_parameters& parameters)
+{
+  std::unique_ptr<gdImage, decltype(&gdImageDestroy)> img(gdImageCreateTrueColor(parameters.width, parameters.height), gdImageDestroy);
+
+  const layer_t* layer = std::get<0>(ltuple);
+  const style_t* style = std::get<1>(ltuple);
+  const tws::geoarray::geoarray_t* garray = std::get<2>(ltuple);
+
+  if(style->colors.size() != 1)
+  {
+    boost::format err_msg("Error on GetMap operation: style is not correctly defined for layer %1%.");
+
+    throw tws::core::http_request_error() << tws::error_description((err_msg % layer->name).str());
+  }
+
 
 // prepare the query string
   std::string str_aql = "SELECT " + style->colors[0] + " "
@@ -431,62 +472,153 @@ tws::wms::render(const layer_tuple_t& ltuple,
                                         + std::to_string(time_idx)
                                         + ")";
 
-// execute query
-    boost::shared_ptr< ::scidb::QueryResult > qresult = conn->execute(str_aql, false);
+  boost::shared_ptr< ::scidb::QueryResult > qresult = conn->execute(str_aql, false);
 
-    if((qresult.get() == nullptr) || (qresult->array.get() == nullptr))
-    {
-      boost::format err_msg("Error querying layer: '%1%'!");
-      throw tws::core::http_request_error() << tws::error_description((err_msg % layer->name).str());
-    }
+  if((qresult.get() == nullptr) || (qresult->array.get() == nullptr))
+  {
+    boost::format err_msg("Error querying layer: '%1%'!");
 
-    const ::scidb::ArrayDesc& array_desc = qresult->array->getArrayDesc();
-    const ::scidb::Attributes& array_attributes = array_desc.getAttributes(true);
-    const ::scidb::AttributeDesc& attr = array_attributes.front();
+    throw tws::core::http_request_error() << tws::error_description((err_msg % layer->name).str());
+  }
 
-    std::shared_ptr<::scidb::ConstArrayIterator> array_it = qresult->array->getConstIterator(attr.getId());
+  int64_t first_col = garray->dimensions[0].min_idx;
+  int64_t first_row = garray->dimensions[1].min_idx;
 
-    while(!array_it->end())
-    {
+  tws::scidb::cell_iterator cit(qresult->array);
 
-      const ::scidb::ConstChunk& chunk = array_it->getChunk();
+  while(!cit.end())
+  {
+    int color = cit.get_uint8(0);
 
-      std::shared_ptr< ::scidb::ConstChunkIterator > chunk_it = chunk.getConstIterator();
+    int gray = gdTrueColorAlpha(color, color, color, 0);
 
-      while(!chunk_it->end())
-      {
-        const ::scidb::Value& v = chunk_it->getItem();
+    const ::scidb::Coordinates& coords = cit.get_position();
 
-        const ::scidb::Coordinates& coords = chunk_it->getPosition();
+    int col = coords[0] - first_col;
+    int row = coords[1] - first_row;
 
-        int color = v.getUint8();
+    assert(static_cast<uint64_t>(coords[2]) == time_idx);
 
-        int gray = gdTrueColorAlpha(color, color, color, 0);
+    gdImageSetPixel(img.get(), col, row, gray);
 
-        int col = coords[0];
-        int row = coords[1];
-        //int t = coords[2];
+    ++cit;
+  }
 
-        gdImageSetPixel(img, col, row, gray);
-
-        ++(*chunk_it);
-      }
-
-      ++(*array_it);
-
-    }
-
-
+  return img.release();
 }
 
-//std::size_t
-//tws::wms::compute_time_index(const tws::geoarray::geoarray_t* geoarray,
-//                             const tws::geoarray::timeline* tl,
-//                             const get_map_request_parameters& parameters)
-//{
-//  std::size_t time_idx = parameters.time_point.empty() ? tl->index(tl->time_points().front()) : tl->index(parameters.time_point);
+gdImagePtr
+tws::wms::render_rgb(tws::scidb::connection* conn,
+                     std::size_t time_idx,
+                     const layer_tuple_t& ltuple,
+                     const get_map_request_parameters& parameters)
+{
+  const layer_t* layer = std::get<0>(ltuple);
+  const style_t* style = std::get<1>(ltuple);
+  const tws::geoarray::geoarray_t* garray = std::get<2>(ltuple);
 
-//  time_idx += geoarray->dimensions[2].min_idx;
+  if(style->colors.size() != 3)
+  {
+    boost::format err_msg("Error on GetMap operation: style is not correctly defined for layer %1%.");
 
-//  return time_idx;
-//}
+    throw tws::core::http_request_error() << tws::error_description((err_msg % layer->name).str());
+  }
+
+// get rendering extent
+  te::gm::Envelope data_extent = tws::wms::compute_intersection(parameters.bbox, std::stoi(parameters.crs),
+                                                                garray->geo_extent.spatial.extent, garray->geo_extent.spatial.crs_code);
+
+// get array coordinates to render
+  te::rst::Grid array_grid(garray->dimensions[0].max_idx - garray->dimensions[0].min_idx + 1,
+                           garray->dimensions[1].max_idx - garray->dimensions[1].min_idx + 1,
+                           garray->geo_extent.spatial.resolution.x,
+                           garray->geo_extent.spatial.resolution.y,
+                           new te::gm::Envelope(garray->geo_extent.spatial.extent.xmin,
+                                                garray->geo_extent.spatial.extent.ymin,
+                                                garray->geo_extent.spatial.extent.xmax,
+                                                garray->geo_extent.spatial.extent.ymax),
+                           garray->geo_extent.spatial.crs_code);
+
+  double dpixel_col = 0.0;
+  double dpixel_row = 0.0;
+
+  array_grid.geoToGrid(data_extent.m_llx, data_extent.m_lly, dpixel_col, dpixel_row);
+
+  int64_t init_pixel_col = static_cast<int64_t>(dpixel_col);
+  int64_t fin_pixel_row = static_cast<int64_t>(dpixel_row);
+
+  array_grid.geoToGrid(data_extent.m_urx, data_extent.m_ury, dpixel_col, dpixel_row);
+
+  int64_t fin_pixel_col = static_cast<int64_t>(dpixel_col);
+  int64_t init_pixel_row = static_cast<int64_t>(dpixel_row);
+
+
+// prepare the query string
+  std::string str_aql = "SELECT " + style->colors[0] + ", " + style->colors[1] + ", " + style->colors[2] + " "
+                      + "FROM between(" + layer->name + ", "
+                                        + std::to_string(init_pixel_col) + ","
+                                        + std::to_string(init_pixel_row) + ","
+                                        + std::to_string(time_idx) + ","
+                                        + std::to_string(fin_pixel_col) + ","
+                                        + std::to_string(fin_pixel_row) + ","
+                                        + std::to_string(time_idx)
+                                        + ")";
+
+  //std::cout << str_aql << std::endl;
+
+  boost::shared_ptr< ::scidb::QueryResult > qresult = conn->execute(str_aql, false);
+
+  if((qresult.get() == nullptr) || (qresult->array.get() == nullptr))
+  {
+    boost::format err_msg("Error querying layer: '%1%'!");
+
+    throw tws::core::http_request_error() << tws::error_description((err_msg % layer->name).str());
+  }
+
+  int width = fin_pixel_col - init_pixel_col + 1;
+  int height = fin_pixel_row - init_pixel_row + 1;
+
+  std::unique_ptr<gdImage, decltype(&gdImageDestroy)> img(gdImageCreateTrueColor(width, height), gdImageDestroy);
+
+  tws::scidb::cell_iterator cit(qresult->array);
+
+  //int64_t first_col = garray->dimensions[0].min_idx;
+  //int64_t first_row = garray->dimensions[1].min_idx;
+
+  while(!cit.end())
+  {
+    int r = cit.get_uint8(0);
+    int g = cit.get_uint8(1);
+    int b = cit.get_uint8(2);
+
+    int color = gdTrueColorAlpha(r, g, b, 0);
+
+    const ::scidb::Coordinates& coords = cit.get_position();
+
+    int col = coords[0] - init_pixel_col;
+    int row = coords[1] - init_pixel_row;
+
+    assert(col < width);
+    assert(row < height);
+    assert(static_cast<uint64_t>(coords[2]) == time_idx);
+
+    gdImageSetPixel(img.get(), col, row, color);
+
+    ++cit;
+  }
+
+  return img.release();
+}
+
+te::gm::Envelope
+tws::wms::compute_intersection(te::gm::Envelope query_rectangle,
+                               int query_srid,
+                               const tws::geoarray::extent_t& layer_extent,
+                               int layer_srid)
+{
+  query_rectangle.transform(query_srid, layer_srid);
+
+  te::gm::Envelope layer_mbr(layer_extent.xmin, layer_extent.ymin, layer_extent.xmax, layer_extent.ymax);
+
+  return query_rectangle.intersection(layer_mbr);
+}
