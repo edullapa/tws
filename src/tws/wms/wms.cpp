@@ -431,7 +431,8 @@ tws::wms::render(const layer_tuple_t& ltuple,
                                         + std::to_string(time_idx)
                                         + ")";
 
-// execute query
+  std::cout << str_aql;
+  // execute query
     boost::shared_ptr< ::scidb::QueryResult > qresult = conn->execute(str_aql, false);
 
     if((qresult.get() == nullptr) || (qresult->array.get() == nullptr))

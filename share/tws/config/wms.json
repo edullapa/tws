@@ -58,7 +58,7 @@
       },
       "exception": [ "xml", "inimage", "blank" ],
       "layer": {
-        "name": "eodb",
+        "name": "mydb",
         "abstract": "Earth Observation Data Base",
         "crs": [],
         "bounding_box": [
@@ -83,6 +83,13 @@
                 "max_y": 10007554.676994,
                 "res_x": 231.65635826395825,
                 "res_y": 231.65635826374995
+              }
+            ],
+            "styles": [
+              {
+                "name": "rgb",
+                "type": "rgb",
+                "colors": ["uint8((nir + 100) / 63.137254902)", "uint8((nir + 100) / 63.137254902)", "uint8((red + 100) / 63.137254902)"]
               }
             ],
             "layers": []
