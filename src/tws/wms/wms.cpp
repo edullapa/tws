@@ -21,6 +21,7 @@
 
   \brief Web Map Service.
 
+  \author Gilberto Ribeiro de Queiroz
   \author Roger Victor
  */
 
@@ -36,6 +37,7 @@
 #include "../scidb/cell_iterator.hpp"
 #include "../scidb/connection.hpp"
 #include "../scidb/connection_pool.hpp"
+#include "../scidb/mem_array.hpp"
 #include "../scidb/utils.hpp"
 #include "data_types.hpp"
 #include "wms_manager.hpp"
@@ -447,8 +449,6 @@ tws::wms::render_single_band_gray(tws::scidb::connection* conn,
                                   const layer_tuple_t& ltuple,
                                   const get_map_request_parameters& parameters)
 {
-  std::unique_ptr<gdImage, decltype(&gdImageDestroy)> img(gdImageCreateTrueColor(parameters.width, parameters.height), gdImageDestroy);
-
   const layer_t* layer = std::get<0>(ltuple);
   const style_t* style = std::get<1>(ltuple);
   const tws::geoarray::geoarray_t* garray = std::get<2>(ltuple);
@@ -460,15 +460,41 @@ tws::wms::render_single_band_gray(tws::scidb::connection* conn,
     throw tws::core::http_request_error() << tws::error_description((err_msg % layer->name).str());
   }
 
+// get rendering extent
+  te::gm::Envelope data_extent = tws::wms::compute_intersection(parameters.bbox, std::stoi(parameters.crs),
+                                                                garray->geo_extent.spatial.extent, garray->geo_extent.spatial.crs_code);
+// get array coordinates to render
+  te::rst::Grid array_grid(garray->dimensions[0].max_idx - garray->dimensions[0].min_idx + 1,
+                           garray->dimensions[1].max_idx - garray->dimensions[1].min_idx + 1,
+                           garray->geo_extent.spatial.resolution.x,
+                           garray->geo_extent.spatial.resolution.y,
+                           new te::gm::Envelope(garray->geo_extent.spatial.extent.xmin,
+                                                garray->geo_extent.spatial.extent.ymin,
+                                                garray->geo_extent.spatial.extent.xmax,
+                                                garray->geo_extent.spatial.extent.ymax),
+                           garray->geo_extent.spatial.crs_code);
+
+  double dpixel_col = 0.0;
+  double dpixel_row = 0.0;
+
+  array_grid.geoToGrid(data_extent.m_llx, data_extent.m_lly, dpixel_col, dpixel_row);
+
+  int64_t init_pixel_col = static_cast<int64_t>(dpixel_col);
+  int64_t fin_pixel_row = static_cast<int64_t>(dpixel_row);
+
+  array_grid.geoToGrid(data_extent.m_urx, data_extent.m_ury, dpixel_col, dpixel_row);
+
+  int64_t fin_pixel_col = static_cast<int64_t>(dpixel_col);
+  int64_t init_pixel_row = static_cast<int64_t>(dpixel_row);
 
 // prepare the query string
   std::string str_aql = "SELECT " + style->colors[0] + " "
                       + "FROM between(" + layer->name + ", "
-                                        + std::to_string(garray->dimensions[0].min_idx) + ","
-                                        + std::to_string(garray->dimensions[1].min_idx) + ","
+                                        + std::to_string(init_pixel_col) + ","
+                                        + std::to_string(init_pixel_row) + ","
                                         + std::to_string(time_idx) + ","
-                                        + std::to_string(garray->dimensions[0].min_idx + (parameters.width - 1)) + ","
-                                        + std::to_string(garray->dimensions[1].min_idx + (parameters.height - 1)) + ","
+                                        + std::to_string(fin_pixel_col) + ","
+                                        + std::to_string(fin_pixel_row) + ","
                                         + std::to_string(time_idx)
                                         + ")";
 
@@ -481,27 +507,24 @@ tws::wms::render_single_band_gray(tws::scidb::connection* conn,
     throw tws::core::http_request_error() << tws::error_description((err_msg % layer->name).str());
   }
 
-  int64_t first_col = garray->dimensions[0].min_idx;
-  int64_t first_row = garray->dimensions[1].min_idx;
-
   tws::scidb::cell_iterator cit(qresult->array);
 
-  while(!cit.end())
+  tws::scidb::array2d<uint8_t> tmp_array(init_pixel_col, fin_pixel_col, init_pixel_row, fin_pixel_row, 1);
+
+  tmp_array.fill(cit);
+
+  std::unique_ptr<gdImage, decltype(&gdImageDestroy)> img(gdImageCreateTrueColor(tmp_array.width, tmp_array.height), gdImageDestroy);
+
+  for(std::size_t i = 0; i != tmp_array.height; ++i)
   {
-    int color = cit.get_uint8(0);
+    std::size_t offset = i *  tmp_array.width;
 
-    int gray = gdTrueColorAlpha(color, color, color, 0);
-
-    const ::scidb::Coordinates& coords = cit.get_position();
-
-    int col = coords[0] - first_col;
-    int row = coords[1] - first_row;
-
-    assert(static_cast<uint64_t>(coords[2]) == time_idx);
-
-    gdImageSetPixel(img.get(), col, row, gray);
-
-    ++cit;
+    for(std::size_t j = 0; j != tmp_array.width; ++j)
+    {
+      int v = tmp_array.attribute_data[0][offset + j];
+      int color = gdTrueColorAlpha(v, v, v, 0);
+      gdImageSetPixel(img.get(), j, i, color);
+    }
   }
 
   return img.release();
