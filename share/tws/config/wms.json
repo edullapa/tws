@@ -34,11 +34,7 @@
           "format": ["text/xml"],
           "dcptype": {
             "http": {
-<<<<<<< HEAD
               "get": { "online_resource": "http://www.dpi.inpe.br/tws/wms/GetCapabilities?" },
-=======
-              "get": { "online_resource": "http://localhost:7654/wms/GetCapabilities?" }
->>>>>>> upstream/master
             }
           }
         },
@@ -46,11 +42,7 @@
           "format": [ "image/png", "image/gif", "image/jpeg" ],
           "dcptype": {
             "http": {
-<<<<<<< HEAD
               "get": { "online_resource": "http://www.dpi.inpe.br/tws/wms/GetMap?" }
-=======
-              "get": { "online_resource": "http://localhost:7654/wms/GetMap?" }
->>>>>>> upstream/master
             }
           }
         },
@@ -58,11 +50,7 @@
           "format": [ "text/xml", "text/plain", "text/html" ],
           "dcptype": {
             "http": {
-<<<<<<< HEAD
               "get": { "online_resource":"http://www.dpi.inpe.br/tws/wms/GetFeatureInfo?" }
-=======
-              "get": { "online_resource":"http://localhost:7654/wms/GetFeatureInfo?" }
->>>>>>> upstream/master
             }
           }
         }
@@ -104,8 +92,6 @@
               }
             ],
             "layers": []
-<<<<<<< HEAD
-=======
           },
           { "name": "hotspot_monthly",
             "abstract": "Monthly aggregated hotspot data",
@@ -172,7 +158,6 @@
               }
             ],
             "layers": []
->>>>>>> upstream/master
           }
         ]
       }
