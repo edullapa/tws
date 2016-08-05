@@ -42,7 +42,8 @@ namespace tws
   {
 
     //! List the metadata, describing the layers avaliable for vizualization.
-    /*! http://chronos.dpi.inpe.br:6543/wms/GetCapabilities */
+    /*! http://localhost:7654/wms/GetCapabilities? */
+    /*! http://www.dpi.inpe.br/tws/wms/GetCapabilities? */
     struct get_capabilities_functor
     {
       void operator()(const tws::core::http_request& request,
