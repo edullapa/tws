@@ -48,10 +48,10 @@ tws::wms::write(const capabilities_t& capabilities, rapidxml::xml_document<>& xm
   attr = xml_capabilities.allocate_attribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
   root->append_attribute(attr);
 
-  attr = xml_capabilities.allocate_attribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+  attr = xml_capabilities.allocate_attribute("xmlns:xsd", "http://www.w3.org/2001/XMLSchema-instance");
   root->append_attribute(attr);
 
-  attr = xml_capabilities.allocate_attribute("xsi:schemaLocation", "http://www.opengis.net/wms http://schemas.opengis.net/wms/1.3.0/capabilities_1_3_0.xsd");
+  attr = xml_capabilities.allocate_attribute("xsd:schemaLocation", "http://www.opengis.net/wms http://schemas.opengis.net/wms/1.3.0/capabilities_1_3_0.xsd");
   root->append_attribute(attr);
 
   root->append_node(write_service(capabilities.service, xml_capabilities));

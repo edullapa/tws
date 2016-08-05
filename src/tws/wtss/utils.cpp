@@ -306,12 +306,21 @@ tws::wtss::write(const tws::geoarray::geo_extent_t& geo_ext,
   if(!jgeo_ext.IsObject())
     throw tws::invalid_argument_error() << tws::error_description("JSON value must be a JSON object!");
 
+  rapidjson::Value jspatial(rapidjson::kObjectType);
+
   rapidjson::Value jspatial_extent(rapidjson::kObjectType);
   jspatial_extent.AddMember("xmin", geo_ext.spatial.extent.xmin, allocator);
   jspatial_extent.AddMember("xmax", geo_ext.spatial.extent.xmax, allocator);
   jspatial_extent.AddMember("ymin", geo_ext.spatial.extent.ymin, allocator);
-  jspatial_extent.AddMember("ymax", geo_ext.spatial.extent.ymax, allocator);
-  jgeo_ext.AddMember("spatial", jspatial_extent, allocator);
+  jspatial_extent.AddMember("ymax", geo_ext.spatial.extent.ymax, allocator);  
+  jspatial.AddMember("extent", jspatial_extent, allocator);
+
+  rapidjson::Value jspatial_resolution(rapidjson::kObjectType);
+  jspatial_resolution.AddMember("x", geo_ext.spatial.resolution.x, allocator);
+  jspatial_resolution.AddMember("y", geo_ext.spatial.resolution.y, allocator);
+  jspatial.AddMember("resolution", jspatial_resolution, allocator);
+
+  jgeo_ext.AddMember("spatial", jspatial, allocator);
 
   rapidjson::Value jtemp_extent(rapidjson::kObjectType);
 

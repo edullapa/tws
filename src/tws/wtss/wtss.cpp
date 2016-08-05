@@ -65,7 +65,6 @@
 
 // TerraLib
 #include <terralib/geometry/Envelope.h>
-#include <terralib/geometry/Point.h>
 #include <terralib/raster/Grid.h>
 #include <terralib/srs/Converter.h>
 
@@ -114,15 +113,6 @@ namespace tws
                                 rapidjson::Document& doc,
                                 rapidjson::Value& jattributes,
                                 rapidjson::Document::AllocatorType& allocator);
-
-    //void render(const layer_tuple_t& ltuple,
-    //            const get_map_request_parameters& parameters,
-    //            gdImagePtr img);
-
-    //std::size_t
-    //compute_time_index(const tws::geoarray::geoarray_t* geoarray,
-    //                   const tws::geoarray::timeline* tl,
-    //                   const get_map_request_parameters& parameters);
 
   }  // end namespace wtss
 }    // end namespace tws
@@ -494,7 +484,7 @@ tws::wtss::compute_time_series(const timeseries_request_parameters& parameters,
 
     boost::shared_ptr< ::scidb::QueryResult > qresult = conn->execute(str_afl, true);
 
-    if((qresult.get() == nullptr) || (qresult->array.get() == nullptr))
+    if((qresult == nullptr) || (qresult->array == nullptr))
     {
       rapidjson::Value jattribute(rapidjson::kObjectType);
 
@@ -506,30 +496,43 @@ tws::wtss::compute_time_series(const timeseries_request_parameters& parameters,
 
       jattributes.PushBack(jattribute, allocator);
 
+      if(qresult != nullptr)
+        conn->completed(qresult->queryID);
+
       continue; // no query result returned after querying database.
     }
 
-    std::vector<double> values(ntime_pts, vparameters.geo_array->attributes[attr_pos].missing_value);
+    try
+    {
+      std::vector<double> values(ntime_pts, vparameters.geo_array->attributes[attr_pos].missing_value);
 
-    const ::scidb::ArrayDesc& array_desc = qresult->array->getArrayDesc();
-    const ::scidb::Attributes& array_attributes = array_desc.getAttributes(true);
-    const ::scidb::AttributeDesc& attr = array_attributes.front();
+      const ::scidb::ArrayDesc& array_desc = qresult->array->getArrayDesc();
+      const ::scidb::Attributes& array_attributes = array_desc.getAttributes(true);
+      const ::scidb::AttributeDesc& attr = array_attributes.front();
 
-    std::shared_ptr< ::scidb::ConstArrayIterator > array_it = qresult->array->getConstIterator(attr.getId());
+      std::shared_ptr< ::scidb::ConstArrayIterator > array_it = qresult->array->getConstIterator(attr.getId());
 
-    fill_time_series(values, ntime_pts, array_it.get(), attr.getType(), 2, -(vparameters.start_time_idx));
+      fill_time_series(values, ntime_pts, array_it.get(), attr.getType(), 2, -(vparameters.start_time_idx));
 
-    rapidjson::Value jattribute(rapidjson::kObjectType);
+      rapidjson::Value jattribute(rapidjson::kObjectType);
 
-    jattribute.AddMember("attribute", attr_name.c_str(), allocator);
+      jattribute.AddMember("attribute", attr_name.c_str(), allocator);
 
-    rapidjson::Value jvalues(rapidjson::kArrayType);
+      rapidjson::Value jvalues(rapidjson::kArrayType);
 
-    tws::core::copy_numeric_array(values.begin(), values.end(), jvalues, allocator);
+      tws::core::copy_numeric_array(values.begin(), values.end(), jvalues, allocator);
 
-    jattribute.AddMember("values", jvalues, allocator);
+      jattribute.AddMember("values", jvalues, allocator);
 
-    jattributes.PushBack(jattribute, allocator);
+      jattributes.PushBack(jattribute, allocator);
+    }
+    catch(...)
+    {
+      conn->completed(qresult->queryID);
+      throw;
+    }
+
+    conn->completed(qresult->queryID);
   }
 }
 
