@@ -1,6 +1,6 @@
 {
   "arrays": [
-    { "name": "mod13q1",
+    { "name": "MOD13Q1",
       "description": "Vegetation Indices 16-Day L3 Global 250m",
       "detail": "https://lpdaac.usgs.gov/products/modis_products_table/mod13q1",
       "dimensions": [
@@ -18,8 +18,8 @@
         },
         { "name": "time_id",
           "description": "time",
-          "min_idx": 0,
-          "max_idx": 1024,
+          "min_idx": 3,
+          "max_idx": 512,
           "pos": 2
         }
       ],
@@ -87,14 +87,14 @@
           "scale_factor": 0.01,
           "missing_value": -10000
         },
-        { "name": "azimuth",
+        { "name": "relative_azimuth",
           "description": "250m 16 days relative azimuth angle', , , 0.1, -4000",
           "datatype": "16-bit signed integer",
           "valid_range": { "min": -3600, "max": 3600 },
           "scale_factor": 0.1,
           "missing_value": -4000
         },
-        { "name": "day",
+        { "name": "day_of_year",
           "description": "250m 16 days composite day of the year",
           "datatype": "16-bit signed integer",
           "valid_range": { "min": 1, "max": 366 },
@@ -127,322 +127,9 @@
         "temporal": {
           "interval": {
             "start": "2000-02-18",
-            "end": "2014-08-13"
+            "end": "2016-06-09"
           },
           "resolution": 16,
-          "unit": "day"
-        }
-      }
-    },
-    { "name": "mod09q1",
-      "description": "Surface Reflectance 8-Day L3 Global 250m",
-      "detail": "https://lpdaac.usgs.gov/dataset_discovery/modis/modis_products_table/mod09q1",
-      "dimensions": [
-        { "name": "col_id",
-          "description": "column",
-          "min_idx": 0,
-          "max_idx": 172799,
-          "pos": 0
-        },
-        { "name": "row_id",
-          "description": "row",
-          "min_idx": 0,
-          "max_idx": 86399,
-          "pos": 1
-        },
-        { "name": "time_id",
-          "description": "time",
-          "min_idx": 0,
-          "max_idx": 1024,
-          "pos": 2
-        }
-      ],
-      "attributes": [
-        { "name": "red",
-          "description": "250m Surface Reflectance Band 1 (620–670 nm)",
-          "datatype": "16-bit signed integer",
-          "valid_range": { "min": -100, "max": 16000 },
-          "scale_factor": 0.0001,
-          "missing_value": -28672
-        },
-        { "name": "nir",
-          "description": "250m Surface Reflectance Band 2 (841–876 nm)",
-          "datatype": "16-bit signed integer",
-          "valid_range": { "min": -100, "max": 16000 },
-          "scale_factor": 0.0001,
-          "missing_value": -28672
-        },
-        { "name": "quality",
-          "description": "250m Reflectance Band Quality",
-          "datatype": "16-bit unsigned integer",
-          "valid_range": { "min": 0, "max": 32767 },
-          "scale_factor": 1,
-          "missing_value": 65535
-        }
-      ],
-      "geo_extent": {
-        "spatial": {
-          "extent": {
-            "xmin": -20015109.35400599,
-            "ymin": -10007554.676994,
-            "xmax": 20015109.35400599,
-            "ymax": 10007554.676994
-          },
-          "resolution": {
-            "x": 231.65635826395825,
-            "y": 231.65635826374995
-          },
-          "crs": "+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs ",
-          "srid": 100002
-        },
-        "temporal": {
-          "interval": {
-            "start": "2000-02-18",
-            "end": "2014-08-13"
-          },
-          "resolution": 8,
-          "unit": "day"
-        }
-      }
-    },
-    { "name": "hotspot_monthly",
-      "description": "Monthly aggregated hotspot data",
-      "detail": "www.inpe.br/queimadas",
-      "dimensions": [
-        { "name": "col",
-          "description": "column",
-          "min_idx": 0,
-          "max_idx": 1020,
-          "pos": 0
-        },
-        { "name": "row",
-          "description": "row",
-          "min_idx": 0,
-          "max_idx": 1380,
-          "pos": 1
-        },
-        { "name": "time_idx",
-          "description": "time index",
-          "min_idx": 1,
-          "max_idx": 180,
-          "pos": 2
-        }
-      ],
-      "attributes": [
-        { "name": "measure",
-          "description": "measure",
-          "datatype": "8-bit unsigned integer",
-          "valid_range": { "min": 0, "max": 255 },
-          "scale_factor": 1.0,
-          "missing_value": 0
-        }
-      ],
-      "geo_extent": {
-        "spatial": {
-          "extent": {
-            "xmin": -82.025,
-            "ymin": -56.025,
-            "xmax": -30.975,
-            "ymax": 13.025
-          },
-          "resolution": {
-            "x": 0.05,
-            "y": 0.05
-          },
-          "crs": "+proj=longlat +datum=WGS84 +no_defs ",
-          "srid": 4326
-        },
-        "temporal": {
-          "interval": {
-            "start": "2000-01",
-            "end": "2014-12"
-          },
-          "resolution": 1,
-          "unit": "month"
-        }
-      }
-    },
-    { "name": "hotspot_daily",
-      "description": "Daily hotspot data",
-      "detail": "www.inpe.br/queimadas",
-      "dimensions": [
-        { "name": "col",
-          "description": "column",
-          "min_idx": 0,
-          "max_idx": 1020,
-          "pos": 0
-        },
-        { "name": "row",
-          "description": "row",
-          "min_idx": 0,
-          "max_idx": 1380,
-          "pos": 1
-        },
-        { "name": "time_idx",
-          "description": "time index",
-          "min_idx": 1,
-          "max_idx": 366,
-          "pos": 2
-        }
-      ],
-      "attributes": [
-        { "name": "measure",
-          "description": "measure",
-          "datatype": "8-bit unsigned integer",
-          "valid_range": { "min": 0, "max": 255 },
-          "scale_factor": 1.0,
-          "missing_value": 0
-        }
-      ],
-      "geo_extent": {
-        "spatial": {
-          "extent": {
-            "xmin": -82.025,
-            "ymin": -56.025,
-            "xmax": -30.975,
-            "ymax": 13.025
-          },
-          "resolution": {
-            "x": 0.05,
-            "y": 0.05
-          },
-          "crs": "+proj=longlat +datum=WGS84 +no_defs ",
-          "srid": 4326
-        },
-        "temporal": {
-          "interval": {
-            "start": "2014-01-01",
-            "end": "2014-12-31"
-          },
-          "resolution": 1,
-          "unit": "day"
-        }
-      }
-    },
-    { "name": "hotspot_risk_daily",
-      "description": "Fire risk daily data",
-      "detail": "www.inpe.br/queimadas",
-      "dimensions": [
-        { "name": "col",
-          "description": "column",
-          "min_idx": 0,
-          "max_idx": 5156,
-          "pos": 0
-        },
-        { "name": "row",
-          "description": "row",
-          "min_idx": 0,
-          "max_idx": 5795,
-          "pos": 1
-        },
-        { "name": "time_idx",
-          "description": "time index",
-          "min_idx": 1,
-          "max_idx": 31,
-          "pos": 2
-        }
-      ],
-      "attributes": [
-        { "name": "measure",
-          "description": "measure",
-          "datatype": "8-bit unsigned integer",
-          "valid_range": { "min": 0, "max": 255 },
-          "scale_factor": 1.0,
-          "missing_value": 0
-        }
-      ],
-      "geo_extent": {
-        "spatial": {
-          "extent": {
-            "xmin": -82.005,
-            "ymin": -44.955,
-            "xmax": -30.435,
-            "ymax": 13.005
-          },
-          "resolution": {
-            "x": 0.01,
-            "y": 0.01
-          },
-          "crs": "+proj=longlat +datum=WGS84 +no_defs ",
-          "srid": 4326
-        },
-        "temporal": {
-          "interval": {
-            "start": "2015-12-01",
-            "end": "2015-12-31"
-          },
-          "resolution": 1,
-          "unit": "day"
-        }
-      }
-    },
-    { "name": "hotspot_risk_monthly",
-      "description": "Fire risk monthly data",
-      "detail": "www.inpe.br/queimadas",
-      "dimensions": [
-        { "name": "col",
-          "description": "column",
-          "min_idx": 0,
-          "max_idx": 5299,
-          "pos": 0
-        },
-        { "name": "row",
-          "description": "row",
-          "min_idx": 0,
-          "max_idx": 6599,
-          "pos": 1
-        },
-        { "name": "time_idx",
-          "description": "time index",
-          "min_idx": 1,
-          "max_idx": 12,
-          "pos": 2
-        }
-      ],
-      "attributes": [
-        { "name": "high_risk",
-          "description": "measure",
-          "datatype": "8-bit unsigned integer",
-          "valid_range": { "min": 0, "max": 255 },
-          "scale_factor": 1.0,
-          "missing_value": 0
-        },
-        { "name": "medium_risk",
-          "description": "measure",
-          "datatype": "8-bit unsigned integer",
-          "valid_range": { "min": 0, "max": 255 },
-          "scale_factor": 1.0,
-          "missing_value": 0
-        },
-        { "name": "low_risk",
-          "description": "measure",
-          "datatype": "8-bit unsigned integer",
-          "valid_range": { "min": 0, "max": 255 },
-          "scale_factor": 1.0,
-          "missing_value": 0
-        }
-      ],
-      "geo_extent": {
-        "spatial": {
-          "extent": {
-            "xmin": -85.995,
-            "ymin": -55.985,
-            "xmax": -32.995,
-            "ymax": 10.015
-          },
-          "resolution": {
-            "x": 0.01,
-            "y": 0.01
-          },
-          "crs": "+proj=longlat +datum=WGS84 +no_defs ",
-          "srid": 4326
-        },
-        "temporal": {
-          "interval": {
-            "start": "2015-01",
-            "end": "2015-12"
-          },
-          "resolution": 1,
           "unit": "day"
         }
       }

@@ -1,10 +1,5 @@
 {
   "timelines": [
-    { "array": "hotspot_daily", "timeline": "hotspot_daily_timeline.json" },
-    { "array": "hotspot_monthly", "timeline": "hotspot_monthly_timeline.json" },
-    { "array": "hotspot_risk_daily", "timeline": "hotspot_risk_daily_timeline.json" },
-    { "array": "hotspot_risk_monthly", "timeline": "hotspot_risk_monthly_timeline.json" },
-    { "array": "mod09q1", "timeline": "mod09q1_timeline.json" },
-    { "array": "mod13q1", "timeline": "mod13q1_timeline.json" }
+    { "array": "MOD13Q1", "timeline": "MOD13Q1_timeline.json" }
   ]
 }

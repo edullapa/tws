@@ -3,8 +3,8 @@
     "service": {
       "title": "e-Sensing WMS Server",
       "abstract": "Web Map Service maintained by e-Sensing team. Visualization of global Land Use and Land Cover maps.",
-      "keyword_list": [ "Amazônia", "floresta", "cerrado" ],
-      "online_resource": "http://localhost:7654/wms",
+      "keyword_list": [ "Amazônia", "Floresta", "Cerrado" ],
+      "online_resource": "http://www.dpi.inpe.br/tws/wms/",
       "contact_information": {
         "contact_person_primary": {
           "contact_person": "Gilberto Ribeiro",
@@ -19,8 +19,8 @@
           "post_code": "12227-010",
           "country": "Brazil"
         },
-        "contact_voice_telephone": "3208 6803",
-        "contact_electronic_mail_address": "gribeiro"
+        "contact_voice_telephone": "+55 12 3208-6803",
+        "contact_electronic_mail_address": "gribeiro@dpi.inpe.br"
       },
       "fees": "none",
       "access_constraints": "none",
@@ -34,8 +34,7 @@
           "format": ["text/xml"],
           "dcptype": {
             "http": {
-              "get": { "online_resource": "http://localhost/wms/GetCapabilities?" },
-              "post": { "online_resource": "http://localhost/wms/GetCapabilities?" }
+              "get": { "online_resource": "http://www.dpi.inpe.br/tws/wms/GetCapabilities?" },
             }
           }
         },
@@ -43,7 +42,7 @@
           "format": [ "image/png", "image/gif", "image/jpeg" ],
           "dcptype": {
             "http": {
-              "get": { "online_resource": "http://localhost/wms/GetMap?" }
+              "get": { "online_resource": "http://www.dpi.inpe.br/tws/wms/GetMap?" }
             }
           }
         },
@@ -51,18 +50,18 @@
           "format": [ "text/xml", "text/plain", "text/html" ],
           "dcptype": {
             "http": {
-              "get": { "online_resource":"http://localhost/wms/GetFeatureInfo?" }
+              "get": { "online_resource":"http://www.dpi.inpe.br/tws/wms/GetFeatureInfo?" }
             }
           }
         }
       },
-      "exception": [ "xml", "inimage", "blank" ],
+      "exception": [ "XML", "INIMAGE", "BLANK" ],
       "layer": {
-        "name": "mydb",
-        "abstract": "Earth Observation Data Base",
-        "crs": [],
+        "name": "EARTH OBSERVATION DATA",
+        "abstract": "Earth Observation Data",
+        "crs": ["WGS84"],
         "bounding_box": [
-          { "crs": "",
+          { "crs": "EPSG:4326",
             "min_x": -180.0,
             "min_y": -90.0,
             "max_x": 180.0,
@@ -72,7 +71,7 @@
           }
         ],
         "layers": [
-          { "name": "mod13q1",
+          { "name": "MOD13Q1",
             "abstract": "Vegetation Indices 16-Day L3 Global 250m",
             "crs": ["100002"],
             "bounding_box": [
@@ -90,50 +89,6 @@
                 "name": "rgb",
                 "type": "rgb",
                 "colors": ["uint8((nir + 100) / 63.137254902)", "uint8((nir + 100) / 63.137254902)", "uint8((red + 100) / 63.137254902)"]
-              }
-            ],
-            "layers": []
-          },
-          { "name": "mod09q1",
-            "abstract": "Surface Reflectance 8-Day L3 Global 250m",
-            "crs": ["100002"],
-            "bounding_box": [
-              { "crs": "100002",
-                "min_x": -20015109.35400599,
-                "min_y": -10007554.676994,
-                "max_x": 20015109.35400599,
-                "max_y": 10007554.676994,
-                "res_x": 231.65635826395825,
-                "res_y": 231.65635826374995
-              }
-            ],
-            "styles": [
-              {
-                "name": "rgb",
-                "type": "rgb",
-                "colors": ["uint8((nir + 100) / 63.137254902)", "uint8((nir + 100) / 63.137254902)", "uint8((red + 100) / 63.137254902)"]
-              }
-            ],
-            "layers": []
-          },
-          { "name": "hotspot_monthly",
-            "abstract": "Monthly aggregated hotspot data",
-            "crs": ["4326"],
-            "bounding_box": [
-              { "crs": "4326",
-                "min_x": -82.025,
-                "min_y": -56.025,
-                "max_x": -30.975,
-                "max_y": 13.025,
-                "res_x": 0.05,
-                "res_y": 0.05
-              }
-            ],
-            "styles": [
-              {
-                "name": "gray",
-                "type": "single band gray",
-                "colors": ["uint8(measure/0.058823529)"]
               }
             ],
             "layers": []
