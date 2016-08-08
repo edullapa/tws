@@ -34,7 +34,7 @@
           "format": ["text/xml"],
           "dcptype": {
             "http": {
-              "get": { "online_resource": "http://www.dpi.inpe.br/tws/wms/GetCapabilities?" },
+              "get": { "online_resource": "http://www.dpi.inpe.br/tws/wms/GetCapabilities?" }
             }
           }
         },
@@ -89,72 +89,6 @@
                 "name": "rgb",
                 "type": "rgb",
                 "colors": ["uint8((nir + 100) / 63.137254902)", "uint8((nir + 100) / 63.137254902)", "uint8((red + 100) / 63.137254902)"]
-              }
-            ],
-            "layers": []
-          },
-          { "name": "hotspot_monthly",
-            "abstract": "Monthly aggregated hotspot data",
-            "crs": ["4326"],
-            "bounding_box": [
-              { "crs": "4326",
-                "min_x": -82.025,
-                "min_y": -56.025,
-                "max_x": -30.975,
-                "max_y": 13.025,
-                "res_x": 0.05,
-                "res_y": 0.05
-              }
-            ],
-            "styles": [
-              {
-                "name": "gray",
-                "type": "single band gray",
-                "colors": ["uint8(measure/0.058823529)"]
-              }
-            ],
-            "layers": []
-          },
-          { "name": "hotspot_daily",
-            "abstract": "Daily hotspot data",
-            "crs": ["4326"],
-            "bounding_box": [
-              { "crs": "4326",
-                "min_x": -82.025,
-                "min_y": -56.025,
-                "max_x": -30.975,
-                "max_y": 13.025,
-                "res_x": 0.05,
-                "res_y": 0.05
-              }
-            ],
-            "styles": [
-              {
-                "name": "gray",
-                "type": "single band gray",
-                "colors": ["uint8(measure/0.058823529)"]
-              }
-            ],
-            "layers": []
-          },
-          { "name": "hotspot_risk_monthly",
-            "abstract": "hotspot_risk_monthly",
-            "crs": ["100002"],
-            "bounding_box": [
-              { "crs": "100002",
-                "min_x": -85.995,
-                "min_y": -55.985,
-                "max_x": -32.995,
-                "max_y": 10.015,
-                "res_x": 0.01,
-                "res_y": 0.01
-              }
-            ],
-            "styles": [
-              {
-                "name": "rgb",
-                "type": "rgb",
-                "colors": ["uint8(high_risk / 0.1215)", "uint8(medium_risk / 0.1215)", "uint8(low_risk / 0.1215)"]
               }
             ],
             "layers": []

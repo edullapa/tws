@@ -27,7 +27,6 @@
 // TWS
 #include "../core/http_server.hpp"
 #include "../core/http_server_builder.hpp"
-#include "../core/logger.hpp"
 #include "../core/utils.hpp"
 
 // TerraLib
@@ -104,17 +103,10 @@ int main(int argc, char *argv[])
     std::string log_file = jlog_file.GetString();
 
 // init logger
-<<<<<<< HEAD
-    TE_ADD_LOGGER(TWS_LOGGER, log_file, TWS_LOGGER_FORMAT);
-
-// init TerraLib and TWS frameworks
-    TWS_LOG_INFO(TE_TR("Starting TerraLib GeoWeb Services..."));
-=======
     TE_INIT_DEFAULT_LOGGER(log_file);
 
 // init TerraLib and TWS frameworks
     TE_LOG_INFO(TE_TR("Starting TerraLib GeoWeb Services..."));
->>>>>>> upstream/master
 
     TerraLib::getInstance().initialize();
 
@@ -135,11 +127,7 @@ int main(int argc, char *argv[])
 
     TerraLib::getInstance().finalize();
 
-<<<<<<< HEAD
-    TWS_LOG_INFO(TE_TR("Finished TerraLib GeoWeb Services!"));
-=======
     TE_LOG_INFO(TE_TR("Finished TerraLib GeoWeb Services!"));
->>>>>>> upstream/master
   }
   catch(const boost::exception& e)
   {
@@ -147,19 +135,11 @@ int main(int argc, char *argv[])
     {
       boost::format err_msg(TE_TR("the following error has occurred: %1%."));
 
-<<<<<<< HEAD
-      TWS_LOG_ERROR((err_msg % *d).str());
-    }
-    else
-    {
-      TWS_LOG_ERROR(TE_TR("an unknown error has occurred"));
-=======
       TE_LOG_ERROR((err_msg % *d).str());
     }
     else
     {
       TE_LOG_ERROR(TE_TR("an unknown error has occurred"));
->>>>>>> upstream/master
     }
 
     return EXIT_FAILURE;
@@ -168,21 +148,13 @@ int main(int argc, char *argv[])
   {
     boost::format err_msg(TE_TR("the following error has occurred: %1%."));
 
-<<<<<<< HEAD
-    TWS_LOG_ERROR((err_msg % e.what()).str());
-=======
     TE_LOG_ERROR((err_msg % e.what()).str());
->>>>>>> upstream/master
 
     return EXIT_FAILURE;
   }
   catch(...)
   {
-<<<<<<< HEAD
-    TWS_LOG_ERROR(TE_TR("an unknown error has occurred."));
-=======
     TE_LOG_ERROR(TE_TR("an unknown error has occurred."));
->>>>>>> upstream/master
 
     return EXIT_FAILURE;
   }

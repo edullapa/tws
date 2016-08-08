@@ -498,11 +498,6 @@ tws::wms::render_single_band_gray(tws::scidb::connection* conn,
                                         + std::to_string(time_idx)
                                         + ")";
 
-<<<<<<< HEAD
-  std::cout << str_aql;
-  // execute query
-    boost::shared_ptr< ::scidb::QueryResult > qresult = conn->execute(str_aql, false);
-=======
   boost::shared_ptr< ::scidb::QueryResult > qresult = conn->execute(str_aql, false);
 
   if((qresult.get() == nullptr) || (qresult->array.get() == nullptr))
@@ -515,7 +510,6 @@ tws::wms::render_single_band_gray(tws::scidb::connection* conn,
   tws::scidb::cell_iterator cit(qresult->array);
 
   tws::scidb::array2d<uint8_t> tmp_array(init_pixel_col, fin_pixel_col, init_pixel_row, fin_pixel_row, 1);
->>>>>>> upstream/master
 
   tmp_array.fill(cit);
 

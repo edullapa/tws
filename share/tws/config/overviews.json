@@ -16,11 +16,11 @@
       { "name": "time_id",
         "description": "time",
         "min_idx": 0,
-        "max_idx": 512,
+        "max_idx": 1024,
         "pos": 2
       }
     ],
-    "attributes": [
+     "attributes": [
       { "name": "ndvi",
         "description": "250m 16 days NDVI",
         "datatype": "16-bit signed integer",
