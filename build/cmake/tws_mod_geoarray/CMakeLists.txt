@@ -33,7 +33,8 @@ file(GLOB TWS_HDR_FILES ${TWS_ABSOLUTE_ROOT_DIR}/src/tws/geoarray/*.hpp)
 
 add_library(tws_mod_geoarray SHARED ${TWS_SRC_FILES} ${TWS_HDR_FILES})
 
-target_link_libraries(tws_mod_geoarray tws_mod_core
+target_link_libraries(tws_mod_geoarray tws_mod_scidb
+                                       tws_mod_core
                                        ${Boost_FILESYSTEM_LIBRARY}
                                        ${Boost_SYSTEM_LIBRARY})
 

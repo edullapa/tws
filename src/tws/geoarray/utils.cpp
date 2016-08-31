@@ -39,8 +39,56 @@
 // RapidJSON
 #include <rapidjson/filestream.h>
 
-// TerraLib
-//#include <terralib/srs/SpatialReferenceSystemManager.h>
+void
+tws::geoarray::load_geoarrays(std::map<std::string, geoarray_t>& arrays)
+{
+  std::string input_file = tws::core::find_in_app_path("share/tws/config/geo_arrays.json");
+
+  if(input_file.empty())
+    throw  tws::file_exists_error() << tws::error_description("could not locate array metadata file: 'share/tws/config/arrays_metadata.json'.");
+
+  load_geoarrays(arrays, input_file);
+}
+
+void
+tws::geoarray::load_geoarrays(std::map<std::string, geoarray_t>& arrays,
+                              const std::string& input_file)
+{
+  arrays.clear();
+
+  try
+  {
+    std::unique_ptr<rapidjson::Document> doc(tws::core::open_json_file(input_file));
+
+    const rapidjson::Value& jarrays = (*doc)["arrays"];
+
+    if(!jarrays.IsArray())
+    {
+      boost::format err_msg("error parsing input file '%1%': expected a vector of array metadata.");
+
+      throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
+    }
+
+    const rapidjson::SizeType nelements = jarrays.Size();
+
+    for(rapidjson::SizeType i = 0; i != nelements; ++i)
+    {
+      const rapidjson::Value& jarray = jarrays[i];
+
+      if(jarray.IsNull())
+        continue;
+
+      geoarray_t g_array = read_array_metadata(jarray);
+
+      arrays.insert(std::make_pair(g_array.name, g_array));
+    }
+  }
+  catch(...)
+  {
+    throw;
+  }
+
+}
 
 std::vector<std::pair<std::string, std::string> >
 tws::geoarray::read_timelines_file_name(const std::string& input_file)
@@ -206,57 +254,6 @@ tws::geoarray::read_timeline(const std::string& input_file)
   fclose(pfile);
 
   return timeline;
-}
-
-void
-tws::geoarray::load_geoarrays(std::map<std::string, geoarray_t>& arrays)
-{
-  std::string input_file = tws::core::find_in_app_path("share/tws/config/geo_arrays.json");
-
-  if(input_file.empty())
-    throw  tws::file_exists_error() << tws::error_description("could not locate array metadata file: 'share/tws/config/arrays_metadata.json'.");
-
-  load_geoarrays(arrays, input_file);
-}
-
-void
-tws::geoarray::load_geoarrays(std::map<std::string, geoarray_t>& arrays,
-                              const std::string& input_file)
-{
-  arrays.clear();
-
-  try
-  {
-    std::unique_ptr<rapidjson::Document> doc(tws::core::open_json_file(input_file));
-
-    const rapidjson::Value& jarrays = (*doc)["arrays"];
-
-    if(!jarrays.IsArray())
-    {
-      boost::format err_msg("error parsing input file '%1%': expected a vector of array metadata.");
-
-      throw tws::parse_error() << tws::error_description((err_msg % input_file).str());
-    }
-
-    const rapidjson::SizeType nelements = jarrays.Size();
-
-    for(rapidjson::SizeType i = 0; i != nelements; ++i)
-    {
-      const rapidjson::Value& jarray = jarrays[i];
-
-      if(jarray.IsNull())
-        continue;
-
-      geoarray_t g_array = read_array_metadata(jarray);
-
-      arrays.insert(std::make_pair(g_array.name, g_array));
-    }
-  }
-  catch(...)
-  {
-    throw;
-  }
-  
 }
 
 tws::geoarray::geoarray_t
