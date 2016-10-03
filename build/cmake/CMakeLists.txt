@@ -35,12 +35,12 @@ project(tws)
 
 # variables that control the system versioning
 set(TWS_VERSION_MAJOR 0)
-set(TWS_VERSION_MINOR 2)
+set(TWS_VERSION_MINOR 3)
 set(TWS_VERSION_PATCH 0)
 set(TWS_VERSION_STATUS "")
 set(TWS_VERSION_STATUS_FULL "")
 set(TWS_VERSION_STRING "${TWS_VERSION_MAJOR}.${TWS_VERSION_MINOR}.${TWS_VERSION_PATCH}${TWS_VERSION_STATUS_FULL}")
-set(TWS_VERSION "0x000200")
+set(TWS_VERSION "0x000300")
 
 # variables storing absolute paths
 get_filename_component(TWS_ABSOLUTE_ROOT_DIR "../../" ABSOLUTE)
