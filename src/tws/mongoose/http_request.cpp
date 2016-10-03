@@ -29,14 +29,15 @@
 
 // STL
 #include <cassert>
+#include <string>
 
 // Mongoose
 #include "mongoose.h"
 
-tws::mongoose::http_request::http_request(mg_connection* conn)
-  : conn_(conn)
+tws::mongoose::http_request::http_request(http_message* msg)
+  : msg_(msg)
 {
-  assert(conn_);
+  assert(msg_);
 }
 
 tws::mongoose::http_request::~http_request()
@@ -64,7 +65,7 @@ tws::mongoose::http_request::base_uri() const
 const char*
 tws::mongoose::http_request::query_string() const
 {
-  return conn_->query_string;
+  return std::string( msg_->query_string.p, msg_->query_string.len).c_str();
 }
 
 const char*

@@ -31,7 +31,7 @@
 #include "../core/http_request.hpp"
 
 // Forward declaration
-extern "C" { struct mg_connection; }
+extern "C" { struct http_message; }
 
 namespace tws
 {
@@ -43,7 +43,7 @@ namespace tws
     {
       public:
 
-        http_request(mg_connection* conn);
+        http_request(http_message *msg);
 
         ~http_request();
 
@@ -63,7 +63,7 @@ namespace tws
 
       private:
 
-        mg_connection* conn_;
+        http_message* msg_;
     };
 
   }   // end namespace mongoose
