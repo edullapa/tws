@@ -29,7 +29,6 @@
 
 // STL
 #include <cassert>
-#include <string>
 
 // Mongoose
 #include "mongoose.h"
@@ -62,10 +61,11 @@ tws::mongoose::http_request::base_uri() const
   return nullptr;
 }
 
-const char*
+std::string
 tws::mongoose::http_request::query_string() const
 {
-  return std::string( msg_->query_string.p, msg_->query_string.len).c_str();
+  std::string query_str(msg_->query_string.p, msg_->query_string.len);
+  return query_str;
 }
 
 const char*

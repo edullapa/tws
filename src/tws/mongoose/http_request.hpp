@@ -53,7 +53,7 @@ namespace tws
 
         const char* base_uri() const;
 
-        const char* query_string() const;
+        std::string query_string() const;
 
         const char* content() const;
 

@@ -68,7 +68,7 @@ rapidxml::xml_node<char>* tws::wcs::initialize_wcs_xml_namespaces(rapidxml::xml_
 
 bool tws::wcs::validate_request_parameters(const tws::core::http_request &request, const tws::core::http_response &response, const std::string &operation)
 {
-  const char* query_string = request.query_string();
+  const char* query_string = request.query_string().c_str();
   if (query_string == nullptr)
   {
     // TODO: wcs xml exception

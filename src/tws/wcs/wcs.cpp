@@ -303,7 +303,7 @@ tws::wcs::describe_coverage_functor::operator()(const tws::core::http_request& r
 void tws::wcs::get_coverage_functor::operator()(const tws::core::http_request& request,
                                                 tws::core::http_response& response)
 {
-  const char* query_string = request.query_string();
+  const char* query_string = request.query_string().c_str();
   // temp code
   if (query_string == nullptr)
   {

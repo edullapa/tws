@@ -30,6 +30,9 @@
 // TWS
 #include "config.hpp"
 
+// STL
+#include <string>
+
 // Boost
 #include <boost/noncopyable.hpp>
 
@@ -59,7 +62,7 @@ namespace tws
         virtual const char* base_uri() const = 0;
 
         //! The query string part in the URI (the URI part after '?' not including '?'). May be NULL.
-        virtual const char* query_string() const = 0;
+        virtual std::string query_string() const = 0;
 
         //! The request content.
         virtual const char* content() const = 0;
