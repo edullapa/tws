@@ -33,10 +33,10 @@
 // Mongoose
 #include "mongoose.h"
 
-tws::mongoose::http_request::http_request(mg_connection* conn)
-  : conn_(conn)
+tws::mongoose::http_request::http_request(http_message* msg)
+  : msg_(msg)
 {
-  assert(conn_);
+  assert(msg_);
 }
 
 tws::mongoose::http_request::~http_request()
@@ -61,10 +61,11 @@ tws::mongoose::http_request::base_uri() const
   return nullptr;
 }
 
-const char*
+std::string
 tws::mongoose::http_request::query_string() const
 {
-  return conn_->query_string;
+  std::string query_str(msg_->query_string.p, msg_->query_string.len);
+  return query_str;
 }
 
 const char*

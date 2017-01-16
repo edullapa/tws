@@ -34,7 +34,8 @@
 #include "mongoose.h"
 
 tws::mongoose::http_response::http_response(mg_connection* conn)
-  : conn_(conn)
+  : conn_(conn),
+    headers_("")
 {
   assert(conn_);
 }
@@ -44,15 +45,19 @@ tws::mongoose::http_response::~http_response()
 }
 
 void
-tws::mongoose::http_response::add_header(const char* key,
-                                         const char* value)
+tws::mongoose::http_response::add_header(const char* key, const char* value)
 {
-  mg_send_header(conn_, key, value);
+  if(headers_.size() > 0)
+    headers_.append("\r\n");
+  headers_.append(key);
+  headers_.append(": ");
+  headers_.append(value);
 }
 
 void
 tws::mongoose::http_response::set_content(const char* value,
                                           const std::size_t size)
 {
-  mg_send_data(conn_, value, size);
+  mg_send_head(conn_, 200, size, headers_.c_str());
+  mg_send(conn_, value, size);
 }

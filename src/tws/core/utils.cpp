@@ -136,6 +136,8 @@ rapidjson::Document* tws::core::open_json_file(const std::string &path)
 
     if(doc->HasParseError())
     {
+      delete doc;
+
       boost::format err_msg("error parsing input file '%1%': %2%.");
 
       throw tws::parse_error() << tws::error_description((err_msg % path % doc->GetParseError()).str());
@@ -143,6 +145,8 @@ rapidjson::Document* tws::core::open_json_file(const std::string &path)
 
     if(!doc->IsObject() || doc->IsNull())
     {
+      delete doc;
+
       boost::format err_msg("error parsing input file '%1%': unexpected file format.");
 
       throw tws::parse_error() << tws::error_description((err_msg % path).str());

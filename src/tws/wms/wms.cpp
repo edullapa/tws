@@ -142,7 +142,7 @@ tws::wms::get_map_functor::operator()(const tws::core::http_request& request,
                                       tws::core::http_response& response)
 {
 // get client query string
-  const char* qstring = request.query_string();
+  const char* qstring = request.query_string().c_str();
 
   if(qstring == nullptr)
     throw tws::core::http_request_error() << tws::error_description("GetMap operation requires the following parameters: \"VERSION\", \"LAYERS\", \"CRS\", \"BBOX\", \"WIDTH\", \"HEIGHT\", \"FORMAT\", \"TIME\".");

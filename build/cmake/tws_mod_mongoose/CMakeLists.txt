@@ -30,7 +30,7 @@ include_directories(${TWS_ABSOLUTE_ROOT_DIR}/third-party/mongoose)
 include_directories(${RAPIDJSON_INCLUDE_DIR})
 include_directories(${terralib_INCLUDE_DIRS})
 
-add_definitions(-DMONGOOSE_NO_FILESYSTEM)
+add_definitions(-DMG_ENABLE_THREADS)
 
 file(GLOB TWS_SRC_MONGOOSE_FILES ${TWS_ABSOLUTE_ROOT_DIR}/third-party/mongoose/*.c)
 file(GLOB TWS_HDR_MONGOOSE_FILES ${TWS_ABSOLUTE_ROOT_DIR}/third-party/mongoose/*.h)

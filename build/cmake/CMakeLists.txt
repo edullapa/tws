@@ -35,15 +35,15 @@ project(tws)
 
 # variables that control the system versioning
 set(TWS_VERSION_MAJOR 0)
-set(TWS_VERSION_MINOR 1)
+set(TWS_VERSION_MINOR 3)
 set(TWS_VERSION_PATCH 0)
 set(TWS_VERSION_STATUS "")
 set(TWS_VERSION_STATUS_FULL "")
 set(TWS_VERSION_STRING "${TWS_VERSION_MAJOR}.${TWS_VERSION_MINOR}.${TWS_VERSION_PATCH}${TWS_VERSION_STATUS_FULL}")
-set(TWS_VERSION "0x000100")
+set(TWS_VERSION "0x000300")
 
 # variables storing absolute paths
-set(TWS_ABSOLUTE_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../..)
+get_filename_component(TWS_ABSOLUTE_ROOT_DIR "../../" ABSOLUTE)
 
 # variables that control paths
 set(TWS_BASE_DESTINATION_DIR "")
@@ -60,18 +60,6 @@ endif()
 # variables that control install locations
 if(NOT DEFINED TWS_DESTINATION_PLUGINS)
   set(TWS_DESTINATION_PLUGINS "${TWS_BASE_DESTINATION_DIR}share/tws/plugins")
-endif()
-
-if(NOT DEFINED TWS_DESTINATION_EXAMPLES)
-  set(TWS_DESTINATION_EXAMPLES "${TWS_BASE_DESTINATION_DIR}share/tws/examples")
-endif()
-
-if(NOT DEFINED TWS_DESTINATION_UNITTEST)
-  set(TWS_DESTINATION_UNITTEST "${TWS_BASE_DESTINATION_DIR}share/tws/unittest")
-endif()
-
-if(NOT DEFINED TWS_DESTINATION_INTEGRATIONTEST)
-  set(TWS_DESTINATION_INTEGRATIONTEST "${TWS_BASE_DESTINATION_DIR}share/tws/integrationtest")
 endif()
 
 if(NOT DEFINED TWS_DESTINATION_LIBRARY)
@@ -106,21 +94,28 @@ if(APPLE)
   add_definitions(-ftemplate-depth-1024)
 endif()
 
-# For each CMake version we need to check some policies
-# Note: automatically link executables with qtmain.lib on Windows when it has Qt dependency.
-#if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}" VERSION_GREATER  2.8.9)
-#  cmake_policy(SET CMP0020 NEW)
-#endif()
+# Compiler options: warning and C++ 11
+if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR (CMAKE_CXX_COMPILER MATCHES ".*clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -std=c++11")
+endif()
 
-#if(${CMAKE_MAJOR_VERSION} GREATER 2)
-#  cmake_policy(SET CMP0026 OLD)
-#  cmake_policy(SET CMP0042 NEW)
-#  cmake_policy(SET CMP0043 NEW)
-#endif()
+# Where to find modules (find procedures)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/modules")
 
-#if(${CMAKE_VERSION} VERSION_GREATER "3.1.2")
-#  cmake_policy(SET CMP0053 OLD)
-#endif()
+# define SciDB PROJECT_ROOT
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DPROJECT_ROOT='\"${TWS_ABSOLUTE_ROOT_DIR}/src\"'")
+
+# Turn on multi process compilation on Windows
+if(MSVC)
+  add_definitions(/MP)
+  set(CMAKE_DEBUG_POSTFIX "d")
+endif()
+
+# Build tree directory will be needed in all projects.
+include_directories(${CMAKE_BINARY_DIR})
+
+# Enable CTest
+enable_testing()
 
 # Build will generate files into a single folder
 if((CMAKE_GENERATOR STREQUAL Xcode) OR MSVC)
@@ -132,28 +127,6 @@ else()
   set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
   set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 endif()
-
-# Where to find modules (find procedures)
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/modules")
-
-# Compiler options: warning and C++ 11
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR (CMAKE_CXX_COMPILER MATCHES ".*clang"))
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -std=c++11")
-endif()
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DPROJECT_ROOT='\"${TWS_ABSOLUTE_ROOT_DIR}/src\"'")
-
-# Turn on multi process compilation on Windows
-if(MSVC)
-  add_definitions(/MP)
-  set(CMAKE_DEBUG_POSTFIX "d")
-endif()
-
-# Enable CTest
-enable_testing()
-
-# Build tree directory will be needed in all projects.
-include_directories(${CMAKE_BINARY_DIR})
 
 
 #
@@ -192,9 +165,9 @@ option(TWS_MOD_CORE_ENABLED "Build TWS CORE library?" ON)
 
 CMAKE_DEPENDENT_OPTION(TWS_MOD_MONGOOSE_ENABLED "Build Mongoose Web Server support?" ON "TWS_MOD_CORE_ENABLED" OFF)
 
-CMAKE_DEPENDENT_OPTION(TWS_MOD_GEOARRAY_ENABLED "Build Geo-Array metadata support?" ON "TWS_MOD_CORE_ENABLED" OFF)
-
 CMAKE_DEPENDENT_OPTION(TWS_MOD_SCIDB_ENABLED "Build SciDB support for web services?" ON "TWS_MOD_CORE_ENABLED" OFF)
+
+CMAKE_DEPENDENT_OPTION(TWS_MOD_GEOARRAY_ENABLED "Build Geo-Array metadata support?" ON "TWS_MOD_SCIDB_ENABLED" OFF)
 
 CMAKE_DEPENDENT_OPTION(TWS_MOD_WMS_ENABLED "Build Application Web Map Service?" ON "TWS_MOD_GEOARRAY_ENABLED;RAPIDXML_FOUND;LIBGD_FOUND" OFF)
 
@@ -202,7 +175,7 @@ CMAKE_DEPENDENT_OPTION(TWS_MOD_WTSS_ENABLED "Build Application Web Time Series D
 
 CMAKE_DEPENDENT_OPTION(TWS_MOD_WCS_ENABLED "Build Application Web Coverage Service?" ON "TWS_MOD_GEOARRAY_ENABLED;RAPIDXML_FOUND" OFF)
 
-CMAKE_DEPENDENT_OPTION(TWS_APP_SERVER_ENABLED "Build Application Web Server?" ON "TWS_MOD_CORE_ENABLED" OFF)
+CMAKE_DEPENDENT_OPTION(TWS_APP_SERVER_ENABLED "Build Application Web Server?" ON "TWS_MOD_GEOARRAY_ENABLED" OFF)
 
 
 #
@@ -221,6 +194,10 @@ configure_file(${TWS_ABSOLUTE_ROOT_DIR}/src/tws/version.hpp.in
 #
 # build modules
 #
+if(TWS_APP_SERVER_ENABLED)
+  add_subdirectory(tws_app_server)
+endif()
+
 if(TWS_MOD_CORE_ENABLED)
   add_subdirectory(tws_mod_core)
 endif()
@@ -229,28 +206,24 @@ if(TWS_MOD_GEOARRAY_ENABLED)
   add_subdirectory(tws_mod_geoarray)
 endif()
 
-if(TWS_MOD_SCIDB_ENABLED)
-  add_subdirectory(tws_mod_scidb)
+if(TWS_MOD_MONGOOSE_ENABLED)
+  add_subdirectory(tws_mod_mongoose)
 endif()
 
-if(TWS_MOD_WMS_ENABLED)
-  add_subdirectory(tws_mod_wms)
+if(TWS_MOD_SCIDB_ENABLED)
+  add_subdirectory(tws_mod_scidb)
 endif()
 
 if(TWS_MOD_WCS_ENABLED)
   add_subdirectory(tws_mod_wcs)
 endif()
 
+if(TWS_MOD_WMS_ENABLED)
+  add_subdirectory(tws_mod_wms)
+endif()
+
 if(TWS_MOD_WTSS_ENABLED)
   add_subdirectory(tws_mod_wtss)
-endif()
-
-if(TWS_MOD_MONGOOSE_ENABLED)
-  add_subdirectory(tws_mod_mongoose)
-endif()
-
-if(TWS_APP_SERVER_ENABLED)
-  add_subdirectory(tws_app_server)
 endif()
 
 
@@ -269,6 +242,9 @@ install(EXPORT tws-targets
         DESTINATION ${TWS_DESTINATION_LIBRARY}/cmake/tws-${TWS_VERSION_STRING}
         FILE tws-exports.cmake
         COMPONENT devel)
+
+install(DIRECTORY ${TWS_ABSOLUTE_ROOT_DIR}/share/tws
+        DESTINATION ${TWS_DESTINATION_SHARE} COMPONENT runtime)
 
 
 #
