@@ -396,6 +396,12 @@ tws::wtss::valid(const timeseries_request_parameters& parameters)
     throw tws::core::http_request_error() << tws::error_description((err_msg % parameters.start_time_point % parameters.end_time_point).str());
   }
 
+  // find start_time_idx on xxx_timeline.json
+  // start_time_idx is not on xxx_timeline.json (find a valid time > that curent start_time_idx)
+  // Find end_time_idx on xxx_timeline.json
+  // end_time_idx is not on xxx_timeline.json (find a valid time < that curent end_time_idx)
+
+
 // prepare SRS conversor that allows to go from lat/long to array projection system and then come back to lat/long
 // TODO: do this only if a transformation is needed!
 //  if(vparameters.geo_array->geo_extent.spatial.crs_code != 4326)
